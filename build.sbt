@@ -1,4 +1,4 @@
-name:="WiFetcher"
+name:="wiFetcher"
 
 scalaVersion :="2.10.1"
 
