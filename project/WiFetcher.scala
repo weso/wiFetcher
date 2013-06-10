@@ -25,6 +25,9 @@ object WiFetcherBuild extends Build {
       libraryDependencies += "info.cukes" % "cucumber-junit" % cucumberV,
       
       libraryDependencies += "org.seleniumhq.selenium" % "selenium-java" % "2.32.0",
+      libraryDependencies += "org.apache.poi" % "poi" % "3.9",
+      libraryDependencies += "commons-configuration" % "commons-configuration" % "1.9",
+      libraryDependencies += "org.apache.poi" % "poi-ooxml" % "3.9",
         
       resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
       resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")

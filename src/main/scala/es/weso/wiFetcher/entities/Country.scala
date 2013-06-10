@@ -1,4 +1,4 @@
-package es.weso.wiFetcher.fetchers
+package es.weso.wiFetcher.entities
 
 class Country{
 	var defName : String = "foo"

@@ -1,4 +1,4 @@
-package es.weso.wiFetcher.fetchers
+package es.weso.wiFetcher.entities
 
 import java.net.URI
 
