@@ -11,17 +11,5 @@ import java.io.FileNotFoundException
 @RunWith(classOf[JUnitRunner])
 class SpreadsheetsFetcherSuite extends FunSuite with BeforeAndAfter 
 	with ShouldMatchers{
-  
-  var fetcher : SpreadsheetsFetcher = null
-  
-  before {
-    fetcher = new SpreadsheetsFetcher
-  }
-  
-  test("Try to load a non-existent spreadsheet") {
-    intercept[FileNotFoundException]{
-      fetcher.loadWorkbook("files/test.xlsx", true)
-    }
-  }
 
 }

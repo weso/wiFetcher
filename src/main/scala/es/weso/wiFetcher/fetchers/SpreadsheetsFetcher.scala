@@ -1,11 +1,10 @@
-package es.wes.wiFetcher.fetchers
+package es.weso.wiFetcher.fetchers
 
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Workbook
-import es.weso.wiFetcher.fetchers.Fetcher
 import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.configuration.Configuration

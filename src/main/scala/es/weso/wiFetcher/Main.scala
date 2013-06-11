@@ -1,7 +1,7 @@
 package es.weso.wiFetcher
 
 import es.wes.wiFetcher.fetchers.IndabaFetcher
-import es.wes.wiFetcher.fetchers.SpreadsheetsFetcher
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.entities.Dataset
 
 object Main {
