@@ -3,14 +3,15 @@ package es.weso.wiFetcher.fetchers
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
+
+import org.apache.poi.hssf.util.CellReference
 import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
+
+import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Observation
-import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.utils.POIUtils
-import org.apache.poi.hssf.util.CellReference
-import org.apache.poi.ss.usermodel.WorkbookFactory
 
 class SpreadsheetsFetcher extends Fetcher {
 	 
@@ -36,6 +37,9 @@ class SpreadsheetsFetcher extends Fetcher {
   def extractObservationsByDataset(dataset: Dataset) : List[Observation] = {
     var observations = List[Observation]()
     val sheet = workbook.getSheet(dataset.id)
+    if(sheet == null) {
+      throw new IllegalArgumentException("There isn't data for dataset: " + dataset.id)
+    }
     val initialCell = new CellReference(
         Configuration.getInitialCellSecondaryObservation)
     for(row <- initialCell.getRow() to sheet.getLastRowNum()) {

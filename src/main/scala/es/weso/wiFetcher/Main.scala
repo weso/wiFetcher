@@ -10,7 +10,7 @@ object Main {
     /*val f = new IndabaFetcher
     f.fetch("demo.csv")*/
     val f = new SpreadsheetsFetcher
-    f.loadWorkbook("rawdata.xlsx", true)
+    f.loadWorkbook("files/rawdata.xlsx", true)
     var dataset : Dataset = new Dataset
     dataset.id = "ITUA"
     f.extractObservationsByDataset(dataset)
