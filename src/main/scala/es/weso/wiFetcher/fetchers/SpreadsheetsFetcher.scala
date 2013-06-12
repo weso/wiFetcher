@@ -3,15 +3,14 @@ package es.weso.wiFetcher.fetchers
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
-
 import org.apache.poi.hssf.util.CellReference
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.utils.POIUtils
+import scala.collection.mutable.ListBuffer
 
 class SpreadsheetsFetcher extends Fetcher {
 	 
@@ -28,18 +27,22 @@ class SpreadsheetsFetcher extends Fetcher {
   }
   
   def getObservations(datasets : List[Dataset]) : List[Observation] = {
-    var observations = List[Observation]()
+    if(datasets == null)
+      throw new IllegalArgumentException("List of datasets to load their observations is null")
+    var observations = ListBuffer[Observation]()
     for(dataset <- datasets)
-      observations:::extractObservationsByDataset(dataset)
-    observations
+      observations.insertAll(0, extractObservationsByDataset(dataset))
+    observations.toList
   }
   
   def extractObservationsByDataset(dataset: Dataset) : List[Observation] = {
-    var observations = List[Observation]()
+    if(dataset == null)
+      throw new IllegalArgumentException("")
+    var observations = ListBuffer[Observation]()
     val sheet = workbook.getSheet(dataset.id)
-    if(sheet == null) {
+    if(sheet == null) 
       throw new IllegalArgumentException("There isn't data for dataset: " + dataset.id)
-    }
+    
     val initialCell = new CellReference(
         Configuration.getInitialCellSecondaryObservation)
     for(row <- initialCell.getRow() to sheet.getLastRowNum()) {
@@ -52,10 +55,12 @@ class SpreadsheetsFetcher extends Fetcher {
     	    var value = POIUtils.extractCellValue(actualRow.getCell(column))
         	println("Country: " + country + " year: " + year + " value: " + 
         	    value)
+    	    //TODO Create the observation with all data
+        	observations += new Observation
         }
       }
     }
-    observations
+    observations.toList
   } 
   
 }

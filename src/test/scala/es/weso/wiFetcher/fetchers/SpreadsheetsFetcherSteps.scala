@@ -26,7 +26,7 @@ class SpreadsheetsFetcherSteps extends ScalaDsl with EN with ShouldMatchers {
   }
   
   Then("""the value should be "([^"]*)"$""") { (value : Double) =>
-    throw new NotImplementedException
+    value should be(result.value.toDouble plusOrMinus 0.0000001f)
   }
   
   Then("""it should raise an Exception$""") { () =>

@@ -7,6 +7,7 @@ class Observation {
   var area : Area = null
   var computation : Computation = null
   var indicator : Indicator = null
-  var year = 0
+  var year : Int = 0
+  var value : Double = 0.0
 
 }
