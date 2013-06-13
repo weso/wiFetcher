@@ -28,7 +28,8 @@ class SpreadsheetsFetcher extends Fetcher {
   
   def getObservations(datasets : List[Dataset]) : List[Observation] = {
     if(datasets == null)
-      throw new IllegalArgumentException("List of datasets to load their observations is null")
+      throw new IllegalArgumentException("List of datasets to load their " +
+      		"observations is null")
     var observations = ListBuffer[Observation]()
     for(dataset <- datasets)
       observations.insertAll(0, extractObservationsByDataset(dataset))
@@ -41,7 +42,8 @@ class SpreadsheetsFetcher extends Fetcher {
     var observations = ListBuffer[Observation]()
     val sheet = workbook.getSheet(dataset.id)
     if(sheet == null) 
-      throw new IllegalArgumentException("There isn't data for dataset: " + dataset.id)
+      throw new IllegalArgumentException("There isn't data for dataset: " + 
+          dataset.id)
     
     val initialCell = new CellReference(
         Configuration.getInitialCellSecondaryObservation)
@@ -55,8 +57,11 @@ class SpreadsheetsFetcher extends Fetcher {
     	    var value = POIUtils.extractCellValue(actualRow.getCell(column))
         	println("Country: " + country + " year: " + year + " value: " + 
         	    value)
-    	    //TODO Create the observation with all data
-        	observations += new Observation
+    	    //TODO Create the observation with all data. Dataset, label, 
+    	    //Area, Computation, Inidicator and status (Raw, Imputed, 
+    	    //Normalised) in this order
+        	observations += new Observation(null, "", null, null, null, 
+        	    year.toInt, value.toDouble, "")
         }
       }
     }
