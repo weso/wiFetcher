@@ -4,8 +4,8 @@ scalaVersion :="2.10.1"
 
 version:="0.0.1"
 
-seq(cucumberSettingsWithTestPhaseIntegration : _*)
+seq(cucumberSettings : _*)
 
-cucumberJunitReport := true 
+cucumberMaxMemory := "512M"
 
 cucumberStepsBasePackage := "es.weso.wiFetcher.fetchers"

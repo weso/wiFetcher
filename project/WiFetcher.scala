@@ -4,7 +4,7 @@ import sbt.Keys._
 object WiFetcherBuild extends Build {
 
   val junitV = "4.11"
-  val cucumberV = "1.1.3"
+  val cucumberV = "1.1.2"
   val scalatestV = "2.0.M5b"
   val scalaV = "2.10.1"
 
