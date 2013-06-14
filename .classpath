@@ -58,6 +58,8 @@
   <classpathentry path="C:\Users\Nacho\.ivy2\cache\org.apache.xmlbeans\xmlbeans\jars\xmlbeans-2.3.0.jar" kind="lib"></classpathentry>
   <classpathentry path="C:\Users\Nacho\.ivy2\cache\stax\stax-api\jars\stax-api-1.0.1.jar" kind="lib"></classpathentry>
   <classpathentry path="C:\Users\Nacho\.ivy2\cache\dom4j\dom4j\jars\dom4j-1.6.1.jar" kind="lib"></classpathentry>
+  <classpathentry path="C:\Users\Nacho\.ivy2\cache\templemore\sbt-cucumber-integration_2.10\jars\sbt-cucumber-integration_2.10-0.7.2.jar" kind="lib"></classpathentry>
+  <classpathentry path="C:\Users\Nacho\.ivy2\cache\org.scala-tools.testing\test-interface\jars\test-interface-0.5.jar" kind="lib"></classpathentry>
   <classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"></classpathentry>
   <classpathentry path="bin" kind="output"></classpathentry>
 </classpath>

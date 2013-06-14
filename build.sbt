@@ -7,3 +7,5 @@ version:="0.0.1"
 seq(cucumberSettingsWithTestPhaseIntegration : _*)
 
 cucumberJunitReport := true 
+
+cucumberStepsBasePackage := "es.weso.wiFetcher.fetchers"
