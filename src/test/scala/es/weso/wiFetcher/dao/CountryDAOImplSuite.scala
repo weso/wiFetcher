@@ -24,7 +24,7 @@ class CountryDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Load correct file an verify that all data is loaded") {
-    val countryDao = new CountryDAOImpl("countryCodes.csv", true)
+    val countryDao = new CountryDAOImpl("files/countryCodes.tsv", true)
     val countries = countryDao.getCountries
     countries.size should be (236)
     countries.foreach(country => {

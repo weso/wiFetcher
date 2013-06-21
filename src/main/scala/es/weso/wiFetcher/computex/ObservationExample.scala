@@ -26,7 +26,7 @@ object ObservationExample {
   val PREFIX_INDICATOR = "http://data.webfoundation.org/webindex/v2013/indicator/"  
 
   def main(args: Array[String]): Unit = {
-    val fetcher : SpreadsheetsFetcher = new SpreadsheetsFetcher
+    /*val fetcher : SpreadsheetsFetcher = new SpreadsheetsFetcher
     fetcher.loadWorkbook("computex/example.xlsx", true)
     var datasets : List[Dataset] = createDatasets()
     var observations : List[Observation] = fetcher.getObservations(datasets)
@@ -41,7 +41,7 @@ object ObservationExample {
     model.setNsPrefix("indicator", PREFIX_INDICATOR)
     println("Numero de observaciones: " + observations.size)
     println(model)
-    observations.foreach(obs => createTriples(obs, model))
+    observations.foreach(obs => createTriples(obs, model))*/
   }
   
   def createDatasets() : List[Dataset] = {

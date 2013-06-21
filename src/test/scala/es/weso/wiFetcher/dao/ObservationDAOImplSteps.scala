@@ -1,4 +1,4 @@
-package es.weso.wiFetcher.fetchers
+package es.weso.wiFetcher.dao
 
 import org.scalatest.matchers.ShouldMatchers
 import cucumber.api.scala.EN
@@ -7,20 +7,21 @@ import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Observation
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
-class SpreadsheetsFetcherSteps extends ScalaDsl with EN with ShouldMatchers {
+class ObservationDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   
+  var observationDAO : ObservationDAO = null
   var observations : List[Observation] = null
   var result : Observation = null
   
   Given("""^I want to load the observations of indicator "([^"]*)"$"""){ (indicator:String) =>
-	var fetcher : SpreadsheetsFetcher = new SpreadsheetsFetcher
-	fetcher.loadWorkbook("files/rawdata.xlsx", true)
 	var dataset : Dataset = new Dataset
 	dataset.id = indicator
-	observations = fetcher.extractObservationsByDataset(dataset)
+	observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
+	observations = observationDAO.getObservationsByIndicator(dataset)
   }  
   
   When("""^I check the value for the country "([^"]*)" in the year "([^"]*)"$""") {(regionName : String, year : Int) =>
+    //TODO This test fail because country and observations aren't still linked
     result = observations.find(obs => (obs.area.name.equals(regionName) && obs.year == year)).getOrElse(null)
     result should not be null
   }
@@ -32,7 +33,5 @@ class SpreadsheetsFetcherSteps extends ScalaDsl with EN with ShouldMatchers {
   Then("""it should raise an Exception$""") { () =>
     throw new NotImplementedException
   }
-  
-  
 
 }

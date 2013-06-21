@@ -6,6 +6,6 @@ version:="0.0.1"
 
 seq(cucumberSettings : _*)
 
-cucumberMaxMemory := "512M"
+cucumberMaxMemory := "1024M"
 
-cucumberStepsBasePackage := "es.weso.wiFetcher.fetchers"
+cucumberStepsBasePackage := "es.weso.wiFetcher"

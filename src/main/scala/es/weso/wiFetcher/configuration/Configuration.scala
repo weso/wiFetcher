@@ -85,8 +85,9 @@ object Configuration {
   def loadConfigure() = {
     if(CONFIG == null) {
       CONFIG = new CompositeConfiguration
-      CONFIG.append(new PropertiesConfiguration("config/config.properties"))
+      CONFIG.append(new PropertiesConfiguration("config/countries.properties"))
       CONFIG.append(new PropertiesConfiguration("config/indicators.properties"))
+      CONFIG.append(new PropertiesConfiguration("config/observations.properties"))
     }
   }
 

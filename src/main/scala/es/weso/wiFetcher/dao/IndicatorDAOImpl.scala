@@ -37,7 +37,7 @@ class IndicatorDAOImpl(path : String, relativePath : Boolean)
       val evaluator : FormulaEvaluator = 
         workbook.getCreationHelper().createFormulaEvaluator()
       val actualRow = sheet.getRow(row)
-      //TODO Extract all information
+      //TODO Extract all information and create the Indicator object
       val id = POIUtils.extractCellValue(actualRow.getCell(
           Configuration.getIndicatorIdColumn))
       val subindex = POIUtils.extractCellValue(actualRow.getCell(
