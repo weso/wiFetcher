@@ -28,6 +28,9 @@ object WiFetcherBuild extends Build {
       libraryDependencies += "org.apache.poi" % "poi" % "3.9",
       libraryDependencies += "commons-configuration" % "commons-configuration" % "1.9",
       libraryDependencies += "org.apache.poi" % "poi-ooxml" % "3.9",
+      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.10.1",
+      libraryDependencies += "org.apache.jena" % "jena-core" % "2.10.1",
+            
         
       resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
       resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
