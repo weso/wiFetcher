@@ -7,36 +7,36 @@ Feature: Cucumber
     
   	Given I want to load names and iso-codes for all countries presents in WebIndex
   	When I check the country with the "name" "New Zealand"
-    Then the "iso2-code" should be "NZ"
+    Then the country "iso2-code" should be "NZ"
     
     Given I want to load names and iso-codes for all countries presents in WebIndex
   	When I check the country with the "name" "United Kingdom of Great Britain and Northern Ireland"
-    Then the "iso3-code" should be "GBR"
+    Then the country "iso3-code" should be "GBR"
     
   	Given I want to load names and iso-codes for all countries presents in WebIndex
   	When I check the country with the "iso2-code" "AN"
-    Then the "name" should be "Netherlands Antilles"
+    Then the country "name" should be "Netherlands Antilles"
     
     Given I want to load names and iso-codes for all countries presents in WebIndex
     When I check the country with the "iso2-code" "YT"
-    Then the "iso3-code" should be "MYT"
+    Then the country "iso3-code" should be "MYT"
     
     Given I want to load names and iso-codes for all countries presents in WebIndex
     When I check the country with the "iso3-code" "LUX"
-    Then the "iso2-code" should be "LU"
+    Then the country "iso2-code" should be "LU"
     
     Given I want to load names and iso-codes for all countries presents in WebIndex
     When I check the country with the "iso3-code" "VEN"
-    Then the "name" should be "Venezuela (Bolivarian Republic of)"
+    Then the country "name" should be "Venezuela (Bolivarian Republic of)"
     
     Given I want to load names and iso-codes for all countries presents in WebIndex
     When I check the country with the "iso3-code" "XXX"
-    Then the result should be null
+    Then the country result should be null
     
     Given I want to load names and iso-codes for all countries presents in WebIndex
     When I check the country with the "iso2-code" "XX"
-    Then the result should be null
+    Then the country result should be null
     
     Given I want to load names and iso-codes for all countries presents in WebIndex
     When I check the country with the "name" "xxxxxxxx"
-    Then the result should be null
+    Then the country result should be null

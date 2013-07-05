@@ -13,6 +13,4 @@ Feature: Cucumber
   	When I check the value for the country "Afghanistan" in the year "2012"
     Then the value should be "5.0"
     
-  	Given I want to load the observations of indicator "ITUA"
-  	When I check the value for the country "Angola" in the year "2007"
-    Then it should raise an Exception
+  	Given I want to load the observations of non-existing indicator "ITUA"

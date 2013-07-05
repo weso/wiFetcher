@@ -13,12 +13,17 @@ import org.apache.poi.hssf.util.CellReference
 import es.weso.wiFetcher.utils.POIUtils
 import es.weso.wiFetcher.entities.Country
 import es.weso.wiFetcher.configuration.Configuration
+import org.apache.poi.ss.usermodel.FormulaEvaluator
+import es.weso.wiFetcher.entities.Area
+import es.weso.wiFetcher.entities.Computation
+import es.weso.wiFetcher.entities.Indicator
+import org.apache.poi.ss.usermodel.Sheet
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import es.weso.wiFetcher.entities.ObservationStatus
+import es.weso.wiFetcher.entities.ObservationStatus._
 
 class ObservationDAOImpl(path : String, relativePath : Boolean) 
 	extends ObservationDAO {
-  
-  val countries : List[Country] = new CountryDAOImpl(
-      Configuration.getCountryFile, true).getCountries
   
   var workbook : Workbook = WorkbookFactory.create(new FileInputStream(
       new File(FileUtils.getFilePath(path, relativePath))))
@@ -42,42 +47,76 @@ class ObservationDAOImpl(path : String, relativePath : Boolean)
     if(sheet == null) 
       throw new IllegalArgumentException("There isn't data for dataset: " + 
           dataset.id)
-    val indicator = null//obtainIndicator(Configuration.getIndicatorCell, sheet)
-    val status = null//obtainStatus(Configuration.getStatusCell, sheet)
+    val indicator = obtainIndicator(Configuration.getIndicatorCell, sheet)
+    val status = obtainStatus(Configuration.getStatusCell, sheet)
     val initialCell = new CellReference(
         Configuration.getInitialCellSecondaryObservation)
+    val evaluator : FormulaEvaluator = 
+        workbook.getCreationHelper().createFormulaEvaluator()
     for(row <- initialCell.getRow() to sheet.getLastRowNum()) {
       val actualRow = sheet.getRow(row)
       if(actualRow != null && !POIUtils.extractCellValue(
-            actualRow.getCell(0)).trim().isEmpty()) {
+            actualRow.getCell(0), evaluator).trim().isEmpty()) {
         var countryName : String = POIUtils.extractCellValue(
             actualRow.getCell(0))
-        var country : Country = null//obtainCountry(countryName)
+        var country : Country = SpreadsheetsFetcher.obtainCountry(countryName)
         for(column <- initialCell.getCol() to actualRow.getLastCellNum() - 1) {
         	var year = POIUtils.extractCellValue(sheet.getRow(
-        	    initialCell.getRow() - 2).getCell(column))
-    	    var value = POIUtils.extractCellValue(actualRow.getCell(column))
-    	    //TODO Create the observation with all data. Dataset, label, 
+        	    initialCell.getRow() - 2).getCell(column), evaluator)
+    	    var value = POIUtils.extractCellValue(actualRow.getCell(column), 
+    	        evaluator)
+    	        //TODO Create the observation with all data. Dataset, label, 
     	    //Area, Computation, Inidicator and status (Raw, Imputed, 
     	    //Normalised) in this order
-        	if(!value.trim.isEmpty()) {
-        		val y = year.toDouble
-				observations += new Observation(dataset, "", country, null, 
-				    indicator, y.toInt, value.toDouble, status)
-        	}
+    	    observations += createObservation(dataset, "", country, null, 
+    	        indicator, year.toDouble, value, status)
+
         }
       }
     }
     observations.toList
   }
   
-  def obtainCountry(countryName : String) : Country = {
-    if(countryName == null || countryName.isEmpty()) 
-      throw new IllegalArgumentException("The name of the country cannot " +
-      		"be null o empty")
-    countries.find(c => c.name.equals(countryName)).getOrElse(
-        throw new IllegalArgumentException("Not exist country with name " + 
-            countryName))
+  def obtainIndicator(cell : String, sheet : Sheet) : Indicator = {
+    val cellReference = new CellReference(cell)
+    val indicatorName = POIUtils.extractCellValue(
+        sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()))
+    SpreadsheetsFetcher.obtainIndicator(indicatorName)
+  }
+  
+  def createObservation(dataset : Dataset, label : String, area : Area, 
+      computation : Computation, indicator : Indicator, year : Double, 
+      value : String, status : String) : Observation = {
+    var observation = new Observation
+    observation.dataset = dataset
+    observation.label = label
+    observation.area = area
+    observation.computation = computation
+    observation.indicator = indicator
+    observation.year = year.toInt
+    if(value.trim.isEmpty()) 
+      observation.status = ObservationStatus.Missed    
+     else {
+       observation.status = status match {
+         case "Raw" => ObservationStatus.Raw
+         case "Imputed" => ObservationStatus.Imputed
+         case "Normalised" => ObservationStatus.Normalised
+         case "Missed" => ObservationStatus.Missed
+         case _ => throw new IllegalArgumentException("Observation status " + 
+             status + " is unknown")
+       } 
+       observation.value = value.toDouble
+    }
+    observation
+  }
+  
+  def obtainStatus(cell : String, sheet : Sheet) : String = {
+    val cellReference : CellReference = new CellReference(cell)
+    val stat = sheet.getRow(cellReference.getRow()).getCell(
+        cellReference.getCol())
+    if(stat == null)
+      throw new IllegalArgumentException("Status cell is empty")
+    POIUtils.extractCellValue(stat)
   }
 
 }

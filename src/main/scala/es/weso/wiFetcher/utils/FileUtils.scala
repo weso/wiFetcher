@@ -11,7 +11,7 @@ object FileUtils {
     if(relativePath) {
       val resource = getClass.getClassLoader().getResource(path)
       if(resource == null)
-        throw new FileNotFoundException("Files especifies cannot be found")
+        throw new FileNotFoundException("File especifies does not exist")
       resource.getPath()
     } else
       path

@@ -2,7 +2,10 @@ package es.weso.wiFetcher.entities
 
 import java.net.URI
 
-class Organization(val name:String, val uri:URI) {
+class Organization {
+  
+  val name:String = "" 
+  val uri:URI = null
 	
   override def toString() : String = {
     new StringBuilder(name)

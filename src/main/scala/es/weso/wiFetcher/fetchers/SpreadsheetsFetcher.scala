@@ -1,95 +1,97 @@
 package es.weso.wiFetcher.fetchers
 
-class SpreadsheetsFetcher extends Fetcher {
-	 
-  /*var file : InputStream = null
-  var workbook : Workbook = null
-  var countries : List[Country] = new CountryDAOImpl(
-      Configuration.getCountryFile, true).getCountries
+import es.weso.wiFetcher.dao.CountryDAOImpl
+import es.weso.wiFetcher.entities.Country
+import es.weso.wiFetcher.configuration.Configuration
+import es.weso.wiFetcher.dao.IndicatorDAOImpl
+import es.weso.wiFetcher.entities.Indicator
+import es.weso.wiFetcher.dao.IndicatorDAO
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
+import scala.collection.mutable.ListBuffer
+import es.weso.wiFetcher.dao.ObservationDAO
+import es.weso.wiFetcher.dao.ObservationDAOImpl
+import es.weso.wiFetcher.dao.CountryDAO
+import es.weso.wiFetcher.entities.Observation
+import es.weso.wiFetcher.dao.DatasetDAO
+import es.weso.wiFetcher.dao.DatasetDAOImpl
+import es.weso.wiFetcher.entities.Dataset
+import es.weso.wiFetcher.dao.SubIndexDAO
+import es.weso.wiFetcher.dao.SubIndexDAOImpl
+import es.weso.wiFetcher.entities.SubIndex
+import es.weso.wiFetcher.entities.Component
+import es.weso.wiFetcher.entities.ObservationStatus._
+
+object SpreadsheetsFetcher extends Fetcher {
   
-  def loadWorkbook(path : String, relativePath : Boolean = false) = {
-    val currentFile = new File(FileUtils.getFilePath(path, relativePath))
-    file = new FileInputStream(currentFile)
-    workbook = WorkbookFactory.create(file)
-  }
+  //Creates CountryDAO to load all countries information
+  private val countryDao : CountryDAO = new CountryDAOImpl(
+      Configuration.getCountryFile, true)
+  //Creates SubIndexDao to load all subindexes and components information
+  private val subindexDao : SubIndexDAO = new SubIndexDAOImpl(
+      Configuration.getSubindexFile, true)
+  //Load all subindexes information
+  val subindexes : List[SubIndex] = subindexDao.getSubIndexes
+  //Load all components information
+  val components : List[Component] = subindexDao.getComponents
+  //Creates IndicatorDAO in order to load all indicators information
+  private val indicatorDao : IndicatorDAO =  new IndicatorDAOImpl(
+      Configuration.getIndicatorFilename, true)
+  //Creates ObservationDAO in order to load all observations information
+  private val observationDao : ObservationDAO = new ObservationDAOImpl(
+      Configuration.getObservationFile, true) 
+  //Creates DatasetDAO in order to load all datasets information
+  private val datasetDao : DatasetDAO = new DatasetDAOImpl(
+      Configuration.getDatasetFile, true)
+  //Obtain all datasets
+  val datasets : List[Dataset] = datasetDao.getDatasets
+  //Obtain all countries
+  val countries : List[Country] = countryDao.getCountries
+  //Obtain all primary indicators    
+  val primaryIndicators : List[Indicator] = indicatorDao.getPrimaryIndicators
+  //Obtain all secondary indicators
+  val secondaryIndicators : List[Indicator] = 
+    indicatorDao.getSecondaryIndicators
+  //Obtain all observations  
+  val observations : List[Observation] = observationDao.getObservations(datasets)
   
-  def getObservations(datasets : List[Dataset]) : List[Observation] = {
-    if(datasets == null)
-      throw new IllegalArgumentException("List of datasets to load their " +
-      		"observations is null")
-    var observations = ListBuffer[Observation]()
-    for(dataset <- datasets)
-      observations.insertAll(0, extractObservationsByDataset(dataset))
-    observations.toList
-  }
+  val observationsByDataset : Map[Dataset, List[Observation]] = observations.groupBy(observation => observation.dataset)
+  val observationsByYear : Map[Int, List[Observation]] = observations.groupBy(observation => observation.year)
+  val observationsByCountry : Map[String, List[Observation]] = observations.groupBy(observation => observation.area.iso3Code)
   
-  def extractObservationsByDataset(dataset: Dataset) : List[Observation] = {
-    if(dataset == null)
-      throw new IllegalArgumentException("Cannot extract observations of a " +
-      		"null dataset")
-    var observations = ListBuffer[Observation]()
-    val sheet = workbook.getSheet(dataset.id)
-    if(sheet == null) 
-      throw new IllegalArgumentException("There isn't data for dataset: " + 
-          dataset.id)
-    val indicator = obtainIndicator(Configuration.getIndicatorCell, sheet)
-    val status = obtainStatus(Configuration.getStatusCell, sheet)
-    val initialCell = new CellReference(
-        Configuration.getInitialCellSecondaryObservation)
-    for(row <- initialCell.getRow() to sheet.getLastRowNum()) {
-      val actualRow = sheet.getRow(row)
-      if(actualRow != null && !POIUtils.extractCellValue(
-            actualRow.getCell(0)).trim().isEmpty()) {
-        var countryName : String = POIUtils.extractCellValue(
-            actualRow.getCell(0))
-        var country : Country = obtainCountry(countryName)
-        for(column <- initialCell.getCol() to actualRow.getLastCellNum() - 1) {
-        	var year = POIUtils.extractCellValue(sheet.getRow(
-        	    initialCell.getRow() - 2).getCell(column))
-    	    var value = POIUtils.extractCellValue(actualRow.getCell(column))
-    	    //TODO Create the observation with all data. Dataset, label, 
-    	    //Area, Computation, Inidicator and status (Raw, Imputed, 
-    	    //Normalised) in this order
-        	if(!value.trim.isEmpty()) {
-        		val y = year.toDouble
-				observations += new Observation(dataset, "", country, null, 
-				    indicator, y.toInt, value.toDouble, status)
-        	}
-        }
-      }
-    }
-    observations.toList
-  } 
-  
-  def obtainCountry(countryName : String) : Country = {
-    if(countryName == null || countryName.isEmpty()) 
+  //Obtain a country given it's name
+  def obtainCountry(regionName : String) : Country = {
+    if(regionName == null || regionName.isEmpty()) 
       throw new IllegalArgumentException("The name of the country cannot " +
       		"be null o empty")
-    countries.find(c => c.name.equals(countryName)).getOrElse(
+    countries.find(c => c.name.equals(regionName)).getOrElse(
         throw new IllegalArgumentException("Not exist country with name " + 
-            countryName))
+            regionName))
   }
   
-  def obtainIndicator(indicatorCell : String, sheet : Sheet) : Indicator = {
-    if(indicatorCell == null || sheet == null)
-      throw new IllegalArgumentException("Cell specifies for the " +
-      		"indicator name is not correct")
-    //TODO This method has to extract the name of the indicator of the 
-    //sprearsheets and find or create the object that represents this indicator
-    val cell = new CellReference(indicatorCell)
-    val indicator = new Indicator(IndicatorType.Secondary, 
-        POIUtils.extractCellValue(sheet.getRow(cell.getRow())
-            .getCell(cell.getCol())), "", null, null, 62)
-    indicator
+  //Obtain an indicator given it's name
+  def obtainIndicator(indicatorName : String) : Indicator = {
+    var combined : ListBuffer[Indicator] = new ListBuffer
+    combined.insertAll(0, primaryIndicators)
+    combined.insertAll(0, secondaryIndicators)
+    combined.find(indicator => indicator.id.equals(indicatorName))
+    .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
+    		"name " + indicatorName))
   }
   
-  def obtainStatus(statusCell : String, sheet : Sheet) : String = {
-    if(statusCell == null || sheet == null)
-      throw new IllegalArgumentException("Cell specifies for the status of a " +
-      		"indicator is not correct")
-    val cell = new CellReference(statusCell)
-    POIUtils.extractCellValue(sheet.getRow(cell.getRow())
-        .getCell(cell.getCol()))
-  }*/
+  //Obtain a component given it's id
+  def obtainComponent(componentId : String) : Component = {
+    components.find(component => component.id.equals(componentId)).getOrElse(throw new IllegalArgumentException("Not exist component " + componentId))
+  }
+  
+  def getObservationsByStatus(status : ObservationStatus) : List[Observation] = {
+    val results : ListBuffer[Observation] = new ListBuffer[Observation]
+    results.toList
+  }
+  
+  def getComponentById(componentId : String) : Component = {
+    components.find(component => component.id.equals(componentId)).getOrElse(
+        throw new IllegalArgumentException("There is no component with id " + 
+            componentId))
+  }
   
 }

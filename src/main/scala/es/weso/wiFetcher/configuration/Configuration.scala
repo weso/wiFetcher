@@ -82,12 +82,85 @@ object Configuration {
     CONFIG.getInt("h/l_column")
   }
   
+  def getIndicatorFilename() : String = {
+    loadConfigure
+    CONFIG.getString("indicator_filename")
+  }
+  
+  def getObservationFile() : String = {
+    loadConfigure
+    CONFIG.getString("observations_file")
+  }
+  
+  def getDatasetFile() : String = {
+    loadConfigure
+    CONFIG.getString("dataset_file")
+  }
+  
+  def getSubindexFile() : String = {
+    loadConfigure
+    CONFIG.getString("subindexes_file")
+  }
+  
+  def getSubindexInitialCell() : String = {
+    loadConfigure
+    CONFIG.getString("initial_cell")
+  }
+  
+  def getSubindexColumn() : Int = {
+    loadConfigure
+    CONFIG.getInt("sb_subindex_column")
+  }
+  
+  def getComponentColumn() : Int = {
+    loadConfigure
+    CONFIG.getInt("sb_component_column")
+  }
+  
+  def getSubindexWeithColumn() : Int = {
+    loadConfigure
+    CONFIG.getInt("sb_weight_column")
+  }
+  
+  def getSubindexNameColumn() : Int = {
+    loadConfigure
+    CONFIG.getInt("sb_name_column")
+  }
+  
+  def getSubindexDescriptionColumn() : Int = {
+    loadConfigure
+    CONFIG.getInt("sb_description_column")
+  }
+  
+  def getRegionsFilename() : String = {
+    loadConfigure
+    CONFIG.getString("regions_filename")
+  }
+  
+  def getRegionInitialCell() : String = {
+    loadConfigure
+    CONFIG.getString("intial_cell_regions_sheet")
+  }
+  
+  def getRegionNameColumn() : Int = {
+    loadConfigure
+    CONFIG.getInt("region_name_column")
+  }
+  
+  def getRegionCountryColumn() : Int = {
+    loadConfigure
+    CONFIG.getInt("region_country_column")
+  }
+  
   def loadConfigure() = {
     if(CONFIG == null) {
       CONFIG = new CompositeConfiguration
       CONFIG.append(new PropertiesConfiguration("config/countries.properties"))
       CONFIG.append(new PropertiesConfiguration("config/indicators.properties"))
       CONFIG.append(new PropertiesConfiguration("config/observations.properties"))
+      CONFIG.append(new PropertiesConfiguration("config/datasets.properties"))
+      CONFIG.append(new PropertiesConfiguration("config/subindexes.properties"))
+      CONFIG.append(new PropertiesConfiguration("config/regions.properties"))
     }
   }
 

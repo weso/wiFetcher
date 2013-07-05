@@ -25,7 +25,7 @@ class CountryDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
     }
   }
   
-  Then("""^the "([^"]*)" should be "([^"]*)"$""") { (comparator : String, value : String) =>
+  Then("""^the country "([^"]*)" should be "([^"]*)"$""") { (comparator : String, value : String) =>
     comparator match {
       case "iso2-code" => result.iso2Code should be (value)
       case "iso3-code" => result.iso3Code should be (value)
@@ -35,7 +35,7 @@ class CountryDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
     }
   }
   
-  Then("""the result should be null$""") { () =>
+  Then("""the country result should be null$""") { () =>
     result should be (null)
   }
 

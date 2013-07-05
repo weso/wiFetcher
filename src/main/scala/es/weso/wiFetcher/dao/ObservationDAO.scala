@@ -2,6 +2,7 @@ package es.weso.wiFetcher.dao
 
 import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.entities.Dataset
+import es.weso.wiFetcher.entities.ObservationStatus._
 
 trait ObservationDAO {
   

@@ -12,6 +12,9 @@ import org.apache.poi.hssf.util.CellReference
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.utils.POIUtils
 import org.apache.poi.ss.usermodel.FormulaEvaluator
+import es.weso.wiFetcher.entities.IndicatorType
+import es.weso.wiFetcher.entities.IndicatorHighLow
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 
 class IndicatorDAOImpl(path : String, relativePath : Boolean) 
 	extends IndicatorDAO {
@@ -58,11 +61,41 @@ class IndicatorDAOImpl(path : String, relativePath : Boolean)
           Configuration.getIndicatorWeightColumn), evaluator)
       val hl = POIUtils.extractCellValue(actualRow.getCell(
           Configuration.getIndicatorHLColumn))  
-      println(id + " " + subindex + " " + component + " " + name + " " + 
-          description + " " + source + " " + provider + " " + typ + " " +
-          weight + " " + hl)
+      createIndicator(id, subindex, component, name, description, source, 
+          provider, typ, weight, hl)
     }
   }
+  
+  def createIndicator(id : String, subindex : String, component : String, 
+      name : String, description : String, source : String, provider : String, 
+      typ : String, weight : String, hl : String) {
+    val indicator = new Indicator
+    indicator.id = id
+    indicator.label = name
+    indicator.comment = description
+    indicator.source = source
+    indicator.indicatorType = typ match {
+      case "Primary" => {IndicatorType.Primary }
+      case "Secondary" => {IndicatorType.Secondary }
+      case _ => throw new IllegalArgumentException("Indicator type " + typ + 
+          " is unknown" )
+    }
+    indicator.highLow = hl match {
+      case "High" => IndicatorHighLow.High
+      case "Low" => IndicatorHighLow.Low
+      case _ => throw new IllegalArgumentException("Incorrect value for indicator property High/Low")
+    }
+    indicator.weight = weight.toDouble
+    if(indicator.indicatorType.equals(IndicatorType.Primary))
+      primaryIndicators += indicator
+    else
+      secondaryIndicators += indicator  
+    val componentObj = SpreadsheetsFetcher.obtainComponent(component)
+    indicator.component = componentObj
+    componentObj.addIndicator(indicator)
+  }
+  
+  
   
   def getPrimaryIndicators() : List[Indicator] = {
     primaryIndicators.toList

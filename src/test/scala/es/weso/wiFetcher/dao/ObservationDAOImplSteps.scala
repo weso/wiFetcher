@@ -14,14 +14,22 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   var result : Observation = null
   
   Given("""^I want to load the observations of indicator "([^"]*)"$"""){ (indicator:String) =>
-	var dataset : Dataset = new Dataset
+	val dataset : Dataset = new Dataset
 	dataset.id = indicator
 	observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
 	observations = observationDAO.getObservationsByIndicator(dataset)
-  }  
+  } 
+  
+  Given("""^I want to load the observations of non-existing indicator "([^"]*)"$""") {(indicator : String) => {
+    val dataset : Dataset = new Dataset
+	dataset.id = indicator
+	observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
+    intercept[IllegalArgumentException] {
+      observations = observationDAO.getObservationsByIndicator(dataset)
+    }
+  }}
   
   When("""^I check the value for the country "([^"]*)" in the year "([^"]*)"$""") {(regionName : String, year : Int) =>
-    //TODO This test fail because country and observations aren't still linked
     result = observations.find(obs => (obs.area.name.equals(regionName) && obs.year == year)).getOrElse(null)
     result should not be null
   }

@@ -1,0 +1,16 @@
+A-RAW
+B-RAW
+C-RAW
+D-RAW
+Q1
+Q1-Normalized
+Q2
+Q2-Normalized
+A-Imputed
+B-Imputed
+C-Imputed
+D-Imputed
+A-Normalized
+B-Normalized
+C-Normalized
+D-Normalized
