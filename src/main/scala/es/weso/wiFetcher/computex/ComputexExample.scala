@@ -13,6 +13,7 @@ import es.weso.wiFetcher.entities.SubIndex
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.DateUtils
 import es.weso.wiFetcher.entities.Country
+import es.weso.wiFetcher.entities.Region
 
 object ComputexExample {
   
@@ -22,6 +23,7 @@ object ComputexExample {
   val PREFIX_WI_ORG = "http://data.webfoundation.org/webindex/organization/"
   val PREFIX_QB = "http://purl.org/linked-data/cube#"
   val PREFIX_COUNTRY = "http://data.webfoundation.org/webindex/v2013/country/"
+  val PREFIX_REGION = "http://data.webfoundation.org/webindex/v2013/region/"
   val PREFIX_CEX = "http://purl.org/weso/ontology/computex#"
   val PREFIX_INDICATOR = "http://data.webfoundation.org/webindex/v2013/indicator/"
   val PREFIX_SDMX_CONCEPT = "http://purl.org/linked-data/sdmx/2009/concept#"
@@ -94,6 +96,7 @@ object ComputexExample {
     val datasets : List[Dataset] = SpreadsheetsFetcher.datasets
     val observationsByDataset : Map[Dataset, List[Observation]] = SpreadsheetsFetcher.observationsByDataset
     val countries : List[Country] = SpreadsheetsFetcher.countries
+    val regions : List[Region] = SpreadsheetsFetcher.regions
     val model = createModel
     var id = 0
     observations.foreach(obs => {
@@ -106,7 +109,17 @@ object ComputexExample {
     subindexes.foreach(subindex => createSubindexTriples(subindex, model))
     datasets.foreach(dataset => createDatasetsTriples(dataset, observationsByDataset, model))
     countries.foreach(country => createCountriesTriples(country, model))
+    regions.foreach(region => createRegionsTriples(region, model))
     model.write(new FileOutputStream("computex.ttl"), "TURTLE")
+  }
+  
+  def createRegionsTriples(region : Region, model : Model) = {
+    val regionResource = model.createResource(PREFIX_REGION + region.name.replace("& ", "").replace(" ", "-"))
+    regionResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_WI_ONTO + "Region"))
+    regionResource.addProperty(PROPERTY_DCTERMS_CONTRIBUTOR, ResourceFactory.createResource(PREFIX_WI_ONTO + "WESO"))
+    regionResource.addProperty(PROPERTY_DCTERMS_PUBLISHER, ResourceFactory.createResource(PREFIX_WI_ONTO + "WebFoundation"))
+    regionResource.addProperty(PROPERTY_DCTERMS_ISSUED, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
+    region.getCountries.foreach(country => regionResource.addProperty(PROPERTY_WIONTO_REFAREA, ResourceFactory.createResource(PREFIX_COUNTRY + country.iso3Code)))
   }
   
   def createCountriesTriples(country : Country, model : Model) = {
@@ -293,6 +306,7 @@ object ComputexExample {
     model.setNsPrefix("subindex", PREFIX_SUBINDEX)
     model.setNsPrefix("weightSchema", PREFIX_WEIGHTSCHEMA)
     model.setNsPrefix("slice", PREFIX_SLICE)
+    model.setNsPrefix("region", PREFIX_REGION)
     model
   }
 

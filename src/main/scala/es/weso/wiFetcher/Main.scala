@@ -12,12 +12,7 @@ import es.weso.wiFetcher.dao.RegionDAOImpl
 object Main {
 
   def main(args: Array[String]): Unit = {
-    val regionDao = new RegionDAOImpl("files/Structure.xlsx", true)
-    val regions = regionDao.getRegions
-    regions.foreach(region => {
-      println(region.name + " Countries: ") 
-      region.getCountries.foreach(country => print(country.name + " "))
-    })
+   
   }
 
 }

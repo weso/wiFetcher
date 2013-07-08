@@ -20,6 +20,9 @@ import es.weso.wiFetcher.dao.SubIndexDAOImpl
 import es.weso.wiFetcher.entities.SubIndex
 import es.weso.wiFetcher.entities.Component
 import es.weso.wiFetcher.entities.ObservationStatus._
+import es.weso.wiFetcher.dao.RegionDAO
+import es.weso.wiFetcher.dao.RegionDAOImpl
+import es.weso.wiFetcher.entities.Region
 
 object SpreadsheetsFetcher extends Fetcher {
   
@@ -53,6 +56,11 @@ object SpreadsheetsFetcher extends Fetcher {
     indicatorDao.getSecondaryIndicators
   //Obtain all observations  
   val observations : List[Observation] = observationDao.getObservations(datasets)
+  //Creates RegionDAO in order to load all regions information
+  private val regionDao : RegionDAO = new RegionDAOImpl(
+      Configuration.getRegionsFilename, true)  
+  //Obtain all regions
+  val regions : List[Region] = regionDao.getRegions
   
   val observationsByDataset : Map[Dataset, List[Observation]] = observations.groupBy(observation => observation.dataset)
   val observationsByYear : Map[Int, List[Observation]] = observations.groupBy(observation => observation.year)
