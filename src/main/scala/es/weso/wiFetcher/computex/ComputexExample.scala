@@ -119,6 +119,7 @@ object ComputexExample {
     regionResource.addProperty(PROPERTY_DCTERMS_CONTRIBUTOR, ResourceFactory.createResource(PREFIX_WI_ONTO + "WESO"))
     regionResource.addProperty(PROPERTY_DCTERMS_PUBLISHER, ResourceFactory.createResource(PREFIX_WI_ONTO + "WebFoundation"))
     regionResource.addProperty(PROPERTY_DCTERMS_ISSUED, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
+    regionResource.addProperty(PROPERTY_RDFS_LABEL, ResourceFactory.createTypedLiteral(region.name, XSDDatatype.XSDstring))
     region.getCountries.foreach(country => regionResource.addProperty(PROPERTY_WIONTO_REFAREA, ResourceFactory.createResource(PREFIX_COUNTRY + country.iso3Code)))
   }
   

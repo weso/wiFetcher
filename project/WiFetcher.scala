@@ -30,6 +30,9 @@ object WiFetcherBuild extends Build {
       libraryDependencies += "org.apache.poi" % "poi-ooxml" % "3.9",
       libraryDependencies += "org.apache.jena" % "jena-arq" % "2.10.1",
       libraryDependencies += "org.apache.jena" % "jena-core" % "2.10.1",
+      libraryDependencies += "org.apache.lucene" % "lucene-core" % "4.0.0",
+      libraryDependencies += "org.apache.solr" % "solr-core" % "4.0.0",
+      libraryDependencies += "es.weso" % "CountryReconciliator" % "1.0",
             
         
       resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
