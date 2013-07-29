@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 
 @RunWith(classOf[JUnitRunner])
 class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter 
@@ -73,7 +74,7 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Validate indicators by components") {
-    subIndexDao.getComponents.foreach(component => {
+    SpreadsheetsFetcher.components.foreach(component => {
       component.id match {
         case "CommunicationsInfrastructure" => component.getIndicators.size should be (13)
         case "InstitutionalInfrastructure" => component.getIndicators.size should be (24)

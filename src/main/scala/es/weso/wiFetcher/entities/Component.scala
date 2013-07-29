@@ -20,5 +20,12 @@ class Component {
   def addIndicator(indicator : Indicator) {
     indicators.add(indicator)
   }
+  
+   override def equals(o : Any) : Boolean = {
+    o match {
+      case o:Component => o.id.equals(this.id)
+      case _ => false
+    }
+  }
 
 }

@@ -23,8 +23,12 @@ import es.weso.wiFetcher.entities.ObservationStatus._
 import es.weso.wiFetcher.dao.RegionDAO
 import es.weso.wiFetcher.dao.RegionDAOImpl
 import es.weso.wiFetcher.entities.Region
+import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
+import org.apache.log4j.Logger
 
 object SpreadsheetsFetcher extends Fetcher {
+  
+  private val logger : Logger = Logger.getLogger(this.getClass())
   
   //Creates CountryDAO to load all countries information
   private val countryDao : CountryDAO = new CountryDAOImpl(
@@ -54,6 +58,12 @@ object SpreadsheetsFetcher extends Fetcher {
   //Obtain all secondary indicators
   val secondaryIndicators : List[Indicator] = 
     indicatorDao.getSecondaryIndicators
+  //Create an indicator reconciliator
+  val indicatorReconciliator : IndicatorReconciliator = 
+    new IndicatorReconciliator
+  //Index all indicators in the reconciliator in order to search indicators
+  indicatorReconciliator.indexIndicators(primaryIndicators)
+  indicatorReconciliator.indexIndicators(secondaryIndicators)
   //Obtain all observations  
   val observations : List[Observation] = observationDao.getObservations(datasets)
   //Creates RegionDAO in order to load all regions information
@@ -78,12 +88,29 @@ object SpreadsheetsFetcher extends Fetcher {
   
   //Obtain an indicator given it's name
   def obtainIndicator(indicatorName : String) : Indicator = {
+    val indicator = indicatorReconciliator.searchIndicator(indicatorName)
+    if(indicator == null)
+      logger.info("Not exist indicator with name " + indicatorName)
+    indicator
+  }
+  
+  //Obtain an indicator given it's id
+  def obtainIndicatorById(id : String) : Indicator = {
     var combined : ListBuffer[Indicator] = new ListBuffer
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
-    combined.find(indicator => indicator.id.equals(indicatorName))
+    combined.find(indicator => indicator.id.equals(id))
     .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
-    		"name " + indicatorName))
+    		"id " + id))
+  }
+  
+  def obtainIndicatorByDescription(indicatorDescription : String) : Indicator = {
+     var combined : ListBuffer[Indicator] = new ListBuffer
+     combined.insertAll(0, primaryIndicators)
+     combined.insertAll(0, secondaryIndicators)
+     combined.find(indicator => indicator.comment.equalsIgnoreCase(indicatorDescription))
+    .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
+    		"description " + indicatorDescription))
   }
   
   //Obtain a component given it's id

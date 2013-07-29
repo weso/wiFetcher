@@ -8,16 +8,18 @@ import es.weso.wiFetcher.dao.CountryDAOImpl
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.IndicatorDAOImpl
 import es.weso.wiFetcher.dao.RegionDAOImpl
+import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
+import es.weso.wiFetcher.dao.ObservationDAOImpl
 
 object Main {
 
   def main(args: Array[String]): Unit = {
-    /*val countryReconciliation = new CountryReconciliation("files/countries.json", true)
-    println(countryReconciliation.searchCountry("Saint-Martin (French part)"))
-    println(countryReconciliation.searchCountry("United Kingdom of Great Britain and Northern Ireland"))
-    println(countryReconciliation.searchCountry("United Kingdom"))
-    println(countryReconciliation.searchCountry("United Republic of Tanzania"))
-    println(countryReconciliation.searchCountry("Bolivarian Republic"))*/
+    val observations = SpreadsheetsFetcher.observations   
+    observations.foreach(observation => {
+      println("Area: " + observation.area.name + ", Dataset: " + observation.dataset.id
+          + ", Indicator: " + observation.indicator.label + ", Year: " + 
+          observation.year + ", Value: " + observation.value)
+    })
   }
 
 }

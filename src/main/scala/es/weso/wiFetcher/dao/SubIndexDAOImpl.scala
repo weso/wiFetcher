@@ -85,10 +85,10 @@ class SubIndexDAOImpl(path : String, relativePath : Boolean) extends SubIndexDAO
   }
 
   def getComponents() : List[Component] = {
-    components.toList
+    components.toSet.toList
   }
   
   def getSubIndexes() : List[SubIndex] = {
-    subIndexes.toList
+    subIndexes.toSet.toList
   }
 }

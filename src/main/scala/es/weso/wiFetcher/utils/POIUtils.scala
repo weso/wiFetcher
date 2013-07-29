@@ -6,6 +6,10 @@ import org.apache.poi.ss.usermodel.CellValue
 
 object POIUtils {
   
+  /**
+   * This function extract the content from a given cell as a string, without 
+   * using a FormulaEvaluator
+   */
   def extractCellValue(cell : Cell) : String = {
     if(cell != null) {
       cell.getCellType() match {
@@ -20,6 +24,10 @@ object POIUtils {
     }    
   }
   
+  /**
+   * This function extract the content from a given cell as a string, using
+   * a FormulaEvaluator
+   */
   def extractCellValue(cell : Cell, evaluator : FormulaEvaluator) : String = {
     val cellValue : CellValue = evaluator.evaluate(cell)
     if(cellValue != null) {
@@ -32,6 +40,30 @@ object POIUtils {
       }
     }else {
      "" 
+    }
+  }
+  
+  /**
+   * This method extract from a given a cell, its content as a number. In case 
+   * that the content not be a number, its return "-1"
+   */
+  def extractNumericCellValue(cell : Cell, evaluator : FormulaEvaluator) : 
+	  Double = {
+    val cellValue : CellValue = evaluator.evaluate(cell)
+    if(cellValue != null) {
+      cellValue.getCellType() match {
+        case Cell.CELL_TYPE_NUMERIC => cellValue.getNumberValue
+        case Cell.CELL_TYPE_STRING => {
+          cellValue.getStringValue() match {
+            case ".." | "..." | "N/A" => -1
+            case s => if(s.forall(_.isDigit)) s.toDouble else -1 
+          }
+        }
+        case Cell.CELL_TYPE_BLANK => -1
+        case Cell.CELL_TYPE_ERROR => -1
+      }
+    }else {
+     -1
     }
   }
 

@@ -152,6 +152,16 @@ object Configuration {
     CONFIG.getInt("region_country_column")
   }
   
+  def getCountryReconciliatorFile() : String = {
+    loadConfigure
+    CONFIG.getString("country_reconciliator_file")
+  }
+  
+  def getIndicatorStopWordsFile() : String = {
+    loadConfigure
+    CONFIG.getString("indicator_stop_words_recon")
+  }
+  
   def loadConfigure() = {
     if(CONFIG == null) {
       CONFIG = new CompositeConfiguration

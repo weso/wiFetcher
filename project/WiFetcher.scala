@@ -32,10 +32,11 @@ object WiFetcherBuild extends Build {
       libraryDependencies += "org.apache.jena" % "jena-core" % "2.10.1",
       libraryDependencies += "org.apache.lucene" % "lucene-core" % "4.0.0",
       libraryDependencies += "org.apache.solr" % "solr-core" % "4.0.0",
-      libraryDependencies += "es.weso" % "CountryReconciliator" % "1.0",
+      libraryDependencies += "es.weso" %% "countryreconciliator" % "0.0.1-SNAPSHOT",
             
         
       resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+	  resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.ivy2/local",
       resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
     )
 }

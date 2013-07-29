@@ -13,24 +13,28 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   var observations : List[Observation] = null
   var result : Observation = null
   
-  Given("""^I want to load the observations of indicator "([^"]*)"$"""){ (indicator:String) =>
+  Given("""^I want to load the observations of dataset "([^"]*)" in the year "([^"]*)"$"""){ (datast:String, year:Int) =>
 	val dataset : Dataset = new Dataset
-	dataset.id = indicator
-	observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
-	observations = observationDAO.getObservationsByIndicator(dataset)
+	dataset.id = datast
+	dataset.year = year
+	dataset.isCountryInRow = true
+	observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+	observations = observationDAO.getObservationsByDataset(dataset)
   } 
   
-  Given("""^I want to load the observations of non-existing indicator "([^"]*)"$""") {(indicator : String) => {
+  Given("""^I want to load the observations of non-existing dataset "([^"]*)" in the year "([^"]*)"$""") {(datast : String, year:Int) => {
     val dataset : Dataset = new Dataset
-	dataset.id = indicator
-	observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
+	dataset.id = datast
+	dataset.isCountryInRow = true
+	dataset.year = year
+	observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
     intercept[IllegalArgumentException] {
-      observations = observationDAO.getObservationsByIndicator(dataset)
+      observations = observationDAO.getObservationsByDataset(dataset)
     }
   }}
   
-  When("""^I check the value for the country "([^"]*)" in the year "([^"]*)"$""") {(regionName : String, year : Int) =>
-    result = observations.find(obs => (obs.area.name.equals(regionName) && obs.year == year)).getOrElse(null)
+  When("""^I check the value for the country "([^"]*)" and indicator "([^"]*)"$""") {(regionName : String, indicator : String) =>
+    result = observations.find(obs => (obs.area.name.equals(regionName) && obs.indicator != null && obs.indicator.id.equals(indicator))).getOrElse(null)
     result should not be null
   }
   

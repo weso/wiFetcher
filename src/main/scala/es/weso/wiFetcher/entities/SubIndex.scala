@@ -17,4 +17,12 @@ class SubIndex {
   def getComponents() : List[Component] = {
     components.toList
   }
+  
+  override def equals(o : Any) : Boolean = {
+    o match {
+      case o:SubIndex => o.id.equals(this.id)
+      case _ => false
+    }
+  }
+  
 }

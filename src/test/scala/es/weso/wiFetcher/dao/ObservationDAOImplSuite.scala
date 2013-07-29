@@ -20,8 +20,12 @@ class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter
   before {
     dataset1 = new Dataset
     dataset2 = new Dataset
-    dataset1.id = "ITUA-Raw"
-    dataset2.id = "ITUA-IMPUTED"
+    dataset1.id = "2008"
+    dataset1.isCountryInRow = true 
+    dataset1.year = 2008
+    dataset2.id = "2009"
+    dataset2.isCountryInRow = true
+    dataset2.year = 2009
   }
   
   test("Try to load a non-existing spreadsheet") {
@@ -31,18 +35,18 @@ class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Load a correct and an existing spreadsheet") {
-    observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
+    observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
   }
   
   test("Try to obtain all observations of a list of datasets null") {
-    observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
+    observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
     intercept[IllegalArgumentException] {
       observationDAO.getObservations(null)
     }
   }
   
   test("Try to obtain all observations of a empty list of datasets") {
-    observationDAO  = new ObservationDAOImpl("files/rawdata.xlsx", true)
+    observationDAO  = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
     var datasets : List[Dataset] = List[Dataset]()
     var observations : List[Observation] = observationDAO.getObservations(datasets)
     observations should not be null
@@ -50,34 +54,34 @@ class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Obatin all observations of a list of datasets") {
-    observationDAO  = new ObservationDAOImpl("files/rawdata.xlsx", true)
+    observationDAO  = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
     var datasets : List[Dataset] = List[Dataset](dataset1, dataset2)
     var observations : List[Observation] = observationDAO.getObservations(datasets)
     observations should not be null
-    observations.size should be (60)
+    observations.size should be (6069)
   }
   
   test("Try to obtain all observations of a non-existing dataset") {
-    observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
+    observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
     var dataset : Dataset = new Dataset
     dataset.id = "test"
     intercept[IllegalArgumentException] {
-      observationDAO.getObservationsByIndicator(dataset)
+      observationDAO.getObservationsByDataset(dataset)
     }  
   }
   
   test("Try to obtain all observations of a null dataset") {
-    observationDAO = new ObservationDAOImpl("files/rawdata.xlsx", true)
+    observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
     intercept[IllegalArgumentException] {
-      observationDAO.getObservationsByIndicator(null)
+      observationDAO.getObservationsByDataset(null)
     }
   }
   
   test("Obtain all observations of a valid dataset") {
-    observationDAO  = new ObservationDAOImpl("files/rawdata.xlsx", true)
-    var observations : List[Observation] = observationDAO.getObservationsByIndicator(dataset1)
+    observationDAO  = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+    var observations : List[Observation] = observationDAO.getObservationsByDataset(dataset1)
     observations should not be null
-    observations.size should be (30)
+    observations.size should be (3645)
   }
   
 }
