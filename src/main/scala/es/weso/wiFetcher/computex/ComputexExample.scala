@@ -37,6 +37,8 @@ object ComputexExample {
   val PREFIX_SUBINDEX = "http://data.webfoundation.org/webindex/v2013/subindex/"
   val PREFIX_WEIGHTSCHEMA = "http://data.webfoundation.org/webindex/v2013/weightSchema/"  
   val PREFIX_SLICE = "http://data.webfoundation.org/webindex/v2013/slice/"
+  val PREFIX_SMDX_ATTRIBUTE = "http://purl.org/linked-data/sdmx/2009/attribute#"
+  val PREFIX_SMDX_SUBJECT = "http://purl.org/linked-data/sdmx/2009/subject#"
     
   val PROPERTY_RDF_TYPE = ResourceFactory.createProperty(PREFIX_RDF + "type")
   val PROPERTY_RDFS_LABEL = ResourceFactory.createProperty(PREFIX_RDFS 
@@ -83,9 +85,21 @@ object ComputexExample {
   val PROPERTY_QB_MEASURE = ResourceFactory.createProperty(PREFIX_QB + "measure")
   val PROPERTY_QB_COMPONENT = ResourceFactory.createProperty(PREFIX_QB + "component")
   val PROPERTY_QB_SLICESTRUCTURE = ResourceFactory.createProperty(PREFIX_QB + "sliceStructure")
-  val PROPERTY_QB_OBSERVATION = ResourceFactory.createProperty(PREFIX_QB + "observations")
+  val PROPERTY_QB_OBSERVATION = ResourceFactory.createProperty(PREFIX_QB + "observation")
   val PROPERTY_WIONTO_ISO2 = ResourceFactory.createProperty(PREFIX_WI_ONTO + "has-iso-alpha2-code")
   val PROPERTY_WIONTO_ISO3 = ResourceFactory.createProperty(PREFIX_WI_ONTO + "has-iso-alpha3-code")
+  val PROPERTY_QB_ATTRIBUTE = ResourceFactory.createProperty(PREFIX_QB + "attribute")
+  val PROPERTY_QB_COMPONENT_REQUIRED = ResourceFactory.createProperty(PREFIX_QB + "componentRequired")
+  val PROPERTY_QB_COMPONENT_ATTACHMENT = ResourceFactory.createProperty(PREFIX_QB + "componentAttachment")
+  val PROPERTY_QB_SLICEKEY = ResourceFactory.createProperty(PREFIX_QB + "sliceKey")
+  val PROPERTY_QB_COMPONENTPROPERTY = ResourceFactory.createProperty(PREFIX_QB + "componentProperty")
+  val PROPERTY_QB_STRUCTURE = ResourceFactory.createProperty(PREFIX_QB + "structure")
+  val PROPERTY_DCTERMS_TITLE = ResourceFactory.createProperty(PREFIX_DCTERMS + "title")
+  val PROPERTY_DCTERMS_SUBJECT = ResourceFactory.createProperty(PREFIX_DCTERMS + "subject")
+  val PROPERTY_SMDX_UNITMEASURE = ResourceFactory.createProperty(PREFIX_SMDX_ATTRIBUTE + "unitMeasure")
+  val PROPERTY_QB_SLICE = ResourceFactory.createProperty(PREFIX_QB + "slice")
+  
+  var id : Int = 1
   
   def main(args: Array[String]): Unit = {
     val observations : List[Observation] = SpreadsheetsFetcher.observations
@@ -98,11 +112,12 @@ object ComputexExample {
     val countries : List[Country] = SpreadsheetsFetcher.countries
     val regions : List[Region] = SpreadsheetsFetcher.regions
     val model = createModel
-    var id = 0
+    /*var id = 0
     observations.foreach(obs => {
       id+=1
       createObservationTriples(obs, model, id)
-    })
+    })*/
+    createDataStructureDefinition(model)
     primaryIndicators.foreach(indicator => createPrimaryIndicatorTriples(indicator, model))
     secondaryIndicators.foreach(indicator => createSecondaryIndicatorTriples(indicator, model))
     components.foreach(comp => createComponentsTriples(comp, model))
@@ -111,6 +126,38 @@ object ComputexExample {
     countries.foreach(country => createCountriesTriples(country, model))
     regions.foreach(region => createRegionsTriples(region, model))
     model.write(new FileOutputStream("computex.ttl"), "TURTLE")
+  }
+  
+  def createDataStructureDefinition(model : Model) = {
+    val dsd = model.createResource(PREFIX_WI_ONTO + "DSD")
+    dsd.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "DataStructureDefinition"))
+    var dimension = model.createResource()
+    dimension.addProperty(PROPERTY_QB_DIMENSION, ResourceFactory.createResource(PREFIX_WI_ONTO + "ref-area"))
+    dimension.addProperty(PROPERTY_QB_ORDER, ResourceFactory.createTypedLiteral("1", XSDDatatype.XSDinteger))
+    dsd.addProperty(PROPERTY_QB_COMPONENT, dimension)
+    dimension = model.createResource()
+    dimension.addProperty(PROPERTY_QB_DIMENSION, ResourceFactory.createResource(PREFIX_WI_ONTO + "ref-year"))
+    dimension.addProperty(PROPERTY_QB_ORDER, ResourceFactory.createTypedLiteral("2", XSDDatatype.XSDinteger))
+    dsd.addProperty(PROPERTY_QB_COMPONENT, dimension)
+    dimension = model.createResource()
+    dimension.addProperty(PROPERTY_QB_DIMENSION, ResourceFactory.createResource(PREFIX_CEX + "indicator"))
+    dimension.addProperty(PROPERTY_QB_ORDER, ResourceFactory.createTypedLiteral("3", XSDDatatype.XSDinteger))
+    dsd.addProperty(PROPERTY_QB_COMPONENT, dimension)
+    val measure = model.createResource()
+    measure.addProperty(PROPERTY_QB_MEASURE, ResourceFactory.createResource(PREFIX_CEX + "value"))
+    dsd.addProperty(PROPERTY_QB_COMPONENT, measure)
+    val component = model.createResource()
+    component.addProperty(PROPERTY_QB_ATTRIBUTE, ResourceFactory.createResource(PREFIX_SMDX_ATTRIBUTE + "unitMeasure"))
+    component.addProperty(PROPERTY_QB_COMPONENT_REQUIRED, ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean))
+    component.addProperty(PROPERTY_QB_COMPONENT_ATTACHMENT, ResourceFactory.createResource(PREFIX_QB + "DataSet"))
+    dsd.addProperty(PROPERTY_QB_COMPONENT, component)
+    val sliceByArea = model.createResource(PREFIX_WI_ONTO + "sliceByArea")
+    dsd.addProperty(PROPERTY_QB_SLICEKEY, sliceByArea)
+    sliceByArea.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "SliceKey"))
+    sliceByArea.addProperty(PROPERTY_RDFS_LABEL, ResourceFactory.createLangLiteral("slice by area", "en"))
+    sliceByArea.addProperty(PROPERTY_RDFS_COMMENT, ResourceFactory.createLangLiteral("Slice by grouping areas together fixing year", "en"))
+    sliceByArea.addProperty(PROPERTY_QB_COMPONENTPROPERTY, ResourceFactory.createResource(PREFIX_CEX + "indicator"))
+    sliceByArea.addProperty(PROPERTY_QB_COMPONENTPROPERTY, ResourceFactory.createResource(PREFIX_WI_ONTO + "ref-year"))
   }
   
   def createRegionsTriples(region : Region, model : Model) = {
@@ -136,11 +183,11 @@ object ComputexExample {
   }
   
   def createObservationTriples(obs : Observation, model : Model, id : Int) = {
-    val obsResource = model.createResource(PREFIX_OBS + "obs" + obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status /*id*/)
+    val obsResource = model.createResource(PREFIX_OBS + "obs" + /*obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status*/ id)
     obsResource.addProperty(PROPERTY_RDF_TYPE, 
         ResourceFactory.createResource(PREFIX_WI_ONTO + "Observation"))
     obsResource.addProperty(PROPERTY_DCTERMS_CONTRIBUTOR, ResourceFactory.createResource(PREFIX_WI_ORG + "WESO"))
-    obsResource.addProperty(PROPERTY_DCTERMS_ISSUED, DateUtils.getCurrentTimeAsString)
+    obsResource.addProperty(PROPERTY_DCTERMS_ISSUED, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     obsResource.addProperty(PROPERTY_DCTERMS_PUBLISHER, ResourceFactory.createResource(PREFIX_WI_ORG + "WebFoundation"))
     obsResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "Observation"))
     obsResource.addProperty(PROPERTY_RDFS_LABEL, ResourceFactory.createLangLiteral(obs.indicator.label + " in " + obs.area.iso3Code + 
@@ -252,13 +299,18 @@ object ComputexExample {
   private def createDatasetsTriples(dataset : Dataset, 
       observationsByDataset : Map[Dataset, List[Observation]], model : Model) = {
     val datasetResource = model.createResource(PREFIX_DATASET + dataset.id)
-    datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "DataSetDefinition"))
-    datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_WI_ONTO + "Dataset"))
+    datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "DataSet"))
+    //datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_WI_ONTO + "Dataset"))
     datasetResource.addProperty(PROPERTY_CEX_MD5, ResourceFactory.createTypedLiteral("MD5...", XSDDatatype.XSDstring))
     datasetResource.addProperty(PROPERTY_DCTERMS_CONTRIBUTOR, ResourceFactory.createResource(PREFIX_WI_ORG + "WESO"))
-    datasetResource.addProperty(PROPERTY_DCTERMS_ISSUED, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDstring))
+    datasetResource.addProperty(PROPERTY_DCTERMS_ISSUED, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     datasetResource.addProperty(PROPERTY_DCTERMS_PUBLISHER, ResourceFactory.createResource(PREFIX_WI_ORG + "WebFoundation"))
-    var anonymousResource = model.createResource()
+    datasetResource.addProperty(PROPERTY_DCTERMS_TITLE, ResourceFactory.createLangLiteral(dataset.id, "en"))
+    datasetResource.addProperty(PROPERTY_DCTERMS_SUBJECT, ResourceFactory.createResource(PREFIX_SMDX_SUBJECT + "2.5"))
+    datasetResource.addProperty(PROPERTY_RDFS_LABEL, ResourceFactory.createLangLiteral(dataset.id, "en"))
+    datasetResource.addProperty(PROPERTY_RDFS_COMMENT, ResourceFactory.createLangLiteral("Description of dataset " + dataset.id, "en"))
+    datasetResource.addProperty(PROPERTY_SMDX_UNITMEASURE, ResourceFactory.createResource("http://dbpedia.org/resource/Year"))
+    /*var anonymousResource = model.createResource()
     anonymousResource.addProperty(PROPERTY_QB_DIMENSION, ResourceFactory.createResource(PREFIX_WI_ONTO + "ref-area"))
     anonymousResource.addProperty(PROPERTY_QB_ORDER, ResourceFactory.createTypedLiteral("1", XSDDatatype.XSDinteger))
     datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)
@@ -272,7 +324,8 @@ object ComputexExample {
     datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)
     anonymousResource = model.createResource()
     anonymousResource.addProperty(PROPERTY_QB_MEASURE, ResourceFactory.createResource(PREFIX_CEX + "indicator"))
-    datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)
+    datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)*/
+    datasetResource.addProperty(PROPERTY_QB_STRUCTURE, ResourceFactory.createResource(PREFIX_WI_ONTO + "DSD"))
     
     val observations : List[Observation] = observationsByDataset.get(dataset).getOrElse(throw new IllegalArgumentException("There is no observations by dataset " + dataset.id))
     val observationsByYear : Map[Int, List[Observation]] = observations.groupBy(observation => observation.year)
@@ -281,10 +334,13 @@ object ComputexExample {
       sliceResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "Slice"))
       sliceResource.addProperty(PROPERTY_CEX_INDICATOR, ResourceFactory.createResource(PREFIX_INDICATOR + observations.head.indicator.id))
       sliceResource.addProperty(PROPERTY_WIONTO_REFYEAR, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
-      sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, datasetResource)
+      sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, /*datasetResource*/ResourceFactory.createResource(PREFIX_WI_ONTO + "sliceByArea"))
       observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
-        sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" + obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status))
+        createObservationTriples(obs, model, id)
+        sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" + /*obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status*/ id))
+        id += 1
       })
+      datasetResource.addProperty(PROPERTY_QB_SLICE, sliceResource)
     })
   }
   
@@ -308,6 +364,10 @@ object ComputexExample {
     model.setNsPrefix("weightSchema", PREFIX_WEIGHTSCHEMA)
     model.setNsPrefix("slice", PREFIX_SLICE)
     model.setNsPrefix("region", PREFIX_REGION)
+    model.setNsPrefix("skos", PREFIX_SKOS)
+    model.setNsPrefix("time", PREFIX_TIME)
+    model.setNsPrefix("smdx-attribute", PREFIX_SMDX_ATTRIBUTE)
+    model.setNsPrefix("smdx-subject", PREFIX_SMDX_SUBJECT)
     model
   }
 

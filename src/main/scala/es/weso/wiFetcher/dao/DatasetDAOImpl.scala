@@ -6,6 +6,15 @@ import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.utils.FileUtils
 import scala.io.Source
 
+/**
+ * This class contains the implementation that allows to load the information
+ * about datasets of the Web Index
+ * 
+ *  At the moment, Web Foundation does not define the structure of files and 
+ * temporally, we use a TSV file that contains the minimum information about 
+ * dataset. Their identifier, year and a boolean that indicates where we can 
+ * find the countries name in observations spreadsheets.  
+ */
 class DatasetDAOImpl(path : String, relativePath : Boolean) 
 	extends DatasetDAO {
   
@@ -21,6 +30,8 @@ class DatasetDAOImpl(path : String, relativePath : Boolean)
    *     indicating whether countries are in a row or in a column and the year
    *     corresponding to the dataset. You can find an example in src/main/
    * 	 resources/files/datasets.tsv 
+   *   @param path The path of the file that contains the information
+   *   @return A list with all datasets loaded
    */    
   private def load(path : String) : List[Dataset] = {
     var datasets : ListBuffer[Dataset] = new ListBuffer[Dataset]

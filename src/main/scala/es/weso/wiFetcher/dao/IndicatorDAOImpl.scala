@@ -16,31 +16,57 @@ import es.weso.wiFetcher.entities.IndicatorType
 import es.weso.wiFetcher.entities.IndicatorHighLow
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 
+/**
+ * This class contains the implementation that allows to load all information
+ * about Web Index indicators
+ * 
+ * At the moment, this class extracts the information of the indicators from an
+ * excel file that follows the structure of 2012 Web Index. Maybe we have 
+ * to change the implementation
+ */
 class IndicatorDAOImpl(path : String, relativePath : Boolean) 
 	extends IndicatorDAO {
   
+  /**
+   * The name of the sheet that contains all indicators data
+   */
   private val SHEET_NAME : String = "Indicators"
   
+  /**
+   *  A list with all primary indicators of the Web Index
+   */  
   private var primaryIndicators : ListBuffer[Indicator] = 
     new ListBuffer[Indicator]()
+    
+  /**
+   * A list with all secondary indicators of the Web Index
+   */
   private var secondaryIndicators : ListBuffer[Indicator] = 
     new ListBuffer[Indicator]()
     
   load(FileUtils.getFilePath(path, relativePath))  
   
+  /**
+   * This method has to load the sheet that contains indicators information.
+   * @param path The path of the file that contains the information
+   */
   def load(path : String) {
     val workbook = WorkbookFactory.create(new FileInputStream(new File(path)))
+    //Obtain the sheet corresponding wiht indicators
     val sheet : Sheet = workbook.getSheet(SHEET_NAME)
     if(sheet == null) 
       throw new IllegalArgumentException("Not exist a sheet in the file " + 
           path + " with the name " + SHEET_NAME)
+    //Obtain the initial cell to extract the information from properties files
     val cellReference = new CellReference(
         Configuration.getInitialCellIndicatorsSheet)
+    //For each row, create a new indicator and extract all information
     for(row <- cellReference.getRow() to sheet.getLastRowNum()) {
       val evaluator : FormulaEvaluator = 
         workbook.getCreationHelper().createFormulaEvaluator()
       val actualRow = sheet.getRow(row)
-      //TODO Extract all information and create the Indicator object
+      //In the properties file, we define the number of the columns that 
+      //contains each indicator property
       val id = POIUtils.extractCellValue(actualRow.getCell(
           Configuration.getIndicatorIdColumn))
       val subindex = POIUtils.extractCellValue(actualRow.getCell(
@@ -66,6 +92,22 @@ class IndicatorDAOImpl(path : String, relativePath : Boolean)
     }
   }
   
+  /**
+   * This method has to create an indicator from the parameters that receive
+   * @param id The identifier of the indicator
+   * @param subindex The subindex identifier that owns the indicator
+   * @param component The component identifier that owns the indicator
+   * @param name The complete name of the indicator
+   * @param description A complete description of the indicator
+   * @param source The source of the indicator
+   * @param provider The entity or organization that provides indicator 
+   * information
+   * @param typ The type of the indicator (primary or secondary)
+   * @param weigth The weigth that has the indicator in order to calculate
+   * the Web Index
+   * @param hl A variable that indicates if for an indicator, values high or 
+   * low are preferred
+   */
   def createIndicator(id : String, subindex : String, component : String, 
       name : String, description : String, source : String, provider : String, 
       typ : String, weight : String, hl : String) {
@@ -90,17 +132,22 @@ class IndicatorDAOImpl(path : String, relativePath : Boolean)
       primaryIndicators += indicator
     else
       secondaryIndicators += indicator  
+    //Ask to SpreadsheetsFetcher for the component that owns the indicator
     val componentObj = SpreadsheetsFetcher.obtainComponent(component)
     indicator.component = componentObj
     componentObj.addIndicator(indicator)
   }
   
-  
-  
+  /**
+   * This method returns a list with all primary indicators
+   */
   def getPrimaryIndicators() : List[Indicator] = {
     primaryIndicators.toList
   }
   
+  /**
+   * This method returns a list with all secondary indicators
+   */
   def getSecondaryIndicators() : List[Indicator] = {
     secondaryIndicators.toList
   }

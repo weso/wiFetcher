@@ -4,7 +4,10 @@ import java.util.Calendar
 import java.text.SimpleDateFormat
 
 object DateUtils {
-  
+  /**
+   * This method obtains the current time, and format it to yyyy-mm-dd in a 
+   * string
+   */
   def getCurrentTimeAsString() : String = {
     val actual = Calendar.getInstance().getTime()
     

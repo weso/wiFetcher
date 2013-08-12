@@ -6,5 +6,8 @@ object ObservationStatus extends Enumeration {
 	val Normalised = Value("Normalised")
 	val Imputed = Value("Imputed")
 	val Missed = Value("Missed")
+	val Sorted = Value("Sorted")
+	val Adjusted = Value("Adjusted")
+	val Weighted = Value("Weighted")
   
 }
