@@ -11,7 +11,7 @@ class Indicator {
   var label : String = "" 
   var comment : String = ""
   var intervalStarts : Date = null  
-  var interfalFinishes : Date = null 
+  var intervalFinishes : Date = null 
   var countriesCoverage : Int = 0
   var weight : Double = 0.0
   var highLow : IndicatorHighLow = null
