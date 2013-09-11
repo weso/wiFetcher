@@ -6,6 +6,8 @@ import org.scalatest.FunSuite
 import java.io.FileNotFoundException
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import java.io.FileInputStream
+import es.weso.wiFetcher.utils.FileUtils
 
 @RunWith(classOf[JUnitRunner])
 class RegionDAOImplSuite extends FunSuite with BeforeAndAfter 
@@ -15,24 +17,32 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
   var emptyDao : RegionDAO = null
   
   before{
-    regionDao = new RegionDAOImpl("files/Structure.xlsx", true)
-    emptyDao = new RegionDAOImpl("files/empty.xlsx", true)
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+        true))
+    regionDao = new RegionDAOImpl(is)
+    val is2 = new FileInputStream(FileUtils.getFilePath("files/empty.xlsx", 
+        true))
+    emptyDao = new RegionDAOImpl(is2)
   }
 
   test("Try to load data from a non-existing file") {
     intercept[FileNotFoundException] {
-      new RegionDAOImpl("", true)
+      val is = new FileInputStream(FileUtils.getFilePath("", true))
+      new RegionDAOImpl(is)
     }
   }
   
   test("Try to load data from null file") {
     intercept[IllegalArgumentException] {
-      new RegionDAOImpl(null, true)
+      val is = new FileInputStream(FileUtils.getFilePath(null, true))
+      new RegionDAOImpl(is)
     }
   }
   
   test("Load data correctly") {
-    val regionDao = new RegionDAOImpl("files/Structure.xlsx", true)
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+        true))
+    val regionDao = new RegionDAOImpl(is)
     regionDao should not be null
     regionDao.getRegions.size should not be(0)
   }

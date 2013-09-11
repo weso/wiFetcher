@@ -12,6 +12,8 @@ import es.weso.wiFetcher.entities.SubIndex
 import es.weso.wiFetcher.utils.FileUtils
 import es.weso.wiFetcher.utils.POIUtils
 import org.apache.log4j.Logger
+import java.io.InputStream
+import java.io.PushbackInputStream
 
 /**
  * This class contains the implementation that allows to load all information 
@@ -20,7 +22,7 @@ import org.apache.log4j.Logger
  * At the moment, the information is extracted from an excel file that follows
  * the structure of the 2012 Web Index. Maybe the implementation has to change
  */
-class SubIndexDAOImpl(path : String, relativePath : Boolean) extends SubIndexDAO{
+class SubIndexDAOImpl(is : InputStream) extends SubIndexDAO{
   
   //The name of the sheet that contains the information
   val SHEET_NAME = "Index"
@@ -32,22 +34,21 @@ class SubIndexDAOImpl(path : String, relativePath : Boolean) extends SubIndexDAO
   
   private val logger : Logger = Logger.getLogger(this.getClass())
   
-  load(FileUtils.getFilePath(path, relativePath))
+  load(is)
   
   /**
    * This method has to load the information about sub-indexes and components
    * @param path The path of the files that contains the information
    */
-  private def load(path : String) = {
-    //Load the excel file
-    val workbook = WorkbookFactory.create(new FileInputStream(new File(path)))
+  private def load(is : InputStream) = {
+    val workbook = WorkbookFactory.create(is)
     //Obtain the corresponding sheet
     val sheet = workbook.getSheet(SHEET_NAME)
     if(sheet == null) {
       logger.error("Sheet " + SHEET_NAME + " does not " +
-      		"exist in the file " + path)
+      		"exist in the file specified")
       throw new IllegalArgumentException("Sheet " + SHEET_NAME + " does not " +
-      		"exist in the file " + path)
+      		"exist in the file specified")
     }
     //Obtain the first cell to load data. The first cell is in the properties 
     //file

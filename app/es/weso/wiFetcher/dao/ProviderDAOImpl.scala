@@ -10,6 +10,8 @@ import es.weso.wiFetcher.utils.POIUtils
 import org.apache.poi.ss.usermodel.FormulaEvaluator
 import es.weso.wiFetcher.configuration.Configuration
 import java.io.File
+import java.io.InputStream
+import java.io.PushbackInputStream
 
 /**
  * This class contains the implementation that allows to load all information 
@@ -18,7 +20,7 @@ import java.io.File
  * At the moment, the information is extracted from an excel file that follows
  * the structure of the 2012 Web Index. Maybe the implementation has to change
  */
-class ProviderDAOImpl(path : String, relativePath : Boolean) 
+class ProviderDAOImpl(is : InputStream) 
 	extends ProviderDAO{
   
   val SHEET_NAME = "Providers"
@@ -27,20 +29,24 @@ class ProviderDAOImpl(path : String, relativePath : Boolean)
   
   private val logger : Logger = Logger.getLogger(this.getClass())
   
+  load(is)
+  
   /**
    * This method has to load the information about providers
    * @param path The path of the files that contains the information
    */
-  private def load(path : String) = {
-    //Load the excel file
-    val workbook = WorkbookFactory.create(new FileInputStream(new File(path)))
+  private def load(is : InputStream) = {
+    var input = is
+    if(!input.markSupported())
+      input = new PushbackInputStream(is, 8)
+    val workbook = WorkbookFactory.create(input)
     //Obtain the corresponding sheet
     val sheet = workbook.getSheet(SHEET_NAME)
     if(sheet == null) {
       logger.error("Sheet " + SHEET_NAME + " does not " +
-      		"exist in the file " + path)
+      		"exist in the file specified")
       throw new IllegalArgumentException("Sheet " + SHEET_NAME + " does not " +
-      		"exist in the file " + path)
+      		"exist in the file specified")
     }
     //Obtain the first cell to load data. The first cell is in the properties 
     //file

@@ -4,6 +4,8 @@ import cucumber.api.scala.ScalaDsl
 import cucumber.api.scala.EN
 import org.scalatest.matchers.ShouldMatchers
 import es.weso.wiFetcher.entities.Region
+import java.io.FileInputStream
+import es.weso.wiFetcher.utils.FileUtils
 
 class RegionDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
 
@@ -12,7 +14,9 @@ class RegionDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   var region : Region = null
   
   Given("""I want to load all information about regions$""") {() =>
-    val regionsDao : RegionDAO = new RegionDAOImpl("files/Structure.xlsx", true)
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+        true))
+    val regionsDao : RegionDAO = new RegionDAOImpl(is)
     regions = regionsDao.getRegions
   }
   

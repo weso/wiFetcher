@@ -15,6 +15,14 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator
 import es.weso.wiFetcher.entities.IndicatorType
 import es.weso.wiFetcher.entities.IndicatorHighLow
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import java.io.InputStream
+import org.apache.poi.ss.usermodel.Workbook
+import java.io.PushbackInputStream
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.POIXMLDocument
+import org.apache.poi.poifs.filesystem.POIFSFileSystem
+import org.apache.poi.openxml4j.opc.OPCPackage
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 
 /**
  * This class contains the implementation that allows to load all information
@@ -24,7 +32,7 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
  * excel file that follows the structure of 2012 Web Index. Maybe we have 
  * to change the implementation
  */
-class IndicatorDAOImpl(path : String, relativePath : Boolean) 
+class IndicatorDAOImpl(is : InputStream)    
 	extends IndicatorDAO {
   
   /**
@@ -44,52 +52,11 @@ class IndicatorDAOImpl(path : String, relativePath : Boolean)
   private var secondaryIndicators : ListBuffer[Indicator] = 
     new ListBuffer[Indicator]()
     
-  load(FileUtils.getFilePath(path, relativePath))  
+  load(is)  
   
-  /**
-   * This method has to load the sheet that contains indicators information.
-   * @param path The path of the file that contains the information
-   */
-  def load(path : String) {
-    val workbook = WorkbookFactory.create(new FileInputStream(new File(path)))
-    //Obtain the sheet corresponding wiht indicators
-    val sheet : Sheet = workbook.getSheet(SHEET_NAME)
-    if(sheet == null) 
-      throw new IllegalArgumentException("Not exist a sheet in the file " + 
-          path + " with the name " + SHEET_NAME)
-    //Obtain the initial cell to extract the information from properties files
-    val cellReference = new CellReference(
-        Configuration.getInitialCellIndicatorsSheet)
-    //For each row, create a new indicator and extract all information
-    for(row <- cellReference.getRow() to sheet.getLastRowNum()) {
-      val evaluator : FormulaEvaluator = 
-        workbook.getCreationHelper().createFormulaEvaluator()
-      val actualRow = sheet.getRow(row)
-      //In the properties file, we define the number of the columns that 
-      //contains each indicator property
-      val id = POIUtils.extractCellValue(actualRow.getCell(
-          Configuration.getIndicatorIdColumn))
-      val subindex = POIUtils.extractCellValue(actualRow.getCell(
-          Configuration.getIndicatorSubindexColumn))
-      val component = POIUtils.extractCellValue(actualRow.getCell(
-          Configuration.getIndicatorComponentColumn))
-      val name = POIUtils.extractCellValue(actualRow.getCell(
-          Configuration.getIndicatorNameColumn))
-      val description = POIUtils.extractCellValue(actualRow.getCell(
-    	  Configuration.getIndicatorDescriptionColumn))
-	  val source = POIUtils.extractCellValue(actualRow.getCell(
-	      Configuration.getIndicatorSourceColumn))
-      val provider = POIUtils.extractCellValue(actualRow.getCell(
-          Configuration.getIndicatorProviderColumn))
-      val typ = POIUtils.extractCellValue(actualRow.getCell(
-          Configuration.getIndicatorTypeColumn))
-      val weight = POIUtils.extractCellValue(actualRow.getCell(
-          Configuration.getIndicatorWeightColumn), evaluator)
-      val hl = POIUtils.extractCellValue(actualRow.getCell(
-          Configuration.getIndicatorHLColumn))  
-      createIndicator(id, subindex, component, name, description, source, 
-          provider, typ, weight, hl)
-    }
+  def load(is : InputStream) {
+    val workbook = WorkbookFactory.create(is)
+    parseData(workbook, extractSheet(null, workbook))
   }
   
   /**
@@ -151,5 +118,51 @@ class IndicatorDAOImpl(path : String, relativePath : Boolean)
   def getSecondaryIndicators() : List[Indicator] = {
     secondaryIndicators.toList
   }
-
+  
+  private def parseData(workbook: Workbook, sheet : Sheet): Unit = {
+	  
+	  //Obtain the initial cell to extract the information from properties files
+	  val cellReference = new CellReference(
+	      Configuration.getInitialCellIndicatorsSheet)
+	  //For each row, create a new indicator and extract all information
+	  for(row <- cellReference.getRow() to sheet.getLastRowNum()) {
+	    val evaluator : FormulaEvaluator = 
+	      workbook.getCreationHelper().createFormulaEvaluator()
+	    val actualRow = sheet.getRow(row)
+	    //In the properties file, we define the number of the columns that 
+	    //contains each indicator property
+	    val id = POIUtils.extractCellValue(actualRow.getCell(
+	        Configuration.getIndicatorIdColumn))
+	    val subindex = POIUtils.extractCellValue(actualRow.getCell(
+	        Configuration.getIndicatorSubindexColumn))
+	    val component = POIUtils.extractCellValue(actualRow.getCell(
+	        Configuration.getIndicatorComponentColumn))
+	    val name = POIUtils.extractCellValue(actualRow.getCell(
+	        Configuration.getIndicatorNameColumn))
+	    val description = POIUtils.extractCellValue(actualRow.getCell(
+	  	  Configuration.getIndicatorDescriptionColumn))
+	  val source = POIUtils.extractCellValue(actualRow.getCell(
+	      Configuration.getIndicatorSourceColumn))
+	    val provider = POIUtils.extractCellValue(actualRow.getCell(
+	        Configuration.getIndicatorProviderColumn))
+	    val typ = POIUtils.extractCellValue(actualRow.getCell(
+	        Configuration.getIndicatorTypeColumn))
+	    val weight = POIUtils.extractCellValue(actualRow.getCell(
+	        Configuration.getIndicatorWeightColumn), evaluator)
+	    val hl = POIUtils.extractCellValue(actualRow.getCell(
+	        Configuration.getIndicatorHLColumn))  
+	    createIndicator(id, subindex, component, name, description, source, 
+	        provider, typ, weight, hl)
+	  }
+	}
+  
+  private def extractSheet(path: Option[String], workbook:Workbook): Sheet = {
+	  //Obtain the sheet corresponding with indicators
+	  val sheet : Sheet = workbook.getSheet(SHEET_NAME)
+	  if(sheet == null) 
+	    throw new IllegalArgumentException("Not exist a sheet in the file " + 
+	        path.get + " with the name " + SHEET_NAME)
+	  sheet
+	}
+  
 }

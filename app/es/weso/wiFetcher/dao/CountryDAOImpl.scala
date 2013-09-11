@@ -17,7 +17,7 @@ import java.io.FileNotFoundException
  * countries. Their name, iso-2 code and iso-3 code.  
  */
 class CountryDAOImpl(path : String, relativePath : Boolean) extends CountryDAO {
-  
+  println("Carga fichero paises")
   private var countries : List[Country] = load(FileUtils.getFilePath(path, 
       relativePath))
   

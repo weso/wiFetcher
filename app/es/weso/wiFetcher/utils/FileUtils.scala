@@ -1,6 +1,7 @@
 package es.weso.wiFetcher.utils
 
 import java.io.FileNotFoundException
+import play.api.Play
 
 object FileUtils {
   
@@ -14,6 +15,7 @@ object FileUtils {
    * @return An absolute path
    */
   def getFilePath(path : String, relativePath : Boolean) : String = {
+    println("PATH " + path)
     if(path == null) {
       throw new IllegalArgumentException("Path cannot be null")
     }

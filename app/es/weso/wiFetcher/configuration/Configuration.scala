@@ -1,14 +1,13 @@
 package es.weso.wiFetcher.configuration
 
 import org.apache.commons.configuration.CompositeConfiguration
-import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
+import org.apache.commons.configuration.PropertiesConfiguration
 
 
 
 object Configuration {
   
-  protected var CONFIG : Config = null
+  protected var CONFIG : CompositeConfiguration = null
   
   def getInitialCellSecondaryObservation() : String = {
     loadConfigure
@@ -192,13 +191,14 @@ object Configuration {
   
   def loadConfigure() = {
     if(CONFIG == null) {
-      CONFIG = ConfigFactory.load()
-      /*CONFIG.append(new PropertiesConfiguration("config/countries.properties"))
-      CONFIG.append(new PropertiesConfiguration("config/indicators.properties"))
-      CONFIG.append(new PropertiesConfiguration("config/observations.properties"))
-      CONFIG.append(new PropertiesConfiguration("config/datasets.properties"))
-      CONFIG.append(new PropertiesConfiguration("config/subindexes.properties"))
-      CONFIG.append(new PropertiesConfiguration("config/regions.properties"))*/
+      CONFIG = new CompositeConfiguration
+      CONFIG.append(new PropertiesConfiguration("conf/countries.properties"))
+      CONFIG.append(new PropertiesConfiguration("conf/indicators.properties"))
+      CONFIG.append(new PropertiesConfiguration("conf/observations.properties"))
+      CONFIG.append(new PropertiesConfiguration("conf/datasets.properties"))
+      CONFIG.append(new PropertiesConfiguration("conf/subindexes.properties"))
+      CONFIG.append(new PropertiesConfiguration("conf/regions.properties"))
+      CONFIG.append(new PropertiesConfiguration("conf/providers.properties"))
     }
   }
 

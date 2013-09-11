@@ -7,6 +7,8 @@ import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import es.weso.wiFetcher.utils.FileUtils
+import java.io.FileInputStream
 
 @RunWith(classOf[JUnitRunner])
 class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter 
@@ -16,24 +18,31 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   var emptyDao : SubIndexDAO = null
   
   before {
-    subIndexDao = new SubIndexDAOImpl("files/Structure.xlsx", true)
-    emptyDao = new SubIndexDAOImpl("files/empty.xlsx", true)
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+        true))
+    subIndexDao = new SubIndexDAOImpl(is)
+    val is2 = new FileInputStream(FileUtils.getFilePath("files/empty.xlsx", 
+        true))
+    emptyDao = new SubIndexDAOImpl(is2)
   }
 
   test("Try to load subindexes data from inexisting file") {
     intercept[FileNotFoundException] {
-      val subindexdao = new SubIndexDAOImpl("test.xlsx", true) 
+      val is = new FileInputStream(FileUtils.getFilePath("test.xlsx", true))
+      val subindexdao = new SubIndexDAOImpl(is) 
     }
   }
   
   test("Try to load subindexes data from null path") {
     intercept[IllegalArgumentException] {
-      val subindexdao = new SubIndexDAOImpl(null, true)
+      val is = new FileInputStream(FileUtils.getFilePath(null, true))
+      val subindexdao = new SubIndexDAOImpl(is)
     }
   }
   
   test("Load all subindex data from correct excel file") {
-    subIndexDao = new SubIndexDAOImpl("files/Structure.xlsx", true)
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", true))
+    subIndexDao = new SubIndexDAOImpl(is)
     subIndexDao should not be (null)
     subIndexDao.getSubIndexes.size should not be (0)
     subIndexDao.getComponents.size should not be (0)

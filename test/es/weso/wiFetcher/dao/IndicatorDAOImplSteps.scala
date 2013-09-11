@@ -5,6 +5,8 @@ import cucumber.api.scala.EN
 import cucumber.api.scala.ScalaDsl
 import es.weso.wiFetcher.entities.Indicator
 import scala.collection.mutable.ListBuffer
+import java.io.FileInputStream
+import es.weso.wiFetcher.utils.FileUtils
 
 class IndicatorDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
 
@@ -13,7 +15,9 @@ class IndicatorDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   var result : Indicator = null
   
   Given("""^I want to load all information about indicators in the WebIndex$""") { () =>
-    indicatorDao = new IndicatorDAOImpl("files/Structure.xlsx", true)
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+        true))
+    indicatorDao = new IndicatorDAOImpl(is)
     indicators ++= indicatorDao.getPrimaryIndicators
     indicators ++= indicatorDao.getSecondaryIndicators
   }

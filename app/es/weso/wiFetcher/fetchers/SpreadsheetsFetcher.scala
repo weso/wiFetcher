@@ -28,6 +28,9 @@ import org.apache.log4j.Logger
 import es.weso.wiFetcher.dao.ProviderDAOImpl
 import es.weso.wiFetcher.dao.ProviderDAO
 import es.weso.wiFetcher.entities.Provider
+import java.io.InputStream
+import java.io.File
+import java.io.FileInputStream
 
 object SpreadsheetsFetcher extends Fetcher {
   
@@ -43,26 +46,31 @@ object SpreadsheetsFetcher extends Fetcher {
    //Create an indicator reconciliator
   val indicatorReconciliator : IndicatorReconciliator = 
     new IndicatorReconciliator
-  //Index all indicators in the reconciliator in order to search indicators
-  indicatorReconciliator.indexIndicators(primaryIndicators)
-  indicatorReconciliator.indexIndicators(secondaryIndicators)
   
   /**
    * This method load all structure about Web Index information
    */
-  def loadStructure(uri:String) {
-    loadSubIndexInformation(uri, false)
-    loadIndicatorInformation(uri, false)
+  def loadStructure(f: File) {
+    var is : InputStream = new FileInputStream(f)
+    loadSubIndexInformation(is)
+    is.close
+    is = new FileInputStream(f)
+    loadIndicatorInformation(is)
+    is.close
     loadCountryInformation(Configuration.getCountryFile, true)
-    loadRegionInformation(uri, false)
-    loadProviderInformation(uri, false)
+    is = new FileInputStream(f)
+    loadRegionInformation(is)
+    is.close
+    is = new FileInputStream(f)
+    loadProviderInformation(is)
+    is.close
   }
   
   /**
    * This method loads all information about subindexes and components
    */
-  private def loadSubIndexInformation(uri : String, relativePath : Boolean) {
-    val subIndexDao = new SubIndexDAOImpl(uri, relativePath)
+  private def loadSubIndexInformation(is : InputStream) {
+    val subIndexDao = new SubIndexDAOImpl(is)
     components = subIndexDao.getComponents
     subIndexes = subIndexDao.getSubIndexes
   }
@@ -70,10 +78,13 @@ object SpreadsheetsFetcher extends Fetcher {
   /**
    * This method loads all information abou indicators
    */
-  private def loadIndicatorInformation(uri : String, relativePath : Boolean) {
-    val indicatorDao = new IndicatorDAOImpl(uri, false)
+  private def loadIndicatorInformation(is : InputStream) {
+    val indicatorDao = new IndicatorDAOImpl(is)
     primaryIndicators = indicatorDao.getPrimaryIndicators
-    secondaryIndicators = indicatorDao.getSecondaryIndicators    
+    secondaryIndicators = indicatorDao.getSecondaryIndicators  
+    //Index all indicators in the reconciliator in order to search indicators
+    indicatorReconciliator.indexIndicators(primaryIndicators)
+    indicatorReconciliator.indexIndicators(secondaryIndicators)
   }
   
   /**
@@ -87,13 +98,13 @@ object SpreadsheetsFetcher extends Fetcher {
   /**
    * This method
    */
-  private def loadRegionInformation(uri : String, relativePath : Boolean) {
-    val regionDao = new RegionDAOImpl(uri, relativePath)
+  private def loadRegionInformation(is : InputStream) {
+    val regionDao = new RegionDAOImpl(is)
     regions = regionDao.getRegions
   }
   
-  private def loadProviderInformation(uri : String, relativePath : Boolean) {
-    val providerDao = new ProviderDAOImpl(uri, relativePath)
+  private def loadProviderInformation(is : InputStream) {
+    val providerDao = new ProviderDAOImpl(is)
     providers = providerDao.getProviders
   }
   

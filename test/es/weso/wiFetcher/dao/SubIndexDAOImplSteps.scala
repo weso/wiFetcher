@@ -6,6 +6,8 @@ import org.scalatest.matchers.ShouldMatchers
 import es.weso.wiFetcher.entities.SubIndex
 import es.weso.wiFetcher.entities.Component
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import es.weso.wiFetcher.utils.FileUtils
+import java.io.FileInputStream
 
 class SubIndexDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   
@@ -16,7 +18,9 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   var component : Component = null
   
   Given("""^I want to load all information about subindexes in the WebIndex$""") {() => 
-    subIndexDAO = new SubIndexDAOImpl("files/Structure.xlsx", true)
+    
+    subIndexDAO = new SubIndexDAOImpl(new FileInputStream(
+        FileUtils.getFilePath("files/Structure.xlsx", true)))
     subIndexDAO should not be (null)
   }
   

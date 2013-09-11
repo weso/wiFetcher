@@ -4,6 +4,9 @@ import play.api.mvc.Controller
 import play.api.mvc.Action
 import java.io.ByteArrayInputStream
 import org.apache.commons.io.FileUtils
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import java.io.FileInputStream
+import java.io.File
 
 object FileUploadController extends Controller {
   
@@ -15,9 +18,11 @@ object FileUploadController extends Controller {
   def byFileUploadPOST() = Action(parse.multipartFormData) {
     implicit request =>
       request.body.file("uploaded_file").map{file =>
-      	val contentIS = new ByteArrayInputStream(FileUtils.readFileToByteArray(
-      	    file.ref.file))
-      	//TODO Call to SpreadsheetFetcher to parse the data
+        val f = new File("public/temp/" + file.filename)
+        file.ref.moveTo(f, true)
+//      	val contentIS = new ByteArrayInputStream(FileUtils.readFileToByteArray(
+//      	    file.ref.file))
+      	SpreadsheetsFetcher.loadStructure(f)
       	Ok("Parsear " + file.filename)
       }
     BadRequest("")

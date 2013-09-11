@@ -14,6 +14,8 @@ import scala.collection.mutable.HashSet
 import es.weso.wiFetcher.utils.POIUtils
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import org.apache.log4j.Logger
+import java.io.InputStream
+import java.io.PushbackInputStream
 
 /**
  * This class contains the implementation that allows to load all information
@@ -23,13 +25,12 @@ import org.apache.log4j.Logger
  * excel file that follows the structure of 2012 Web Index. Maybe we have to 
  * change the implementation  
  */
-class RegionDAOImpl(path : String, relativePath : Boolean) extends RegionDAO {
+class RegionDAOImpl(is : InputStream) extends RegionDAO {
   
   //The name of the sheet that contains the information about regions
   private val SHEET_NAME = "Geo"
   //A list with all regions  
-  private var regions : List[Region] = load(FileUtils.getFilePath(path, 
-      relativePath))
+  private var regions : List[Region] = load(is)
       
   private val logger : Logger = Logger.getLogger(this.getClass())
   
@@ -39,17 +40,19 @@ class RegionDAOImpl(path : String, relativePath : Boolean) extends RegionDAO {
    * @param path the path of the file that contains the information
    * @return A list with all regions loaded
    */
-  private def load(path : String) : List[Region] = {
+  private def load(is : InputStream) : List[Region] = {
     val regions : HashSet[Region] = new HashSet[Region]
-    //Load the excel file
-    val workbook = WorkbookFactory.create(new FileInputStream(new File(path)))
+    var input = is
+    if(!input.markSupported())
+      input = new PushbackInputStream(is, 8)
+    val workbook = WorkbookFactory.create(input)
     //Obtain corresponding sheet
     val sheet : Sheet = workbook.getSheet(SHEET_NAME)
     if(sheet == null) {
-      logger.error("Not exist a sheet in the file " + 
-          path + " with the name " + SHEET_NAME)
-      throw new IllegalArgumentException("Not exist a sheet in the file " + 
-          path + " with the name " + SHEET_NAME)
+      logger.error("Not exist a sheet in the file specified" +
+      		" with the name " + SHEET_NAME)
+      throw new IllegalArgumentException("Not exist a sheet in the file " +
+      		"specified with the name " + SHEET_NAME)
     }
     //Obtain the first cell that contains data. This cell is in properties file
     val cellReference = new CellReference(
