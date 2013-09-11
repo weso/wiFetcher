@@ -1,7 +1,12 @@
+// Comment to get more information during initialization
 logLevel := Level.Warn
 
-addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.2.0")
+// The Typesafe repository 
+resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/" 
+ 
+//resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots" 
+ 
+resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.ivy2/local"
 
-resolvers += "Templemore Repository" at "http://templemore.co.uk/repo/"
-
-addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.2")
+// Use the Play sbt plugin for Play projects
+addSbtPlugin("play" % "sbt-plugin" % "2.1.3")
