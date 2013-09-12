@@ -29,10 +29,11 @@ class RegionDAOImpl(is : InputStream) extends RegionDAO {
   
   //The name of the sheet that contains the information about regions
   private val SHEET_NAME = "Geo"
+    
+  private val logger : Logger = Logger.getLogger(this.getClass())
+    
   //A list with all regions  
   private var regions : List[Region] = load(is)
-      
-  private val logger : Logger = Logger.getLogger(this.getClass())
   
   /**
    * This method has to extract the information from an excel file. This file
@@ -73,7 +74,8 @@ class RegionDAOImpl(is : InputStream) extends RegionDAO {
           Configuration.getRegionCountryColumn))
       //Obtain the unique region with the name extracted that is in the set, in 
       //order to add the countries at the same region
-      region = regions.find(region => region.name.equals(regionName)).getOrElse(throw new IllegalArgumentException)
+      region = regions.find(region => region.name.equals(regionName)).getOrElse(
+          throw new IllegalArgumentException)
       //I add the country in the region information. First, we have to obtain
       //the country from SpreadsheetsFetcher given a name
       region.addCountry(SpreadsheetsFetcher.obtainCountry(country))

@@ -23,6 +23,7 @@ import org.apache.poi.POIXMLDocument
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.openxml4j.opc.OPCPackage
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.log4j.Logger
 
 /**
  * This class contains the implementation that allows to load all information
@@ -39,6 +40,8 @@ class IndicatorDAOImpl(is : InputStream)
    * The name of the sheet that contains all indicators data
    */
   private val SHEET_NAME : String = "Indicators"
+    
+  private val logger : Logger = Logger.getLogger(this.getClass())
   
   /**
    *  A list with all primary indicators of the Web Index
@@ -125,6 +128,7 @@ class IndicatorDAOImpl(is : InputStream)
 	  val cellReference = new CellReference(
 	      Configuration.getInitialCellIndicatorsSheet)
 	  //For each row, create a new indicator and extract all information
+	  logger.info("Begin indicators extraction")
 	  for(row <- cellReference.getRow() to sheet.getLastRowNum()) {
 	    val evaluator : FormulaEvaluator = 
 	      workbook.getCreationHelper().createFormulaEvaluator()
@@ -154,14 +158,18 @@ class IndicatorDAOImpl(is : InputStream)
 	    createIndicator(id, subindex, component, name, description, source, 
 	        provider, typ, weight, hl)
 	  }
+	  logger.info("Finish indicators extraction")
 	}
   
   private def extractSheet(path: Option[String], workbook:Workbook): Sheet = {
 	  //Obtain the sheet corresponding with indicators
 	  val sheet : Sheet = workbook.getSheet(SHEET_NAME)
-	  if(sheet == null) 
+	  if(sheet == null) {
+	    logger.error("Not exist a sheet in the file " + 
+	        path.get + " with the name " + SHEET_NAME)
 	    throw new IllegalArgumentException("Not exist a sheet in the file " + 
 	        path.get + " with the name " + SHEET_NAME)
+	  }
 	  sheet
 	}
   

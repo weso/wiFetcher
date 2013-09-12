@@ -23,7 +23,7 @@ object FileUploadController extends Controller {
 //      	val contentIS = new ByteArrayInputStream(FileUtils.readFileToByteArray(
 //      	    file.ref.file))
       	SpreadsheetsFetcher.loadStructure(f)
-      	Ok("Parsear " + file.filename)
+      	Ok("Peto")
       }
     BadRequest("")
   }

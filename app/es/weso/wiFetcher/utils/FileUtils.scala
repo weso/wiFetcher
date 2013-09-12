@@ -15,12 +15,12 @@ object FileUtils {
    * @return An absolute path
    */
   def getFilePath(path : String, relativePath : Boolean) : String = {
-    println("PATH " + path)
     if(path == null) {
       throw new IllegalArgumentException("Path cannot be null")
     }
     if(relativePath) {
-      val resource = getClass.getClassLoader().getResource(path)
+//      val resource = getClass.getClassLoader().getResource(path)
+      val resource = Play.current.classloader.getResource(path)
       if(resource == null)
         throw new FileNotFoundException("File especifies does not exist")
       resource.getPath()
