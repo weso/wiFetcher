@@ -1,0 +1,18 @@
+@* observationsFile Template File *@
+@(param: Any)
+<div id="frontforms">
+	
+	<div>Structure file has been processed correctly! Now upload an observations file</div>
+	
+	<div>
+		@helper.form(action = routes.FileUploadController.byObservationFileUploadPOST, 'enctype -> "multipart/form-data") {
+	      	<p class="instructions">
+	      		<label title="Choose a Local File to Upload and load Web Index observations" for="uploaded_file">File:</label>
+	      		<input type="file" id="uploaded_file" name="uploaded_file"/>
+	      	</p>
+			<p class="submit_button">
+				<input type="submit" title="Submit for validation" value="Check" class="button"/>
+			</p>
+		}
+	</div>
+</div>

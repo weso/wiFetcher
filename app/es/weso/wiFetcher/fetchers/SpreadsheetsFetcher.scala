@@ -50,29 +50,36 @@ object SpreadsheetsFetcher extends Fetcher {
   //Create an indicator reconciliator
   val indicatorReconciliator: IndicatorReconciliator =
     new IndicatorReconciliator
+  var datasets : List[Dataset] = null
+  var observations : List[Observation] = null
 
   /**
    * This method load all structure about Web Index information
    */
   def loadStructure(f: File) {
-    /*var is: InputStream = new FileInputStream(f)
-    loadSubIndexInformation(is)
-    is.close
-    is = new FileInputStream(f)
-    loadIndicatorInformation(is)
-    is.close
-    loadCountryInformation(Configuration.getCountryFile, true)
-    is = new FileInputStream(f)
-    loadRegionInformation(is)
-    is.close
-    is = new FileInputStream(f)
-    loadProviderInformation(is)
-    is.close*/
     handleFooIS(f, loadSubIndexInformation)
     handleFooIS(f, loadIndicatorInformation)
     loadCountryInformation(Configuration.getCountryFile, true)
     handleFooIS(f, loadRegionInformation)
     handleFooIS(f, loadProviderInformation)
+  }
+  
+  /**
+   * This method load all observation form an excel file
+   */
+  def loadObservations(f : File) {
+    loadDatasetInformation(Configuration.getDatasetFile, true)
+    handleFooIS(f, loadObservationInformation)
+  }
+  
+  private def loadDatasetInformation(path : String, relativePath : Boolean) {
+    val datasetDao = new DatasetDAOImpl(path, relativePath)
+    datasets = datasetDao.getDatasets
+  }
+  
+  private def loadObservationInformation(is : InputStream) {
+    val observationDao = new ObservationDAOImpl(is)
+    observations = observationDao.getObservations(datasets)
   }
 
   def handleFooIS(file: File, foo:(InputStream)=>Unit) {

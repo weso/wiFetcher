@@ -23,6 +23,7 @@ import es.weso.wiFetcher.entities.ObservationStatus
 import es.weso.wiFetcher.entities.ObservationStatus._
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.log4j.Logger
+import java.io.InputStream
 
 /**
  * This class contains the implementation that allows extract all information
@@ -33,14 +34,12 @@ import org.apache.log4j.Logger
  * Maybe the implementation has to change.
  *  
  */
-class ObservationDAOImpl(path : String, relativePath : Boolean) 
-	extends ObservationDAO {
+class ObservationDAOImpl(is : InputStream) extends ObservationDAO {
   
   /**
    * The excel workbook that contains the information about observations
    */
-  var workbook : Workbook = WorkbookFactory.create(new FileInputStream(
-      new File(FileUtils.getFilePath(path, relativePath))))
+  var workbook : Workbook = WorkbookFactory.create(is)
       
   private val logger : Logger = Logger.getLogger(this.getClass())
   
@@ -84,7 +83,9 @@ class ObservationDAOImpl(path : String, relativePath : Boolean)
     }     
     logger.info("Begin observations extraction")
     //Status of observations depends on excel templates
-    val status = obtainStatus(Configuration.getStatusCell, sheet)
+    //At the moment, we extract the status of the observations from the dataset 
+    //id
+    val status = dataset.id.substring(dataset.id.lastIndexOf('-'))
     //Obtain the initial cell of observation from properties file
     val initialCell = new CellReference(
         Configuration.getInitialCellSecondaryObservation)
@@ -94,25 +95,28 @@ class ObservationDAOImpl(path : String, relativePath : Boolean)
       val actualRow = sheet.getRow(row)
       if(actualRow != null && !POIUtils.extractCellValue(
             actualRow.getCell(0), evaluator).trim().isEmpty()) {
-//        var countryName : String = POIUtils.extractCellValue(
-//            actualRow.getCell(0))
-//        var country : Country = SpreadsheetsFetcher.obtainCountry(countryName)
+        var countryName : String = POIUtils.extractCellValue(
+            actualRow.getCell(0))
+        var country : Country = SpreadsheetsFetcher.obtainCountry(countryName)
         //We have to iterate throw the excel file
         for(column <- initialCell.getCol() to actualRow.getLastCellNum() - 1) {
         	//Obtain the indicator corresponds to the observation
-            var indicator : Indicator = obtainIndicator(sheet, dataset, 
-                column, row, initialCell)
+            var indicator : Indicator = obtainIndicator(sheet, 
+                Configuration.getIndicatorCell)
             //Obtain the country corresponds to the observation 
-            var country : Country = obtainCountry(sheet, dataset, column, row, 
-                initialCell)
+            var country : Country = obtainCountry(countryName)
             //If country of the observation is null, there is no observation
             //for this cell
             if(country != null) {
-              var year = dataset.year
+              //TODO Have to extract the year for the spreadsheet
+              var year = POIUtils.extractCellValue(sheet.getRow(
+                initialCell.getRow() - 1).getCell(column), evaluator)
     	      var value = POIUtils.extractNumericCellValue(actualRow.getCell(column), 
     	        evaluator)
     	      //Create the observation with the extracted data
     	      logger.info("Extracted observation of: " + dataset.id + " " +
+    	        country.iso3Code + " " + indicator + " " + value)
+    	        println("Extracted observation of: " + dataset.id + " " +
     	        country.iso3Code + " " + indicator + " " + value)
     	      observations += createObservation(dataset, "", country, null, 
     	        indicator, year.toDouble, value, status)
@@ -138,27 +142,10 @@ class ObservationDAOImpl(path : String, relativePath : Boolean)
    * @param initialCell The initial cell of the observations
    * @return A country corresponds to an observations
    */
-  def obtainCountry(sheet : Sheet, dataset : Dataset, column : Int, row : Int, 
-      initialCell : CellReference) : Country = {
-    var cell : Cell = null
-    //We have to check if the countries are defined in a row or in a column
-    if(dataset.isCountryInRow) 
-      cell = sheet.getRow(initialCell.getRow() - 1).getCell(column)
-    else
-      cell = sheet.getRow(row).getCell(0)
-    //Extract the name of the country
-    val cellValue : String = POIUtils.extractCellValue(cell)  
-    if(cellValue.isEmpty()) {
-      //If the cell is empty, the method returns null
-      null
-    } else {
-      //We ask to country reconciliator for the Web Index name of the country
-      //extracted from the sheet
-      var countryName : String = reconciliator.searchCountry(cellValue)
+  def obtainCountry(countryName : String) : Country = {
       logger.info("Obtaining country with name: " + countryName)
       //Ask to SpreadsheetFetcher for the country accord to the Web Index name
       SpreadsheetsFetcher.obtainCountry(countryName)
-    }
   }
   
   /**
@@ -171,22 +158,10 @@ class ObservationDAOImpl(path : String, relativePath : Boolean)
    * @param initialCell The initial cell of the observations
    * @return An indicator
    */
-  def obtainIndicator(sheet : Sheet, dataset : Dataset, column : Int, 
-      row : Int, initialCell : CellReference) : Indicator = {
-    /*val cellReference = new CellReference(cell)
+  def obtainIndicator(sheet : Sheet, cell : String) : Indicator = {
+    val cellReference = new CellReference(cell)
     val indicatorName = POIUtils.extractCellValue(
         sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()))
-    SpreadsheetsFetcher.obtainIndicator(indicatorName)*/
-    var cell : Cell = null
-    //We have to check if the indicators are defined in a row or in a column
-    if(dataset.isCountryInRow) 
-      cell = sheet.getRow(row).getCell(0)
-    else
-      cell = sheet.getRow(initialCell.getRow() - 1).getCell(column)
-    //Extract indicator name
-    val indicatorName : String = POIUtils.extractCellValue(cell)
-    logger.info("Obtaining indicator from name: " + indicatorName)
-    //Ask to SpreadsheetFetcher for the indicator with the name extracted
     SpreadsheetsFetcher.obtainIndicator(indicatorName)
   }
   
@@ -222,6 +197,7 @@ class ObservationDAOImpl(path : String, relativePath : Boolean)
          case "Sorted" => ObservationStatus.Sorted
          case "Adjusted" => ObservationStatus.Adjusted
          case "Weighted" => ObservationStatus.Weighted
+         case "Ordered" => ObservationStatus.Ordered
          case _ => throw new IllegalArgumentException("Observation status " + 
              status + " is unknown")
        } 

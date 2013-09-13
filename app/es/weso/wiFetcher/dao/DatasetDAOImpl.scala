@@ -37,14 +37,13 @@ class DatasetDAOImpl(path : String, relativePath : Boolean)
     var datasets : ListBuffer[Dataset] = new ListBuffer[Dataset]
     val src = Source.fromFile(path)
     val iter = src.getLines.map(_.split("\t"))
+    println("Begin dataset extraction")
     iter.foreach(line => {
       var dataset = new Dataset
       dataset.id = line(0)
-      dataset.isCountryInRow = line(1).toBoolean
-      dataset.year = line(2).toInt
       datasets += dataset
     })
-    
+    println("Finish dataset extraction")
     datasets.toList
   }
   

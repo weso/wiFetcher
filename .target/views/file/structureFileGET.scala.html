@@ -1,0 +1,6 @@
+@(param: Any)(implicit flash:Flash)
+
+@main("Structure file upload") {
+	<div>@param</div>
+	@views.html.file.structureFile(param)
+}

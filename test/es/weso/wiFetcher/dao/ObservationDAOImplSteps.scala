@@ -6,6 +6,9 @@ import cucumber.api.scala.ScalaDsl
 import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Observation
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
+import java.io.FileInputStream
+import java.io.File
+import es.weso.wiFetcher.utils.FileUtils
 
 class ObservationDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   
@@ -16,18 +19,18 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   Given("""^I want to load the observations of dataset "([^"]*)" in the year "([^"]*)"$"""){ (datast:String, year:Int) =>
 	val dataset : Dataset = new Dataset
 	dataset.id = datast
-	dataset.year = year
-	dataset.isCountryInRow = true
-	observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+	val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+	observationDAO = new ObservationDAOImpl(is)
 	observations = observationDAO.getObservationsByDataset(dataset)
   } 
   
   Given("""^I want to load the observations of non-existing dataset "([^"]*)" in the year "([^"]*)"$""") {(datast : String, year:Int) => {
     val dataset : Dataset = new Dataset
 	dataset.id = datast
-	dataset.isCountryInRow = true
-	dataset.year = year
-	observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+	val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+	observationDAO = new ObservationDAOImpl(is)
     intercept[IllegalArgumentException] {
       observations = observationDAO.getObservationsByDataset(dataset)
     }

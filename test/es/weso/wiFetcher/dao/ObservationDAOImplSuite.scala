@@ -8,6 +8,9 @@ import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.entities.Observation
 import java.io.FileNotFoundException
 import es.weso.wiFetcher.entities.Dataset
+import java.io.FileInputStream
+import java.io.File
+import es.weso.wiFetcher.utils.FileUtils
 
 @RunWith(classOf[JUnitRunner])
 class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter 
@@ -21,32 +24,36 @@ class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter
     dataset1 = new Dataset
     dataset2 = new Dataset
     dataset1.id = "2008"
-    dataset1.isCountryInRow = true 
-    dataset1.year = 2008
     dataset2.id = "2009"
-    dataset2.isCountryInRow = true
-    dataset2.year = 2009
   }
   
   test("Try to load a non-existing spreadsheet") {
     intercept[FileNotFoundException]{
-      observationDAO  = new ObservationDAOImpl("files/text.xlsx", true)
+      val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/text.xlsx", true)))
+      observationDAO  = new ObservationDAOImpl(is)
     }
   }
   
   test("Load a correct and an existing spreadsheet") {
-    observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+    val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+    observationDAO = new ObservationDAOImpl(is)
   }
   
   test("Try to obtain all observations of a list of datasets null") {
-    observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+    val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+    observationDAO = new ObservationDAOImpl(is)
     intercept[IllegalArgumentException] {
       observationDAO.getObservations(null)
     }
   }
   
   test("Try to obtain all observations of a empty list of datasets") {
-    observationDAO  = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+    val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+    observationDAO  = new ObservationDAOImpl(is)
     var datasets : List[Dataset] = List[Dataset]()
     var observations : List[Observation] = observationDAO.getObservations(datasets)
     observations should not be null
@@ -54,7 +61,9 @@ class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Obatin all observations of a list of datasets") {
-    observationDAO  = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+    val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+    observationDAO  = new ObservationDAOImpl(is)
     var datasets : List[Dataset] = List[Dataset](dataset1, dataset2)
     var observations : List[Observation] = observationDAO.getObservations(datasets)
     observations should not be null
@@ -62,7 +71,9 @@ class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Try to obtain all observations of a non-existing dataset") {
-    observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+    val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+    observationDAO = new ObservationDAOImpl(is)
     var dataset : Dataset = new Dataset
     dataset.id = "test"
     intercept[IllegalArgumentException] {
@@ -71,14 +82,18 @@ class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Try to obtain all observations of a null dataset") {
-    observationDAO = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+    val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+    observationDAO = new ObservationDAOImpl(is)
     intercept[IllegalArgumentException] {
       observationDAO.getObservationsByDataset(null)
     }
   }
   
   test("Obtain all observations of a valid dataset") {
-    observationDAO  = new ObservationDAOImpl("files/TASTemplate.xlsx", true)
+    val is = new FileInputStream(new File(
+	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
+    observationDAO  = new ObservationDAOImpl(is)
     var observations : List[Observation] = observationDAO.getObservationsByDataset(dataset1)
     observations should not be null
     observations.size should be (3645)

@@ -30,7 +30,7 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
     val datasets : List[Dataset] = datasetDao.getDatasets
     datasets.size should be (5)
     datasets.foreach(dataset => {
-      if(dataset.id == null || dataset.id.equals("") || dataset.year == 0)
+      if(dataset.id == null || dataset.id.equals(""))
         throw new Exception("Any dataset is no loaded correctly")
     })
   }

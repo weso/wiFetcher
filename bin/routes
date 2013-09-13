@@ -9,5 +9,5 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET		/uri						controllers.URIController.byUriGET
-GET		/file						controllers.FileUploadController.byFileUploadGET
-POST	/file						controllers.FileUploadController.byFileUploadPOST
+GET		/file						controllers.FileUploadController.byStructureFileUploadGET
+POST	/file						controllers.FileUploadController.byStructureFileUploadPOST

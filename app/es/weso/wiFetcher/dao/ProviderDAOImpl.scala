@@ -78,7 +78,7 @@ class ProviderDAOImpl(is : InputStream)
       
       providers += provider
     }
-    logger.info("Finish extraction of sub-indexes and components")
+    logger.info("Finish extraction of providers")
   }
   
   def getProviders() : List[Provider] = {
