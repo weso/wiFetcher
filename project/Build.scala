@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
   val scalatestV = "2.0.M5b"
   val scalaV = "2.10.2"
   val appName         = "wiFetcher"
-  val appVersion      = "1.0-SNAPSHOT"
+  val appVersion      = "1.1-SNAPSHOT"
 
   val appDependencies = Seq(
     // Add your project dependencies here,
@@ -30,7 +30,7 @@ object ApplicationBuild extends Build {
     "org.apache.jena" % "jena-core" % "2.10.1",
     "org.apache.lucene" % "lucene-core" % "4.0.0",
     "org.apache.solr" % "solr-core" % "4.0.0",
-    "es.weso" %% "countryreconciliator" % "0.0.1-SNAPSHOT"
+    "es.weso" %% "countryreconciliator" % "0.2.0-SNAPSHOT"
   )
 
 
