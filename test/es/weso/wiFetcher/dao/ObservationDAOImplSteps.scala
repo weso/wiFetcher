@@ -1,6 +1,6 @@
 package es.weso.wiFetcher.dao
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import cucumber.api.scala.EN
 import cucumber.api.scala.ScalaDsl
 import es.weso.wiFetcher.entities.Dataset
@@ -10,7 +10,7 @@ import java.io.FileInputStream
 import java.io.File
 import es.weso.wiFetcher.utils.FileUtils
 
-class ObservationDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
+class ObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var observationDAO : ObservationDAO = null
   var observations : List[Observation] = null
@@ -42,7 +42,7 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
   }
   
   Then("""the value should be "([^"]*)"$""") { (value : Double) =>
-    value should be(result.value.toDouble plusOrMinus 0.0000001f)
+    value should be(result.value.toDouble +- 0.0000001f)
   }
   
   Then("""it should raise an Exception$""") { () =>

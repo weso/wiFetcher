@@ -4,12 +4,12 @@ import java.io.FileNotFoundException
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class CountryDAOImplSuite extends FunSuite with BeforeAndAfter 
-	with ShouldMatchers{
+	with Matchers{
 
   test("Try to load countries specifying a null path") {
     intercept[IllegalArgumentException]{

@@ -4,42 +4,61 @@ import play.Project._
 
 object ApplicationBuild extends Build {
 
-  val junitV = "4.11"
-  val cucumberV = "1.1.2"
-  val scalatestV = "2.0.M5b"
-  val scalaV = "2.10.2"
-  val appName         = "wiFetcher"
-  val appVersion      = "1.1-SNAPSHOT"
+  val AppName = "wiFetcher"
+  val AppOrg = "es.weso"
+  val AppVersion = "1.1-SNAPSHOT"
+
+  val ScalaV = "2.10.2"
+
+  /**
+   * Dependancies Versions
+   */
+  val ConfigV = "1.9"
+  val CountryV = "0.2.0-SNAPSHOT"
+  val CucumberV = "1.1.4"
+  val JenaV = "2.10.1"
+  val JunitV = "4.11"
+  val PoiV = "3.9"
+  val SeleniumV = "2.35.0"
+  val ScalatestV = "2.0.M7"
+  val LuceneV = "4.0.0"
+  val TypeConfigV = "1.0.1"
 
   val appDependencies = Seq(
-    // Add your project dependencies here,
+      
     jdbc,
     anorm,
-    "junit" % "junit" % junitV,
-    "org.scalatest" %% "scalatest" % scalatestV,
-    "info.cukes" % "cucumber-jvm" % cucumberV,
-    "info.cukes" % "cucumber-core" % cucumberV,
-    "info.cukes" % "cucumber-scala" % cucumberV,
-    "info.cukes" % "cucumber-junit" % cucumberV,
-    "org.seleniumhq.selenium" % "selenium-java" % "2.32.0",
-    "org.apache.poi" % "poi" % "3.9",
-    "commons-configuration" % "commons-configuration" % "1.9",
-    "com.typesafe" % "config" % "1.0.1",
-    "org.apache.poi" % "poi-ooxml" % "3.9",
-    "org.apache.jena" % "jena-arq" % "2.10.1",
-    "org.apache.jena" % "jena-core" % "2.10.1",
-    "org.apache.lucene" % "lucene-core" % "4.0.0",
-    "org.apache.solr" % "solr-core" % "4.0.0",
-    "es.weso" %% "countryreconciliator" % "0.2.0-SNAPSHOT"
-  )
 
+    /*Test Dependencies*/
+    "junit" % "junit" % JunitV,
+    "info.cukes" % "cucumber-jvm" % CucumberV,
+    "info.cukes" % "cucumber-core" % CucumberV,
+    "info.cukes" % "cucumber-junit" % CucumberV,
 
-  val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here
+    "org.scalatest" %% "scalatest" % ScalatestV,
+    "info.cukes" %% "cucumber-scala" % CucumberV,
+
+    /*Scala Dependencies*/
+    "es.weso" %% "countryreconciliator" % CountryV,
+
+    /*Java Dependencies*/
+    "org.seleniumhq.selenium" % "selenium-java" % SeleniumV,
+    "commons-configuration" % "commons-configuration" % ConfigV,
+    "com.typesafe" % "config" % TypeConfigV,
+    "org.apache.poi" % "poi" % PoiV,
+    "org.apache.poi" % "poi-ooxml" % PoiV,
+    "org.apache.jena" % "jena-arq" % JenaV,
+    "org.apache.jena" % "jena-core" % JenaV,
+    "org.apache.lucene" % "lucene-core" % LuceneV,
+    "org.apache.solr" % "solr-core" % LuceneV)
+
+  val main = play.Project(AppName, AppVersion, appDependencies).settings(
+    /*Extern Repositories*/
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-    resolvers += Resolver.url("Local Ivy Repository", url("file://"+Path.userHome.absolutePath+"/.ivy2/local/"))(Resolver.ivyStylePatterns),
-    resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
-  )
+
+    /*Local Repositories*/
+    resolvers += Resolver.url("Local Ivy Repository", url("file://" + Path.userHome.absolutePath + "/.ivy2/local/"))(Resolver.ivyStylePatterns),
+    resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository")
 
 }

@@ -1,7 +1,7 @@
 package es.weso.wiFetcher.dao
 
 import org.scalatest.BeforeAndAfter
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.FunSuite
 import java.io.FileNotFoundException
 import org.junit.runner.RunWith
@@ -11,7 +11,7 @@ import es.weso.wiFetcher.utils.FileUtils
 
 @RunWith(classOf[JUnitRunner])
 class RegionDAOImplSuite extends FunSuite with BeforeAndAfter 
-	with ShouldMatchers{
+	with Matchers{
   
   var regionDao : RegionDAO = null
   var emptyDao : RegionDAO = null

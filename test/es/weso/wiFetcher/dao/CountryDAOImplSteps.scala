@@ -2,10 +2,10 @@ package es.weso.wiFetcher.dao
 
 import cucumber.api.scala.ScalaDsl
 import cucumber.api.scala.EN
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import es.weso.wiFetcher.entities.Country
 
-class CountryDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
+class CountryDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var countryDao : CountryDAO = null
   var result : Country = null

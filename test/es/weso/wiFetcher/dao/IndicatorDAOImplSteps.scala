@@ -1,6 +1,6 @@
 package es.weso.wiFetcher.dao
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import cucumber.api.scala.EN
 import cucumber.api.scala.ScalaDsl
 import es.weso.wiFetcher.entities.Indicator
@@ -8,7 +8,7 @@ import scala.collection.mutable.ListBuffer
 import java.io.FileInputStream
 import es.weso.wiFetcher.utils.FileUtils
 
-class IndicatorDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
+class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
 
   var indicatorDao : IndicatorDAO = null
   var indicators : ListBuffer[Indicator] = new ListBuffer[Indicator]()
@@ -37,7 +37,7 @@ class IndicatorDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
       case "name" => result.label should be (value)
       case "description" => result.comment should be (value)
       case "type" => result.indicatorType.toString() should be(value)
-      case "weight" => result.weight should be (value.toDouble plusOrMinus 0.0000001f)
+      case "weight" => result.weight should be (value.toDouble +- 0.0000001f)
       case "source" => result.source should be (value)
       case "hl" => result.highLow.toString should be (value)
       case _ => throw new IllegalArgumentException("")
@@ -50,7 +50,7 @@ class IndicatorDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
       case "name" => result.label should not be (value)
       case "description" => result.comment should not be (value)
       case "type" => result.indicatorType should not be(value)
-      case "weight" => result.weight should not be (value.toDouble plusOrMinus 0.0000001f)
+      case "weight" => result.weight should not be (value.toDouble +- 0.0000001f)
       case "source" => result.source should not be (value)
       case "hl" => result.highLow should not be (value)
       case _ => throw new IllegalArgumentException("")

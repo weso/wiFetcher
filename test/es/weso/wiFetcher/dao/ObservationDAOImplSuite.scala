@@ -2,7 +2,7 @@ package es.weso.wiFetcher.dao
 
 import org.scalatest.BeforeAndAfter
 import org.junit.runner.RunWith
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.entities.Observation
@@ -14,7 +14,7 @@ import es.weso.wiFetcher.utils.FileUtils
 
 @RunWith(classOf[JUnitRunner])
 class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter 
-	with ShouldMatchers{
+	with Matchers{
 
   var observationDAO : ObservationDAO = null
   var dataset1 : Dataset = null

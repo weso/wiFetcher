@@ -4,7 +4,7 @@ import java.io.FileNotFoundException
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.FileUtils
@@ -12,7 +12,7 @@ import java.io.FileInputStream
 
 @RunWith(classOf[JUnitRunner])
 class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter 
-	with ShouldMatchers{
+	with Matchers{
   
   var subIndexDao : SubIndexDAO = null
   var emptyDao : SubIndexDAO = null

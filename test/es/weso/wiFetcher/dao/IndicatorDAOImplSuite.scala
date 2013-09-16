@@ -1,7 +1,7 @@
 package es.weso.wiFetcher.dao
 
 import org.scalatest.BeforeAndAfter
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -13,7 +13,7 @@ import es.weso.wiFetcher.utils.FileUtils
 
 @RunWith(classOf[JUnitRunner])
 class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter 
-	with ShouldMatchers{
+	with Matchers{
   
   test("Try to load indicators information given a null path") {
     intercept[IllegalArgumentException] {

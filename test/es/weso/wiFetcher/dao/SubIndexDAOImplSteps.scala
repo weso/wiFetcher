@@ -2,14 +2,14 @@ package es.weso.wiFetcher.dao
 
 import cucumber.api.scala.ScalaDsl
 import cucumber.api.scala.EN
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import es.weso.wiFetcher.entities.SubIndex
 import es.weso.wiFetcher.entities.Component
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.FileUtils
 import java.io.FileInputStream
 
-class SubIndexDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
+class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var subIndexDAO : SubIndexDAO = null
   var subIndexes : List[SubIndex] = null
@@ -64,7 +64,7 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
       case "name" => component.name should be (value)
       case "id" => component.id should be (value)
       case "description" => component.description should be (value)
-      case "weight" => component.weight should be (value.toDouble plusOrMinus 0.0000001f)
+      case "weight" => component.weight should be (value.toDouble +- 0.0000001f)
     }
   }
   
@@ -82,7 +82,7 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with ShouldMatchers{
       case "name" => subIndex.name should be (value)
       case "id" => subIndex.id should be (value)
       case "description" => subIndex.description should be (value)
-      case "weight" => subIndex.weight should be (value.toDouble plusOrMinus 0.0000001f)
+      case "weight" => subIndex.weight should be (value.toDouble +- 0.0000001f)
     }
   }
 

@@ -3,14 +3,14 @@ package es.weso.wiFetcher.dao
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.BeforeAndAfter
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.FunSuite
 import java.io.FileNotFoundException
 import es.weso.wiFetcher.entities.Dataset
 
 @RunWith(classOf[JUnitRunner])
 class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter 
-	with ShouldMatchers{
+	with Matchers{
   
   test("Try to load datasets specifying a null path") {
     intercept[IllegalArgumentException] {
