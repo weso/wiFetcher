@@ -25,7 +25,7 @@ object ApplicationBuild extends Build {
   val TypeConfigV = "1.0.1"
 
   val appDependencies = Seq(
-      
+
     jdbc,
     anorm,
 
@@ -53,12 +53,15 @@ object ApplicationBuild extends Build {
     "org.apache.solr" % "solr-core" % LuceneV)
 
   val main = play.Project(AppName, AppVersion, appDependencies).settings(
+
+    scalaVersion := ScalaV,
+    
     /*Extern Repositories*/
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+    resolvers += "Typesafe snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
 
     /*Local Repositories*/
     resolvers += Resolver.url("Local Ivy Repository", url("file://" + Path.userHome.absolutePath + "/.ivy2/local/"))(Resolver.ivyStylePatterns),
     resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository")
-
 }

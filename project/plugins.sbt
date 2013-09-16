@@ -2,8 +2,6 @@
 
 logLevel := Level.Warn
 
-// The Typesafe repository 
-
 // Use the Play sbt plugin for Play projects
 
-addSbtPlugin("play" % "sbt-plugin" % "2.1.3")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % System.getProperty("play.version"))
