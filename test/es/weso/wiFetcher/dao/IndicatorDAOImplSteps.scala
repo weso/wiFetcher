@@ -1,13 +1,18 @@
 package es.weso.wiFetcher.dao
 
+import java.io.FileInputStream
+import scala.collection.mutable.ListBuffer
+import org.junit.runner.RunWith
 import org.scalatest.Matchers
 import cucumber.api.scala.EN
 import cucumber.api.scala.ScalaDsl
 import es.weso.wiFetcher.entities.Indicator
-import scala.collection.mutable.ListBuffer
-import java.io.FileInputStream
 import es.weso.wiFetcher.utils.FileUtils
+import org.scalatest.junit.JUnitRunner
+import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
+import es.weso.wiFetcher.dao.IndicatorDAO
 
+@RunWith(classOf[JUnitRunner])
 class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
 
   var indicatorDao : IndicatorDAO = null

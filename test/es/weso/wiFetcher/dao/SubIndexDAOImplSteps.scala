@@ -3,12 +3,17 @@ package es.weso.wiFetcher.dao
 import cucumber.api.scala.ScalaDsl
 import cucumber.api.scala.EN
 import org.scalatest.Matchers
-import es.weso.wiFetcher.entities.SubIndex
-import es.weso.wiFetcher.entities.Component
+import es.weso.wiFetcher.entities.traits.SubIndex
+import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.FileUtils
 import java.io.FileInputStream
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
+import es.weso.wiFetcher.dao.SubIndexDAO
 
+@RunWith(classOf[JUnitRunner])
 class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var subIndexDAO : SubIndexDAO = null

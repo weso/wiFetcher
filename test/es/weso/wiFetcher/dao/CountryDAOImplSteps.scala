@@ -4,7 +4,12 @@ import cucumber.api.scala.ScalaDsl
 import cucumber.api.scala.EN
 import org.scalatest.Matchers
 import es.weso.wiFetcher.entities.Country
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import es.weso.wiFetcher.dao.file.CountryDAOImpl
+import es.weso.wiFetcher.dao.CountryDAO
 
+@RunWith(classOf[JUnitRunner])
 class CountryDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var countryDao : CountryDAO = null

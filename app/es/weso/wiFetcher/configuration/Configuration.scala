@@ -3,203 +3,169 @@ package es.weso.wiFetcher.configuration
 import org.apache.commons.configuration.CompositeConfiguration
 import org.apache.commons.configuration.PropertiesConfiguration
 
-
-
 object Configuration {
-  
-  protected var CONFIG : CompositeConfiguration = null
-  
-  def getInitialCellSecondaryObservation() : String = {
-    loadConfigure
-    CONFIG.getString("initial_cell_secondary_indicator")
-  }  
-  
-  def getIndicatorCell() : String = {
-    loadConfigure
-    CONFIG.getString("indicator_cell")
+
+  protected val Config: CompositeConfiguration = loadConfigure
+
+  def getInitialCellSecondaryObservation(): String = {
+    Config.getString("initial_cell_secondary_indicator")
   }
-  
-  def getStatusCell() : String = {
-    loadConfigure
-    CONFIG.getString("status_cell")
+
+  def getIndicatorCell(): String = {
+    Config.getString("indicator_cell")
   }
-  
-  def getCountryFile() : String = {
-    loadConfigure
-    CONFIG.getString("countries_file")
+
+  def getStatusCell(): String = {
+    Config.getString("status_cell")
   }
-  
-  def getInitialCellIndicatorsSheet() : String = {
-    loadConfigure
-    CONFIG.getString("intial_cell_indicators_sheet")
+
+  def getCountryFile(): String = {
+    Config.getString("countries_file")
   }
-  
-  def getIndicatorIdColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("indicator_column")
+
+  def getInitialCellIndicatorsSheet(): String = {
+    Config.getString("intial_cell_indicators_sheet")
   }
-  
-  def getIndicatorSubindexColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("subindex_column")
+
+  def getIndicatorIdColumn(): Int = {
+    Config.getInt("indicator_column")
   }
-  
-  def getIndicatorComponentColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("component_column")
+
+  def getIndicatorComponentColumn(): Int = {
+    Config.getInt("component_column")
   }
-  
-  def getIndicatorNameColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("name_column")
+
+  def getIndicatorNameColumn(): Int = {
+    Config.getInt("name_column")
   }
-  
-  def getIndicatorDescriptionColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("description_column")
+
+  def getIndicatorDescriptionColumn(): Int = {
+    Config.getInt("description_column")
   }
-  
-  def getIndicatorSourceColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("source_column")
+
+  def getIndicatorSourceColumn(): Int = {
+
+    Config.getInt("source_column")
   }
-  
-  def getIndicatorProviderColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("provider_column")
+
+  def getIndicatorProviderColumn(): Int = {
+
+    Config.getInt("provider_column")
   }
-  
-  def getIndicatorTypeColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("type_column")
+
+  def getIndicatorTypeColumn(): Int = {
+
+    Config.getInt("type_column")
   }
-  
-  def getIndicatorWeightColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("weight_column")
+
+  def getIndicatorWeightColumn(): Int = {
+
+    Config.getInt("weight_column")
   }
-  
-  def getIndicatorHLColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("h/l_column")
+
+  def getIndicatorHLColumn(): Int = {
+
+    Config.getInt("h/l_column")
   }
-  
-  def getIndicatorFilename() : String = {
-    loadConfigure
-    CONFIG.getString("indicator_filename")
+
+  def getIndicatorFilename(): String = {
+
+    Config.getString("indicator_filename")
   }
-  
-  def getObservationFile() : String = {
-    loadConfigure
-    CONFIG.getString("observations_file")
+
+  def getObservationFile(): String = {
+
+    Config.getString("observations_file")
   }
-  
-  def getDatasetFile() : String = {
-    loadConfigure
-    CONFIG.getString("dataset_file")
+
+  def getDatasetFile(): String = {
+
+    Config.getString("dataset_file")
   }
-  
-  def getSubindexFile() : String = {
-    loadConfigure
-    CONFIG.getString("subindexes_file")
+
+  def getSubindexFile(): String = {
+    Config.getString("subindexes_file")
   }
-  
-  def getSubindexInitialCell() : String = {
-    loadConfigure
-    CONFIG.getString("initial_cell")
+
+  def getSubindexInitialCell(): String = {
+    Config.getString("initial_cell")
   }
-  
-  def getSubindexColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("sb_subindex_column")
+
+  def getTypeColumn(): Int = {
+
+    Config.getInt("sb_type_column")
   }
-  
-  def getComponentColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("sb_component_column")
+
+  def getIdColumn(): Int = {
+    Config.getInt("sb_id_column")
   }
-  
-  def getSubindexWeithColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("sb_weight_column")
+
+  def getSubindexWeithColumn(): Int = {
+    Config.getInt("sb_weight_column")
   }
-  
-  def getSubindexNameColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("sb_name_column")
+
+  def getSubindexNameColumn(): Int = {
+    Config.getInt("sb_name_column")
   }
-  
-  def getSubindexDescriptionColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("sb_description_column")
+
+  def getSubindexDescriptionColumn(): Int = {
+    Config.getInt("sb_description_column")
   }
-  
-  def getRegionsFilename() : String = {
-    loadConfigure
-    CONFIG.getString("regions_filename")
+
+  def getRegionsFilename(): String = {
+    Config.getString("regions_filename")
   }
-  
-  def getRegionInitialCell() : String = {
-    loadConfigure
-    CONFIG.getString("intial_cell_regions_sheet")
+
+  def getRegionInitialCell(): String = {
+    Config.getString("intial_cell_regions_sheet")
   }
-  
-  def getRegionNameColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("region_name_column")
+
+  def getRegionNameColumn(): Int = {
+    Config.getInt("region_name_column")
   }
-  
-  def getRegionCountryColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("region_country_column")
+
+  def getRegionCountryColumn(): Int = {
+    Config.getInt("region_country_column")
   }
-  
-  def getCountryReconciliatorFile() : String = {
-    loadConfigure
-    CONFIG.getString("country_reconciliator_file")
+
+  def getCountryReconciliatorFile(): String = {
+    Config.getString("country_reconciliator_file")
   }
-  
-  def getIndicatorStopWordsFile() : String = {
-    loadConfigure
-    CONFIG.getString("indicator_stop_words_recon")
+
+  def getIndicatorStopWordsFile(): String = {
+    Config.getString("indicator_stop_words_recon")
   }
-  
-  def getProvierInitialCell() : String = {
-    loadConfigure
-    CONFIG.getString("initial_cell_providers")
+
+  def getProvierInitialCell(): String = {
+    Config.getString("initial_cell_providers")
   }
-  
-  def getProviderIdColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("provider_id_column")
+
+  def getProviderIdColumn(): Int = {
+    Config.getInt("provider_id_column")
   }
-  
-  def getProviderNameColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("provider_name_column")
+
+  def getProviderNameColumn(): Int = {
+    Config.getInt("provider_name_column")
   }
-  
-  def getProviderWebColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("provider_web_column")
+
+  def getProviderWebColumn(): Int = {
+    Config.getInt("provider_web_column")
   }
-  
-  def getProviderSourceColumn() : Int = {
-    loadConfigure
-    CONFIG.getInt("provider_source_column")
+
+  def getProviderSourceColumn(): Int = {
+    Config.getInt("provider_source_column")
   }
-  
+
   def loadConfigure() = {
-    if(CONFIG == null) {
-      CONFIG = new CompositeConfiguration
-      CONFIG.append(new PropertiesConfiguration("conf/countries.properties"))
-      CONFIG.append(new PropertiesConfiguration("conf/indicators.properties"))
-      CONFIG.append(new PropertiesConfiguration("conf/observations.properties"))
-      CONFIG.append(new PropertiesConfiguration("conf/datasets.properties"))
-      CONFIG.append(new PropertiesConfiguration("conf/subindexes.properties"))
-      CONFIG.append(new PropertiesConfiguration("conf/regions.properties"))
-      CONFIG.append(new PropertiesConfiguration("conf/providers.properties"))
-    }
+    val config = new CompositeConfiguration
+    config.append(new PropertiesConfiguration("conf/countries.properties"))
+    config.append(new PropertiesConfiguration("conf/indicators.properties"))
+    config.append(new PropertiesConfiguration("conf/observations.properties"))
+    config.append(new PropertiesConfiguration("conf/datasets.properties"))
+    config.append(new PropertiesConfiguration("conf/subindexes.properties"))
+    config.append(new PropertiesConfiguration("conf/regions.properties"))
+    config.append(new PropertiesConfiguration("conf/providers.properties"))
+    config
   }
 
 }

@@ -18,8 +18,6 @@ object FileUploadController extends Controller {
       request.body.file("uploaded_file").map{file =>
         val f = new File("public/temp/" + file.filename)
         file.ref.moveTo(f, true)
-//      	val contentIS = new ByteArrayInputStream(FileUtils.readFileToByteArray(
-//      	    file.ref.file))
         SpreadsheetsFetcher.loadStructure(f)
         Ok(views.html.file.observationsFileGET())
       }.getOrElse{

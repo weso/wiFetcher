@@ -6,7 +6,11 @@ import org.scalatest.Matchers
 import es.weso.wiFetcher.entities.Region
 import java.io.FileInputStream
 import es.weso.wiFetcher.utils.FileUtils
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import es.weso.wiFetcher.dao.poi.RegionDAOImpl
 
+@RunWith(classOf[JUnitRunner])
 class RegionDAOImplSteps extends ScalaDsl with EN with Matchers{
 
   var regions : List[Region] = null

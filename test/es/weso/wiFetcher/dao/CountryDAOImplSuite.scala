@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
 import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
+import es.weso.wiFetcher.dao.file.CountryDAOImpl
 
 @RunWith(classOf[JUnitRunner])
 class CountryDAOImplSuite extends FunSuite with BeforeAndAfter 

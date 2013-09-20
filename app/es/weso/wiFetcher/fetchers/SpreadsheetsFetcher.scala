@@ -1,91 +1,82 @@
 package es.weso.wiFetcher.fetchers
 
-import es.weso.wiFetcher.dao.CountryDAOImpl
-import es.weso.wiFetcher.entities.Country
-import es.weso.wiFetcher.configuration.Configuration
-import es.weso.wiFetcher.dao.IndicatorDAOImpl
-import es.weso.wiFetcher.entities.Indicator
-import es.weso.wiFetcher.dao.IndicatorDAO
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
-import scala.collection.mutable.ListBuffer
-import es.weso.wiFetcher.dao.ObservationDAO
-import es.weso.wiFetcher.dao.ObservationDAOImpl
-import es.weso.wiFetcher.dao.CountryDAO
-import es.weso.wiFetcher.entities.Observation
-import es.weso.wiFetcher.dao.DatasetDAO
-import es.weso.wiFetcher.dao.DatasetDAOImpl
-import es.weso.wiFetcher.entities.Dataset
-import es.weso.wiFetcher.dao.SubIndexDAO
-import es.weso.wiFetcher.dao.SubIndexDAOImpl
-import es.weso.wiFetcher.entities.SubIndex
-import es.weso.wiFetcher.entities.Component
-import es.weso.wiFetcher.entities.ObservationStatus._
-import es.weso.wiFetcher.dao.RegionDAO
-import es.weso.wiFetcher.dao.RegionDAOImpl
-import es.weso.wiFetcher.entities.Region
-import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
-import org.apache.log4j.Logger
-import es.weso.wiFetcher.dao.ProviderDAOImpl
-import es.weso.wiFetcher.dao.ProviderDAO
-import es.weso.wiFetcher.entities.Provider
-import java.io.InputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
+import scala.collection.mutable.ListBuffer
+import org.apache.log4j.Logger
 import es.weso.reconciliator.CountryReconciliator
-import es.weso.wiFetcher.utils.FileUtils
+import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
+import es.weso.wiFetcher.configuration.Configuration
+import es.weso.wiFetcher.dao.file.CountryDAOImpl
+import es.weso.wiFetcher.dao.poi.DatasetDAOImpl
+import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
+import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
+import es.weso.wiFetcher.dao.poi.ProviderDAOImpl
+import es.weso.wiFetcher.dao.poi.RegionDAOImpl
+import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
+import es.weso.wiFetcher.entities.traits.Component
+import es.weso.wiFetcher.entities.Country
+import es.weso.wiFetcher.entities.Dataset
+import es.weso.wiFetcher.entities.Indicator
+import es.weso.wiFetcher.entities.Observation
+import es.weso.wiFetcher.entities.ObservationStatus.ObservationStatus
+import es.weso.wiFetcher.entities.Provider
+import es.weso.wiFetcher.entities.Region
+import es.weso.wiFetcher.entities.traits.SubIndex
 
 object SpreadsheetsFetcher extends Fetcher {
 
-  private val logger: Logger = Logger.getLogger(this.getClass())
-
-   var components: List[Component] = null
-   var subIndexes: List[SubIndex] = null
-   var primaryIndicators: List[Indicator] = null
-   var secondaryIndicators: List[Indicator] = null
-   var countries: List[Country] = null
-  private val countryReconciliator : CountryReconciliator = 
-    new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
-   var regions: List[Region] = null
-   var providers: List[Provider] = null
+  var components: List[Component] = null
+  var subIndexes: List[SubIndex] = null
+  var primaryIndicators: List[Indicator] = null
+  var secondaryIndicators: List[Indicator] = null
+  var countries: List[Country] = null
+  var regions: List[Region] = null
+  var providers: List[Provider] = null
   //Create an indicator reconciliator
   val indicatorReconciliator: IndicatorReconciliator =
     new IndicatorReconciliator
-  var datasets : List[Dataset] = null
-  var observations : List[Observation] = null
+  var datasets: List[Dataset] = null
+  var observations: List[Observation] = null
+
+  private val logger: Logger = Logger.getLogger(this.getClass())
+  private val countryReconciliator: CountryReconciliator =
+    new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
 
   /**
    * This method load all structure about Web Index information
    */
   def loadStructure(f: File) {
-    handleFooIS(f, loadSubIndexInformation)
-    handleFooIS(f, loadIndicatorInformation)
+    safeLoadInformation(f, loadSubIndexInformation)
+    safeLoadInformation(f, loadIndicatorInformation)
     loadCountryInformation(Configuration.getCountryFile, true)
-    handleFooIS(f, loadRegionInformation)
-    handleFooIS(f, loadProviderInformation)
+    safeLoadInformation(f, loadRegionInformation)
+    safeLoadInformation(f, loadProviderInformation)
   }
-  
+
   /**
    * This method load all observation form an excel file
    */
-  def loadObservations(f : File) {
+  def loadObservations(f: File) {
     loadDatasetInformation(Configuration.getDatasetFile, true)
-    handleFooIS(f, loadObservationInformation)
+    safeLoadInformation(f, loadObservationInformation)
   }
-  
-  private def loadDatasetInformation(path : String, relativePath : Boolean) {
+
+  private def loadDatasetInformation(path: String, relativePath: Boolean) {
     val datasetDao = new DatasetDAOImpl(path, relativePath)
     datasets = datasetDao.getDatasets
   }
-  
-  private def loadObservationInformation(is : InputStream) {
+
+  private def loadObservationInformation(is: InputStream) {
     val observationDao = new ObservationDAOImpl(is)
     observations = observationDao.getObservations(datasets)
   }
 
-  def handleFooIS(file: File, foo:(InputStream)=>Unit) {
+  def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
     val is = new FileInputStream(file)
     try {
-      foo(is)
+      proccess(is)
     } finally {
       is.close
     }
@@ -135,13 +126,13 @@ object SpreadsheetsFetcher extends Fetcher {
 
   //Obtain a country given it's name
   def obtainCountry(regionName: String): Country = {
-    if (regionName == null || regionName.isEmpty()){
+    if (regionName == null || regionName.isEmpty()) {
       logger.error("The name of the country cannot " +
         "be null o empty")
       throw new IllegalArgumentException("The name of the country cannot " +
         "be null o empty")
     }
-    var wiName : String = countryReconciliator.searchCountry(regionName)
+    var wiName: String = countryReconciliator.searchCountry(regionName)
     countries.find(c => c.name.equals(wiName)).getOrElse({
       logger.error("Not exist country with name " +
         regionName)
@@ -160,7 +151,7 @@ object SpreadsheetsFetcher extends Fetcher {
 
   //Obtain an indicator given it's id
   def obtainIndicatorById(id: String): Indicator = {
-    var combined: ListBuffer[Indicator] = new ListBuffer
+    val combined: ListBuffer[Indicator] = new ListBuffer
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.id.equals(id))
@@ -169,7 +160,7 @@ object SpreadsheetsFetcher extends Fetcher {
   }
 
   def obtainIndicatorByDescription(indicatorDescription: String): Indicator = {
-    var combined: ListBuffer[Indicator] = new ListBuffer
+    val combined: ListBuffer[Indicator] = new ListBuffer
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.comment.equalsIgnoreCase(indicatorDescription))

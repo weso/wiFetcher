@@ -1,8 +1,3 @@
 package es.weso.wiFetcher.entities
 
-class Area {
-  
-  var name : String = ""
-  var iso2Code : String = ""
-  var iso3Code : String = ""
-}
+abstract class Area(val name: String, val iso2Code: String, val iso3Code: String)
