@@ -24,6 +24,7 @@ import es.weso.wiFetcher.entities.ObservationStatus.ObservationStatus
 import es.weso.wiFetcher.entities.Provider
 import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.entities.traits.SubIndex
+import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
 
 object SpreadsheetsFetcher extends Fetcher {
 
@@ -70,7 +71,7 @@ object SpreadsheetsFetcher extends Fetcher {
 
   private def loadObservationInformation(is: InputStream) {
     val observationDao = new ObservationDAOImpl(is)
-    observations = observationDao.getObservations(datasets)
+    observations = observationDao.getObservations
   }
 
   def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
@@ -173,9 +174,14 @@ object SpreadsheetsFetcher extends Fetcher {
     components.find(component => component.id.equals(componentId)).getOrElse(throw new IllegalArgumentException("Not exist component " + componentId))
   }
 
+  def getDatasets(): List[Dataset] = {
+    return datasets
+  }
+  
   def getObservationsByStatus(status: ObservationStatus): List[Observation] = {
     val results: ListBuffer[Observation] = new ListBuffer[Observation]
     results.toList
+    
   }
 
   def getComponentById(componentId: String): Component = {

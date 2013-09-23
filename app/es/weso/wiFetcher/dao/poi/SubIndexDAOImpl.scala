@@ -1,24 +1,22 @@
 package es.weso.wiFetcher.dao.poi
 
 import java.io.InputStream
+
 import scala.collection.mutable.ListBuffer
+
 import org.apache.poi.hssf.util.CellReference
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 import es.weso.wiFetcher.configuration.Configuration
-import es.weso.wiFetcher.entities.traits.Component
+import es.weso.wiFetcher.dao.SubIndexDAO
 import es.weso.wiFetcher.entities.Entity
+import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.traits.SubIndex
 import es.weso.wiFetcher.utils.POIUtils
-import SubIndexDAOImpl.ComponentType
-import SubIndexDAOImpl.SheetName
-import SubIndexDAOImpl.SubindexType
-import SubIndexDAOImpl.logger
-import es.weso.wiFetcher.dao.SubIndexDAO
-import es.weso.wiFetcher.dao.poi.PoiDAO
 
 /**
  * This class contains the implementation that allows to load all information

@@ -1,27 +1,28 @@
 package es.weso.wiFetcher.dao.poi
 
+import java.io.InputStream
+
 import scala.collection.immutable.List
-import es.weso.wiFetcher.entities.Dataset
-import es.weso.wiFetcher.entities.Observation
+import scala.collection.mutable.ListBuffer
+
+import org.apache.log4j.Logger
+import org.apache.poi.hssf.util.CellReference
+import org.apache.poi.ss.usermodel.FormulaEvaluator
+import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import scala.collection.mutable.ListBuffer
-import org.apache.poi.hssf.util.CellReference
-import es.weso.wiFetcher.utils.POIUtils
-import es.weso.wiFetcher.entities.Country
+
 import es.weso.wiFetcher.configuration.Configuration
-import org.apache.poi.ss.usermodel.FormulaEvaluator
+import es.weso.wiFetcher.dao.ObservationDAO
 import es.weso.wiFetcher.entities.Area
 import es.weso.wiFetcher.entities.Computation
+import es.weso.wiFetcher.entities.Country
+import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Indicator
-import org.apache.poi.ss.usermodel.Sheet
+import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.entities.ObservationStatus
-import es.weso.wiFetcher.entities.ObservationStatus._
-import org.apache.log4j.Logger
-import java.io.InputStream
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
-import es.weso.wiFetcher.dao.ObservationDAO
-import es.weso.wiFetcher.dao.poi.PoiDAO
+import es.weso.wiFetcher.utils.POIUtils
 
 /**
  * This class contains the implementation that allows extract all information
@@ -33,99 +34,78 @@ import es.weso.wiFetcher.dao.poi.PoiDAO
  *
  */
 class ObservationDAOImpl(
-  is: InputStream) extends ObservationDAO with PoiDAO[Observation] {
+  is: InputStream
+ ) extends ObservationDAO with PoiDAO[Observation] {
 
-  /**
-   * The excel workbook that contains the information about observations
-   */
-  val workbook: Workbook = WorkbookFactory.create(is)
+  import ObservationDAOImpl._
 
-  /**
-   *  This method loads all observations for each dataset given in a list
-   */
-  def getObservations(datasets: List[Dataset]): List[Observation] = {
+  private val observations: ListBuffer[Observation] = new ListBuffer[Observation]()
+  private var dataset: Dataset = null //Temporal Fix ;(
+
+  load(is)
+
+  protected def load(is: InputStream) {
+
+    val datasets = SpreadsheetsFetcher.getDatasets
+
     if (datasets == null) {
-      ObservationDAOImpl.logger.error("List of datasets to load their " +
+      logger.error("List of datasets to load their " +
         "observations is null")
       throw new IllegalArgumentException("List of datasets to load their " +
         "observations is null")
     }
-    var observations = ListBuffer[Observation]()
-    //For each dataset, has to load all it's observations
-    for (dataset <- datasets)
-      observations.insertAll(0, getObservationsByDataset(dataset))
-    observations.toList
+    logger.info("Begin observations extraction")
+    val workbook: Workbook = WorkbookFactory.create(is)
+    val obs = for {
+      dataset <- datasets
+      sheet = workbook.getSheet(dataset.id)
+    } yield {
+      if (sheet == null) {
+        ObservationDAOImpl.logger.error("There isn't data for dataset: " +
+          dataset.id)
+        throw new IllegalArgumentException("There isn't data for dataset: " +
+          dataset.id)
+      }
+      this.dataset = dataset
+      parseData(workbook, sheet)
+    }
+    observations ++= obs.foldLeft(ListBuffer[Observation]())((a, b) => a ++= b)
+    logger.info("Finish observations extraction")
   }
 
-  /**
-   * Given a dataset, this method has to load all it's observations
-   * @param dataset A dataset to extract all it's observations
-   * @return A list with all observations of a dataset
-   */
-  def getObservationsByDataset(dataset: Dataset): List[Observation] = {
-    if (dataset == null) {
-      ObservationDAOImpl.logger.error("Cannot extract observations of a " +
-        "null dataset")
-      throw new IllegalArgumentException("Cannot extract observations of a " +
-        "null dataset")
-    }
-    var observations = ListBuffer[Observation]()
-    //Each dataset corresponds to a sheet of the excel file
-    val sheet = workbook.getSheet(dataset.id)
-    if (sheet == null) {
-      ObservationDAOImpl.logger.error("There isn't data for dataset: " +
-        dataset.id)
-      throw new IllegalArgumentException("There isn't data for dataset: " +
-        dataset.id)
-    }
+  protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Observation] = {
     ObservationDAOImpl.logger.info("Begin observations extraction")
-    //Status of observations depends on excel templates
-    //At the moment, we extract the status of the observations from the dataset 
-    //id
-    val status = dataset.id.substring(dataset.id.lastIndexOf('-'))
-    //Obtain the initial cell of observation from properties file
-    val initialCell = new CellReference(
-      Configuration.getInitialCellSecondaryObservation)
-    val evaluator: FormulaEvaluator =
-      workbook.getCreationHelper().createFormulaEvaluator()
-    for (row <- initialCell.getRow() to sheet.getLastRowNum()) {
-      val actualRow = sheet.getRow(row)
-      if (actualRow != null && !POIUtils.extractCellValue(
-        actualRow.getCell(0), evaluator).trim().isEmpty()) {
-        var countryName: String = POIUtils.extractCellValue(
-          actualRow.getCell(0))
-        var country: Country = SpreadsheetsFetcher.obtainCountry(countryName)
-        //We have to iterate throw the excel file
-        for (column <- initialCell.getCol() to actualRow.getLastCellNum() - 1) {
-          //Obtain the indicator corresponds to the observation
-          var indicator: Indicator = obtainIndicator(sheet,
-            Configuration.getIndicatorCell)
-          //Obtain the country corresponds to the observation 
-          var country: Country = obtainCountry(countryName)
-          //If country of the observation is null, there is no observation
-          //for this cell
-          if (country != null) {
-            //TODO Have to extract the year for the spreadsheet
-            var year = POIUtils.extractCellValue(sheet.getRow(
-              initialCell.getRow() - 1).getCell(column), evaluator)
-            var value = POIUtils.extractNumericCellValue(actualRow.getCell(column),
-              evaluator)
-            //Create the observation with the extracted data
-            ObservationDAOImpl.logger.info("Extracted observation of: " + dataset.id + " " +
-              country.iso3Code + " " + indicator + " " + value)
-            println("Extracted observation of: " + dataset.id + " " +
-              country.iso3Code + " " + indicator + " " + value)
-            observations += createObservation(dataset, "", country, null,
-              indicator, year.toDouble, value, status)
-          }
-          //        	var year = POIUtils.extractCellValue(sheet.getRow(
-          //        	    initialCell.getRow() - 2).getCell(column), evaluator)
 
-        }
-      }
+    //Obtain the initial cell of observation from properties file
+    val initialCell = new CellReference(Configuration.getInitialCellSecondaryObservation)
+    for {
+      row <- initialCell.getRow() to sheet.getLastRowNum()
+      evaluator = workbook.getCreationHelper().createFormulaEvaluator()
+      actualRow = sheet.getRow(row)
+      if actualRow != null && !POIUtils.extractCellValue(actualRow.getCell(0), evaluator).trim().isEmpty()
+      countryName = POIUtils.extractCellValue(actualRow.getCell(0))
+      country = SpreadsheetsFetcher.obtainCountry(countryName)
+      //We have to iterate throw the excel file
+      column <- initialCell.getCol() to actualRow.getLastCellNum() - 1
+      //Obtain the indicator corresponds to the observation
+      indicator = obtainIndicator(sheet, Configuration.getIndicatorCell)
+      //Obtain the country corresponds to the observation 
+      country = obtainCountry(countryName)
+      //If country of the observation is null, there is no observation
+      //for this cell
+      if country != null
+      //TODO Have to extract the year for the spreadsheet
+      year = POIUtils.extractCellValue(sheet.getRow(
+        initialCell.getRow() - 1).getCell(column), evaluator)
+      value = POIUtils.extractNumericCellValue(actualRow.getCell(column), evaluator)
+      status = dataset.id.substring(dataset.id.lastIndexOf('-'))
+    } yield {
+      //Create the observation with the extracted data
+      logger.info("Extracted observation of: " + dataset.id + " " +
+        country.iso3Code + " " + indicator + " " + value)
+      createObservation(dataset, "", country, null,
+        indicator, year.toDouble, value, status)
     }
-    ObservationDAOImpl.logger.info("Finish observations extraction")
-    observations.toList
   }
 
   /**
@@ -140,7 +120,7 @@ class ObservationDAOImpl(
    * @return A country corresponds to an observations
    */
   def obtainCountry(countryName: String): Country = {
-    ObservationDAOImpl.logger.info("Obtaining country with name: " + countryName)
+    logger.info("Obtaining country with name: " + countryName)
     //Ask to SpreadsheetFetcher for the country accord to the Web Index name
     SpreadsheetsFetcher.obtainCountry(countryName)
   }
@@ -221,6 +201,7 @@ class ObservationDAOImpl(
     POIUtils.extractCellValue(stat)
   }
 
+  def getObservations(): List[Observation] = observations.toList
 }
 
 object ObservationDAOImpl {

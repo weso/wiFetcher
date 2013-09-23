@@ -1,12 +1,11 @@
 package es.weso.wiFetcher.dao.file
 
 import scala.collection.immutable.List
-import scala.collection.mutable.ListBuffer
-import es.weso.wiFetcher.entities.Country
 import scala.io.Source
-import scala.collection.mutable.ListBuffer
-import es.weso.wiFetcher.utils.FileUtils
+
 import es.weso.wiFetcher.dao.CountryDAO
+import es.weso.wiFetcher.entities.Country
+import es.weso.wiFetcher.utils.FileUtils
 
 /**
  * This class contains the implementation that allows to load all information
@@ -32,7 +31,6 @@ class CountryDAOImpl(path: String, relativePath: Boolean)
 
   protected def parseData(path: String): Seq[Country] = {
     val src = Source.fromFile(path)
-    println(path)
     for {
       line <- src.getLines.toList
       chunks = line.split("\t")

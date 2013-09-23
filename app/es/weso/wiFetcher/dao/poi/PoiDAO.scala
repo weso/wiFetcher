@@ -1,9 +1,11 @@
 package es.weso.wiFetcher.dao.poi
 
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.Sheet
-import es.weso.wiFetcher.dao.DAO
 import java.io.InputStream
+
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
+
+import es.weso.wiFetcher.dao.DAO
 
 trait PoiDAO[T] extends DAO[T]{
   

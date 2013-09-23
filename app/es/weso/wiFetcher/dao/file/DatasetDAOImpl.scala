@@ -1,14 +1,14 @@
 package es.weso.wiFetcher.dao.file
 
 import scala.collection.immutable.List
-import scala.collection.mutable.ListBuffer
 import scala.io.Source
+
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import es.weso.wiFetcher.dao.DatasetDAO
 import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.utils.FileUtils
-import DatasetDAOImpl.logger
-import es.weso.wiFetcher.dao.DatasetDAO
 /**
  * This class contains the implementation that allows to load the information
  * about datasets of the Web Index
@@ -39,7 +39,7 @@ class DatasetDAOImpl(path: String, relativePath: Boolean) extends DatasetDAO
    *   @param path The path of the file that contains the information
    *   @return A list with all datasets loaded
    */
-  private def load(path: String): List[Dataset] = {
+  protected def load(path: String): List[Dataset] = {
     logger.info("Begining dataset extraction")
     val datasets = parseData(path)
     logger.info("Finished dataset extraction")
@@ -53,7 +53,7 @@ class DatasetDAOImpl(path: String, relativePath: Boolean) extends DatasetDAO
     datasets.toList
   }
   
-  private def parseData(path: String): Seq[Dataset] = {
+  protected def parseData(path: String): Seq[Dataset] = {
     val src = Source.fromFile(path)
     for{
       line <- src.getLines.toList
