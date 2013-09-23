@@ -1,10 +1,8 @@
 package es.weso.wiFetcher.entities
 
-class Provider {
-  
-  var id : String = ""
-  var name : String = ""
-  var web : String = ""
-  var source : String = ""
-
-}
+case class Provider (
+  val id : String = "",
+  val name : String = "",
+  val web : String = "",
+  val source : String = ""
+)

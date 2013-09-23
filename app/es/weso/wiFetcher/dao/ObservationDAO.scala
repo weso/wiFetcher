@@ -6,12 +6,9 @@ import es.weso.wiFetcher.entities.ObservationStatus._
 import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.configuration.Configuration
 
-trait ObservationDAO {
+trait ObservationDAO  extends DAO[Observation]{
   
   val reconciliator : CountryReconciliator = new CountryReconciliator(
       Configuration.getCountryReconciliatorFile, true)
   
-  def getObservations(datasets : List[Dataset]) : List[Observation]
-  def getObservationsByDataset(dataset : Dataset) : List[Observation]
-
 }

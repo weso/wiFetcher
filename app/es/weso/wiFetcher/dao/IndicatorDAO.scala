@@ -2,7 +2,7 @@ package es.weso.wiFetcher.dao
 
 import es.weso.wiFetcher.entities.Indicator
 
-trait IndicatorDAO {
+trait IndicatorDAO extends DAO [Indicator] {
   
   def getPrimaryIndicators() : List[Indicator]
   

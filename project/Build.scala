@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
 import play.Project._
+import templemore.sbt.cucumber.CucumberPlugin
 
 object ApplicationBuild extends Build {
 
@@ -20,29 +21,29 @@ object ApplicationBuild extends Build {
   val JunitV = "4.11"
   val PoiV = "3.9"
   val SeleniumV = "2.35.0"
-  val ScalatestV = "2.0.M7"
+  val ScalatestV = "2.0.M8"
   val LuceneV = "4.0.0"
   val TypeConfigV = "1.0.1"
 
   val appDependencies = Seq(
-      
+
     jdbc,
     anorm,
 
     /*Test Dependencies*/
-    "junit" % "junit" % JunitV,
-    "info.cukes" % "cucumber-jvm" % CucumberV,
-    "info.cukes" % "cucumber-core" % CucumberV,
-    "info.cukes" % "cucumber-junit" % CucumberV,
-
-    "org.scalatest" %% "scalatest" % ScalatestV,
-    "info.cukes" %% "cucumber-scala" % CucumberV,
+    "junit" % "junit" % JunitV % "test",
+    "info.cukes" % "cucumber-jvm" % CucumberV % "test",
+    "info.cukes" % "cucumber-core" % CucumberV % "test",
+    "info.cukes" % "cucumber-junit" % CucumberV % "test",
+    "org.seleniumhq.selenium" % "selenium-java" % SeleniumV % "test",
+    
+    "org.scalatest" %% "scalatest" % ScalatestV % "test",
+    "info.cukes" %% "cucumber-scala" % CucumberV % "test",
 
     /*Scala Dependencies*/
     "es.weso" %% "countryreconciliator" % CountryV,
 
     /*Java Dependencies*/
-    "org.seleniumhq.selenium" % "selenium-java" % SeleniumV,
     "commons-configuration" % "commons-configuration" % ConfigV,
     "com.typesafe" % "config" % TypeConfigV,
     "org.apache.poi" % "poi" % PoiV,
@@ -53,12 +54,15 @@ object ApplicationBuild extends Build {
     "org.apache.solr" % "solr-core" % LuceneV)
 
   val main = play.Project(AppName, AppVersion, appDependencies).settings(
+
+    scalaVersion := ScalaV,
+    
     /*Extern Repositories*/
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+    resolvers += "Typesafe snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-
+    
     /*Local Repositories*/
     resolvers += Resolver.url("Local Ivy Repository", url("file://" + Path.userHome.absolutePath + "/.ivy2/local/"))(Resolver.ivyStylePatterns),
     resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository")
-
 }

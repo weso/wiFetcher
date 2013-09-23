@@ -8,6 +8,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import java.io.FileInputStream
 import es.weso.wiFetcher.utils.FileUtils
+import es.weso.wiFetcher.dao.poi.RegionDAOImpl
 
 @RunWith(classOf[JUnitRunner])
 class RegionDAOImplSuite extends FunSuite with BeforeAndAfter 

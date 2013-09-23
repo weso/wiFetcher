@@ -2,8 +2,10 @@
 
 logLevel := Level.Warn
 
-// The Typesafe repository 
-
 // Use the Play sbt plugin for Play projects
 
-addSbtPlugin("play" % "sbt-plugin" % "2.1.3")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % System.getProperty("play.version"))
+
+resolvers += "Templemore Repository" at "http://templemore.co.uk/repo/"
+
+addSbtPlugin("templemore" %% "sbt-cucumber-plugin" % "0.8.0")

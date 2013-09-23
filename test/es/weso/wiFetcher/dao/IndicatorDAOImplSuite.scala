@@ -10,6 +10,7 @@ import es.weso.wiFetcher.entities.IndicatorHighLow
 import es.weso.wiFetcher.entities.IndicatorType
 import java.io.FileInputStream
 import es.weso.wiFetcher.utils.FileUtils
+import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
 
 @RunWith(classOf[JUnitRunner])
 class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter 

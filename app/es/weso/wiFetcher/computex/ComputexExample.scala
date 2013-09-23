@@ -5,11 +5,11 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 import com.hp.hpl.jena.rdf.model.Model
 import com.hp.hpl.jena.rdf.model.ModelFactory
 import com.hp.hpl.jena.rdf.model.ResourceFactory
-import es.weso.wiFetcher.entities.Component
+import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.entities.Observation
-import es.weso.wiFetcher.entities.SubIndex
+import es.weso.wiFetcher.entities.traits.SubIndex
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.DateUtils
 import es.weso.wiFetcher.entities.Country

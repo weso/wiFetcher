@@ -11,6 +11,7 @@ import es.weso.wiFetcher.entities.Dataset
 import java.io.FileInputStream
 import java.io.File
 import es.weso.wiFetcher.utils.FileUtils
+import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
 
 @RunWith(classOf[JUnitRunner])
 class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter 

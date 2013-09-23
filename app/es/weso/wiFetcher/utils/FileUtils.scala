@@ -3,6 +3,8 @@ package es.weso.wiFetcher.utils
 import java.io.FileNotFoundException
 import play.api.Play
 
+case class FileUtils()
+
 object FileUtils {
   
   /**
@@ -19,8 +21,7 @@ object FileUtils {
       throw new IllegalArgumentException("Path cannot be null")
     }
     if(relativePath) {
-//      val resource = getClass.getClassLoader().getResource(path)
-      val resource = Play.current.classloader.getResource(path)
+      val resource = classOf[FileUtils].getClassLoader().getResource(path)
       if(resource == null)
         throw new FileNotFoundException("File especifies does not exist")
       resource.getPath()
