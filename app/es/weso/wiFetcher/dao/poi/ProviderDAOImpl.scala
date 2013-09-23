@@ -16,6 +16,7 @@ import ProviderDAOImpl.logger
 import es.weso.wiFetcher.dao.ProviderDAO
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
+import es.weso.wiFetcher.dao.poi.PoiDAO
 
 /**
  * This class contains the implementation that allows to load all information

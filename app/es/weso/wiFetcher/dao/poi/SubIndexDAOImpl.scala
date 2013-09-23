@@ -18,6 +18,7 @@ import SubIndexDAOImpl.SheetName
 import SubIndexDAOImpl.SubindexType
 import SubIndexDAOImpl.logger
 import es.weso.wiFetcher.dao.SubIndexDAO
+import es.weso.wiFetcher.dao.poi.PoiDAO
 
 /**
  * This class contains the implementation that allows to load all information

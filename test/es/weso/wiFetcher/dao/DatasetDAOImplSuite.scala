@@ -7,7 +7,7 @@ import org.scalatest.Matchers
 import org.scalatest.FunSuite
 import java.io.FileNotFoundException
 import es.weso.wiFetcher.entities.Dataset
-import es.weso.wiFetcher.dao.poi.DatasetDAOImpl
+import es.weso.wiFetcher.dao.file.DatasetDAOImpl
 
 @RunWith(classOf[JUnitRunner])
 class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter 

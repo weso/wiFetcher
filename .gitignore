@@ -5,7 +5,7 @@ tmp
 *~
 *.class
 *.log
-
+*.~lock.*
 
 bin/
 

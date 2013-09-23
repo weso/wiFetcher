@@ -6,6 +6,7 @@ import es.weso.wiFetcher.entities.Entity
 import es.weso.wiFetcher.entities.Indicator
 
 trait Component extends Entity {
+  
   private val indicators: HashSet[Indicator] = new HashSet[Indicator]
 
   var logger = Logger.getLogger(this.getClass())

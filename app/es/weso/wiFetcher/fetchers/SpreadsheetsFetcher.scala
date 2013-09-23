@@ -9,7 +9,7 @@ import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
-import es.weso.wiFetcher.dao.poi.DatasetDAOImpl
+import es.weso.wiFetcher.dao.file.DatasetDAOImpl
 import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
 import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
 import es.weso.wiFetcher.dao.poi.ProviderDAOImpl

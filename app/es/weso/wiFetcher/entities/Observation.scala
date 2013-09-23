@@ -2,15 +2,13 @@ package es.weso.wiFetcher.entities
 
 import es.weso.wiFetcher.entities.ObservationStatus._
 
-class Observation {
-  
-    var dataset : Dataset = null
-    var label : String = "" 
-    var area : Area = null 
-    var computation : Computation = null 
-    var indicator : Indicator = null 
-    var year : Int = -1 
-    var value : Double = -1 
-    var status : ObservationStatus = null
-
-}
+case class Observation ( 
+    val dataset : Dataset = null,
+    val label : String = "",
+    val area : Area = null,
+    val computation : Computation = null,
+    val indicator : Indicator = null,
+    val year : Int = -1,
+    val value : Double = -1, 
+    val status : ObservationStatus = null
+)

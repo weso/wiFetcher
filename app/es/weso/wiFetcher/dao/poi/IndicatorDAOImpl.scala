@@ -19,6 +19,7 @@ import es.weso.wiFetcher.entities.IndicatorHighLow
 import IndicatorDAOImpl.SheetName
 import IndicatorDAOImpl.logger
 import es.weso.wiFetcher.dao.IndicatorDAO
+import es.weso.wiFetcher.dao.poi.PoiDAO
 
 /**
  * This class contains the implementation that allows to load all information

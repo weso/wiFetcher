@@ -21,6 +21,7 @@ import org.apache.log4j.Logger
 import java.io.InputStream
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.dao.ObservationDAO
+import es.weso.wiFetcher.dao.poi.PoiDAO
 
 /**
  * This class contains the implementation that allows extract all information
@@ -32,8 +33,7 @@ import es.weso.wiFetcher.dao.ObservationDAO
  *
  */
 class ObservationDAOImpl(
-  is: InputStream
-) extends ObservationDAO {
+  is: InputStream) extends ObservationDAO with PoiDAO[Observation] {
 
   /**
    * The excel workbook that contains the information about observations
@@ -176,17 +176,11 @@ class ObservationDAOImpl(
   def createObservation(dataset: Dataset, label: String, area: Area,
     computation: Computation, indicator: Indicator, year: Double,
     value: Double, status: String): Observation = {
-    var observation = new Observation
-    observation.dataset = dataset
-    observation.label = label
-    observation.area = area
-    observation.computation = computation
-    observation.indicator = indicator
-    observation.year = year.toInt
-    if (value == -1)
-      observation.status = ObservationStatus.Missed
+
+    val tmpStatus = if (value == -1)
+      ObservationStatus.Missed
     else {
-      observation.status = status match {
+      status match {
         case "Raw" => ObservationStatus.Raw
         case "Imputed" => ObservationStatus.Imputed
         case "Normalised" => ObservationStatus.Normalised
@@ -198,9 +192,18 @@ class ObservationDAOImpl(
         case _ => throw new IllegalArgumentException("Observation status " +
           status + " is unknown")
       }
-      observation.value = value
     }
-    observation
+
+    Observation(
+      dataset,
+      label,
+      area,
+      computation,
+      indicator,
+      year.toInt,
+      value,
+      tmpStatus)
+
   }
 
   /**
@@ -221,7 +224,7 @@ class ObservationDAOImpl(
 }
 
 object ObservationDAOImpl {
-  
+
   private val logger: Logger = Logger.getLogger(this.getClass())
-  
+
 }

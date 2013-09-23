@@ -1,4 +1,4 @@
-package es.weso.wiFetcher.dao.poi
+package es.weso.wiFetcher.dao.file
 
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
@@ -19,11 +19,12 @@ import es.weso.wiFetcher.dao.DatasetDAO
  * find the countries name in observations spreadsheets.
  */
 
-class DatasetDAOImpl(path: String, relativePath: Boolean) extends DatasetDAO {
+class DatasetDAOImpl(path: String, relativePath: Boolean) extends DatasetDAO 
+  with FileDAO[Dataset] {
   
   import DatasetDAOImpl._
   
-  private var datasets: List[Dataset] = load(FileUtils.getFilePath(
+  private val datasets: List[Dataset] = load(FileUtils.getFilePath(
     path, relativePath))
 
   /**
@@ -39,16 +40,9 @@ class DatasetDAOImpl(path: String, relativePath: Boolean) extends DatasetDAO {
    *   @return A list with all datasets loaded
    */
   private def load(path: String): List[Dataset] = {
-    var datasets: ListBuffer[Dataset] = new ListBuffer[Dataset]
-    val src = Source.fromFile(path)
-    val iter = src.getLines.map(_.split("\t"))
-    logger.info("Begin dataset extraction")
-    iter.foreach(line => {
-      var dataset = new Dataset
-      dataset.id = line(0)
-      datasets += dataset
-    })
-    logger.info("Finish dataset extraction")
+    logger.info("Begining dataset extraction")
+    val datasets = parseData(path)
+    logger.info("Finished dataset extraction")
     datasets.toList
   }
 
@@ -56,7 +50,18 @@ class DatasetDAOImpl(path: String, relativePath: Boolean) extends DatasetDAO {
    * This method returns a list with datasets
    */
   def getDatasets(): List[Dataset] = {
-    datasets
+    datasets.toList
+  }
+  
+  private def parseData(path: String): Seq[Dataset] = {
+    val src = Source.fromFile(path)
+    for{
+      line <- src.getLines.toList
+      chunks = line.split("\t")
+      id = chunks(0)
+    } yield {
+      Dataset(id)
+    }
   }
 
 }
