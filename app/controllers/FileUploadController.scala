@@ -7,28 +7,33 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 
 object FileUploadController extends Controller {
-  
+
   def byStructureFileUploadGET() = Action {
     implicit request =>
       Ok(views.html.file.structureFileGET())
   }
-  
+
   def byStructureFileUploadPOST() = Action(parse.multipartFormData) {
     implicit request =>
-      request.body.file("uploaded_file").map{file =>
+      request.body.file("uploaded_file").map { file =>
         val f = new File("public/temp/" + file.filename)
         file.ref.moveTo(f, true)
         SpreadsheetsFetcher.loadStructure(f)
         Ok(views.html.file.observationsFileGET())
-      }.getOrElse{
-          Ok(views.html.file.structureFileGET("Structure file cannot be " +
-          		"parsed! Upload it again"))
+      }.getOrElse {
+        Ok(views.html.file.structureFileGET("Structure file cannot be " +
+          "parsed! Upload it again"))
       }
   }
-  
+
+  def byObservationFileUploadGET() = Action {
+    implicit request =>
+      Ok(views.html.file.observationsFileGET())
+  }
+
   def byObservationFileUploadPOST() = Action(parse.multipartFormData) {
     implicit request =>
-      request.body.file("uploaded_file").map{ file =>
+      request.body.file("uploaded_file").map { file =>
         println("ObservationFileUploadPOST")
         val f = new File("public/temp/" + file.filename)
         file.ref.moveTo(f, true)

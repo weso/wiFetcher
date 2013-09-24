@@ -31,7 +31,7 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
   import RegionDAOImpl._
 
   //A list with all regions  
-  private val regions: ListBuffer[Region] = new ListBuffer[Region]()
+  private val regions: ListBuffer[Region] = ListBuffer.empty
 
   load(is)
 

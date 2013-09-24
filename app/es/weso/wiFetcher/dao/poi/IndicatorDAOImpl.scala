@@ -29,7 +29,7 @@ import es.weso.wiFetcher.utils.POIUtils
  * excel file that follows the structure of 2012 Web Index. Maybe we have
  * to change the implementation
  */
-class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO 
+class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
   with PoiDAO[Indicator] {
 
   import IndicatorDAOImpl._
@@ -37,14 +37,12 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
   /**
    *  A list with all primary indicators of the Web Index
    */
-  private val primaryIndicators: ListBuffer[Indicator] =
-    new ListBuffer[Indicator]()
+  private val primaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
 
   /**
    * A list with all secondary indicators of the Web Index
    */
-  private val secondaryIndicators: ListBuffer[Indicator] =
-    new ListBuffer[Indicator]()
+  private val secondaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
 
   load(is)
 
@@ -131,7 +129,7 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
    * low are preferred
    */
   def createIndicator(id: String, iType: String,
-    name: String, description: String, weight: String, hl: String, 
+    name: String, description: String, weight: String, hl: String,
     source: String, component: String, provider: String): Indicator = {
 
     val componentObj = SpreadsheetsFetcher.obtainComponent(component)

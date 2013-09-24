@@ -11,7 +11,6 @@ import java.io.FileInputStream
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
-import es.weso.wiFetcher.dao.SubIndexDAO
 
 @RunWith(classOf[JUnitRunner])
 class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{

@@ -1,5 +1,7 @@
 package es.weso.wiFetcher.fetchers
 
+import scala.collection.mutable.ListBuffer
+
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -28,18 +30,18 @@ import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
 
 object SpreadsheetsFetcher extends Fetcher {
 
-  var components: List[Component] = null
-  var subIndexes: List[SubIndex] = null
-  var primaryIndicators: List[Indicator] = null
-  var secondaryIndicators: List[Indicator] = null
-  var countries: List[Country] = null
-  var regions: List[Region] = null
-  var providers: List[Provider] = null
+  val components: ListBuffer[Component] = ListBuffer.empty
+  val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
+  val primaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
+  val secondaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
+  val countries: ListBuffer[Country] = ListBuffer.empty
+  val regions: ListBuffer[Region] = ListBuffer.empty
+  val providers: ListBuffer[Provider] = ListBuffer.empty
   //Create an indicator reconciliator
   val indicatorReconciliator: IndicatorReconciliator =
     new IndicatorReconciliator
-  var datasets: List[Dataset] = null
-  var observations: List[Observation] = null
+  val datasets: ListBuffer[Dataset] = ListBuffer.empty
+  val observations: ListBuffer[Observation] = ListBuffer.empty
 
   private val logger: Logger = Logger.getLogger(this.getClass())
   private val countryReconciliator: CountryReconciliator =
@@ -66,12 +68,12 @@ object SpreadsheetsFetcher extends Fetcher {
 
   private def loadDatasetInformation(path: String, relativePath: Boolean) {
     val datasetDao = new DatasetDAOImpl(path, relativePath)
-    datasets = datasetDao.getDatasets
+    datasets ++= datasetDao.getDatasets
   }
 
   private def loadObservationInformation(is: InputStream) {
     val observationDao = new ObservationDAOImpl(is)
-    observations = observationDao.getObservations
+    observations ++= observationDao.getObservations
   }
 
   def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
@@ -88,8 +90,8 @@ object SpreadsheetsFetcher extends Fetcher {
    */
   private def loadSubIndexInformation(is: InputStream) {
     val subIndexDao = new SubIndexDAOImpl(is)
-    components = subIndexDao.getComponents
-    subIndexes = subIndexDao.getSubIndexes
+    components ++= subIndexDao.getComponents
+    subIndexes ++= subIndexDao.getSubIndexes
   }
 
   /**
@@ -97,11 +99,11 @@ object SpreadsheetsFetcher extends Fetcher {
    */
   private def loadIndicatorInformation(is: InputStream) {
     val indicatorDao = new IndicatorDAOImpl(is)
-    primaryIndicators = indicatorDao.getPrimaryIndicators
-    secondaryIndicators = indicatorDao.getSecondaryIndicators
+    primaryIndicators ++= indicatorDao.getPrimaryIndicators
+    secondaryIndicators ++= indicatorDao.getSecondaryIndicators
     //Index all indicators in the reconciliator in order to search indicators
-    indicatorReconciliator.indexIndicators(primaryIndicators)
-    indicatorReconciliator.indexIndicators(secondaryIndicators)
+    indicatorReconciliator.indexIndicators(primaryIndicators.toList)
+    indicatorReconciliator.indexIndicators(secondaryIndicators.toList)
   }
 
   /**
@@ -109,7 +111,7 @@ object SpreadsheetsFetcher extends Fetcher {
    */
   private def loadCountryInformation(uri: String, relativePath: Boolean) {
     val countryDao = new CountryDAOImpl(uri, relativePath)
-    countries = countryDao.getCountries
+    countries ++= countryDao.getCountries
   }
 
   /**
@@ -117,12 +119,12 @@ object SpreadsheetsFetcher extends Fetcher {
    */
   private def loadRegionInformation(is: InputStream) {
     val regionDao = new RegionDAOImpl(is)
-    regions = regionDao.getRegions
+    regions ++= regionDao.getRegions
   }
 
   private def loadProviderInformation(is: InputStream) {
     val providerDao = new ProviderDAOImpl(is)
-    providers = providerDao.getProviders
+    providers ++= providerDao.getProviders
   }
 
   //Obtain a country given it's name
@@ -175,13 +177,15 @@ object SpreadsheetsFetcher extends Fetcher {
   }
 
   def getDatasets(): List[Dataset] = {
-    return datasets
+    return datasets.toList
   }
-  
+
+  def getDatasetById(id: String): Dataset = {
+    datasets.filter(_.id == id).head
+  }
+
   def getObservationsByStatus(status: ObservationStatus): List[Observation] = {
-    val results: ListBuffer[Observation] = new ListBuffer[Observation]
-    results.toList
-    
+    observations.filter(_.status == status).toList
   }
 
   def getComponentById(componentId: String): Component = {

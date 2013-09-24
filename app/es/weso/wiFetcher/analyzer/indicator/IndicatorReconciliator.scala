@@ -29,7 +29,7 @@ class IndicatorReconciliator {
 
   //The directory where the reconciliator indexes the indicators. In this case
   //is a RAM directory
-  private val idx: RAMDirectory = new RAMDirectory
+  private val iRamDir: RAMDirectory = new RAMDirectory
 
   private val analyzer: IndicatorAnalyzer = new IndicatorAnalyzer
 
@@ -39,21 +39,20 @@ class IndicatorReconciliator {
    * @param indicators A list of indicators that the reconciliator has to index
    */
   def indexIndicators(indicators: List[Indicator]) = {
-    val deletionPolicy: IndexDeletionPolicy =
-      new KeepOnlyLastCommitDeletionPolicy
-    val indexConfiguration: IndexWriterConfig = new IndexWriterConfig(
+    val deletionPolicy = new KeepOnlyLastCommitDeletionPolicy
+    val indexConfiguration = new IndexWriterConfig(
       Version.LUCENE_40, analyzer)
     indexConfiguration.setIndexDeletionPolicy(deletionPolicy)
     //Create the index writer
-    val indexWriter: IndexWriter = new IndexWriter(idx, indexConfiguration)
+    val indexWriter = new IndexWriter(iRamDir, indexConfiguration)
     //For each indicator, create a Lucene document with the data that we want to
     //index. In this case we store the identifier and the name of a indicator.
     //Once it is created, we index in the directory
     indicators.foreach(indicator => {
-      val doc: Document = new Document
-      val id: TextField = new TextField(IndicatorIdField, indicator.id,
+      val doc = new Document
+      val id = new TextField(IndicatorIdField, indicator.id,
         Field.Store.YES)
-      val name: TextField = new TextField(IndicatorNameField,
+      val name = new TextField(IndicatorNameField,
         indicator.label, Field.Store.YES)
       doc.add(id)
       doc.add(name)
@@ -70,8 +69,8 @@ class IndicatorReconciliator {
    * @return The lucene query built
    */
   private def createQueryFromString(str: String): Query = {
-    var queryStr = str.replace("/", " ")
-    val parser: QueryParser = new QueryParser(Version.LUCENE_40,
+    val queryStr = str.replace("/", " ")
+    val parser = new QueryParser(Version.LUCENE_40,
       IndicatorNameField, analyzer)
     parser.setDefaultOperator(QueryParser.Operator.OR)
     parser.parse(queryStr)
@@ -85,9 +84,9 @@ class IndicatorReconciliator {
    * @return The indicator searched
    */
   def searchIndicator(indicator: String): Indicator = {
+    val reader = DirectoryReader.open(iRamDir)
     //Create the index searcher
-    val indexSearcher: IndexSearcher = new IndexSearcher(
-      DirectoryReader.open(idx))
+    val indexSearcher: IndexSearcher = new IndexSearcher(reader)
     val collector = TopScoreDocCollector.create(MaxResults, true)
     //Build the query
     val query = createQueryFromString(indicator)

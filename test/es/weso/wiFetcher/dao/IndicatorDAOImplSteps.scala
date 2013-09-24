@@ -10,7 +10,6 @@ import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.utils.FileUtils
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
-import es.weso.wiFetcher.dao.IndicatorDAO
 
 @RunWith(classOf[JUnitRunner])
 class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{

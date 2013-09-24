@@ -34,13 +34,11 @@ import es.weso.wiFetcher.utils.POIUtils
  *
  */
 class ObservationDAOImpl(
-  is: InputStream
- ) extends ObservationDAO with PoiDAO[Observation] {
+  is: InputStream) extends ObservationDAO with PoiDAO[Observation] {
 
   import ObservationDAOImpl._
 
-  private val observations: ListBuffer[Observation] = new ListBuffer[Observation]()
-  private var dataset: Dataset = null //Temporal Fix ;(
+  private val observations: ListBuffer[Observation] = ListBuffer.empty
 
   load(is)
 
@@ -54,7 +52,9 @@ class ObservationDAOImpl(
       throw new IllegalArgumentException("List of datasets to load their " +
         "observations is null")
     }
+
     logger.info("Begin observations extraction")
+
     val workbook: Workbook = WorkbookFactory.create(is)
     val obs = for {
       dataset <- datasets
@@ -66,7 +66,6 @@ class ObservationDAOImpl(
         throw new IllegalArgumentException("There isn't data for dataset: " +
           dataset.id)
       }
-      this.dataset = dataset
       parseData(workbook, sheet)
     }
     observations ++= obs.foldLeft(ListBuffer[Observation]())((a, b) => a ++= b)
@@ -78,15 +77,13 @@ class ObservationDAOImpl(
 
     //Obtain the initial cell of observation from properties file
     val initialCell = new CellReference(Configuration.getInitialCellSecondaryObservation)
+    val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
     for {
       row <- initialCell.getRow() to sheet.getLastRowNum()
-      evaluator = workbook.getCreationHelper().createFormulaEvaluator()
       actualRow = sheet.getRow(row)
-      if actualRow != null && !POIUtils.extractCellValue(actualRow.getCell(0), evaluator).trim().isEmpty()
+      if actualRow != null
+      if !POIUtils.extractCellValue(actualRow.getCell(0), evaluator).trim().isEmpty()
       countryName = POIUtils.extractCellValue(actualRow.getCell(0))
-      country = SpreadsheetsFetcher.obtainCountry(countryName)
-      //We have to iterate throw the excel file
-      column <- initialCell.getCol() to actualRow.getLastCellNum() - 1
       //Obtain the indicator corresponds to the observation
       indicator = obtainIndicator(sheet, Configuration.getIndicatorCell)
       //Obtain the country corresponds to the observation 
@@ -94,10 +91,13 @@ class ObservationDAOImpl(
       //If country of the observation is null, there is no observation
       //for this cell
       if country != null
+      //We have to iterate throw the excel file
+      column <- initialCell.getCol() to actualRow.getLastCellNum() - 1
       //TODO Have to extract the year for the spreadsheet
       year = POIUtils.extractCellValue(sheet.getRow(
         initialCell.getRow() - 1).getCell(column), evaluator)
       value = POIUtils.extractNumericCellValue(actualRow.getCell(column), evaluator)
+      dataset = SpreadsheetsFetcher.getDatasetById(sheet.getSheetName())
       status = dataset.id.substring(dataset.id.lastIndexOf('-'))
     } yield {
       //Create the observation with the extracted data

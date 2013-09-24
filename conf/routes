@@ -11,4 +11,5 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 GET		/uri						controllers.URIController.byUriGET
 GET		/structure					controllers.FileUploadController.byStructureFileUploadGET
 POST	/structure					controllers.FileUploadController.byStructureFileUploadPOST
-POST	/observations				controllers.FileUploadController.byObservationFileUploadPOST
+GET		/observation				controllers.FileUploadController.byObservationFileUploadGET
+POST	/observation				controllers.FileUploadController.byObservationFileUploadPOST

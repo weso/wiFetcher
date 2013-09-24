@@ -31,9 +31,9 @@ class SubIndexDAOImpl(is: InputStream) extends SubIndexDAO
   import SubIndexDAOImpl._
 
   //A list with all components loaded
-  private val components: ListBuffer[Component] = new ListBuffer[Component]
+  private val components: ListBuffer[Component] = ListBuffer.empty
   //A list with all sub-indexes loaded
-  private val subIndexes: ListBuffer[SubIndex] = new ListBuffer[SubIndex]
+  private val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
 
   load(is)
 
