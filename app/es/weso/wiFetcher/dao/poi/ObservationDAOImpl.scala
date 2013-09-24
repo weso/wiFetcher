@@ -83,12 +83,12 @@ class ObservationDAOImpl(
       evaluator = workbook.getCreationHelper().createFormulaEvaluator()
       actualRow = sheet.getRow(row)
       if actualRow != null && !POIUtils.extractCellValue(actualRow.getCell(0), evaluator).trim().isEmpty()
-      countryName = POIUtils.extractCellValue(actualRow.getCell(0))
+      countryName = POIUtils.extractCellValue(actualRow.getCell(0), evaluator)
       country = SpreadsheetsFetcher.obtainCountry(countryName)
       //We have to iterate throw the excel file
       column <- initialCell.getCol() to actualRow.getLastCellNum() - 1
       //Obtain the indicator corresponds to the observation
-      indicator = obtainIndicator(sheet, Configuration.getIndicatorCell)
+      indicator = obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)
       //Obtain the country corresponds to the observation 
       country = obtainCountry(countryName)
       //If country of the observation is null, there is no observation
@@ -98,7 +98,7 @@ class ObservationDAOImpl(
       year = POIUtils.extractCellValue(sheet.getRow(
         initialCell.getRow() - 1).getCell(column), evaluator)
       value = POIUtils.extractNumericCellValue(actualRow.getCell(column), evaluator)
-      status = dataset.id.substring(dataset.id.lastIndexOf('-'))
+      status = dataset.id.substring(dataset.id.lastIndexOf('-')+1)
     } yield {
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
@@ -135,10 +135,10 @@ class ObservationDAOImpl(
    * @param initialCell The initial cell of the observations
    * @return An indicator
    */
-  def obtainIndicator(sheet: Sheet, cell: String): Indicator = {
+  def obtainIndicator(sheet: Sheet, cell: String, evaluator : FormulaEvaluator): Indicator = {
     val cellReference = new CellReference(cell)
     val indicatorName = POIUtils.extractCellValue(
-      sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()))
+      sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()), evaluator)
     SpreadsheetsFetcher.obtainIndicator(indicatorName)
   }
 
@@ -192,13 +192,13 @@ class ObservationDAOImpl(
    * @param sheet The sheet that contains all observations of a dataset
    * @return The values extracted of the status cell
    */
-  def obtainStatus(cell: String, sheet: Sheet): String = {
+  def obtainStatus(cell: String, sheet: Sheet, evaluator : FormulaEvaluator): String = {
     val cellReference: CellReference = new CellReference(cell)
     val stat = sheet.getRow(cellReference.getRow()).getCell(
       cellReference.getCol())
     if (stat == null)
       throw new IllegalArgumentException("Status cell is empty")
-    POIUtils.extractCellValue(stat)
+    POIUtils.extractCellValue(stat, evaluator)
   }
 
   def getObservations(): List[Observation] = observations.toList

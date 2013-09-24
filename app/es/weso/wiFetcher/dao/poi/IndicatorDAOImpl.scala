@@ -89,23 +89,23 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
       //In the properties file, we define the number of the columns that 
       //contains each indicator property
       id = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorIdColumn))
+        Configuration.getIndicatorIdColumn), evaluator)
       iType = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorTypeColumn))
+        Configuration.getIndicatorTypeColumn), evaluator)
       name = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorNameColumn))
+        Configuration.getIndicatorNameColumn), evaluator)
       description = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorDescriptionColumn))
+        Configuration.getIndicatorDescriptionColumn), evaluator)
       source = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorSourceColumn))
+        Configuration.getIndicatorSourceColumn), evaluator)
       provider = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorProviderColumn))
+        Configuration.getIndicatorProviderColumn), evaluator)
       weight = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorWeightColumn), evaluator)
       hl = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorHLColumn))
+        Configuration.getIndicatorHLColumn), evaluator)
       component = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorComponentColumn))
+        Configuration.getIndicatorComponentColumn), evaluator)
     } yield {
       createIndicator(id, iType, name, description, weight, hl, source,
         component, provider)

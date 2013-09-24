@@ -15,15 +15,14 @@ object FileUploadController extends Controller {
   
   def byFileUploadPOST() = Action(parse.multipartFormData) {
     implicit request =>
-      /*request.body.file("structure_file").map{file =>
+      request.body.file("structure_file").map{file =>
         val f = new File("public/temp/" + file.filename)
         file.ref.moveTo(f, true)
         SpreadsheetsFetcher.loadStructure(f)
-        //Ok(views.html.file.observationsFileGET())
       }.getOrElse{
           Ok("Structure file cannot be " +
           		"parsed! Upload it again")
-      }*/
+      }
       request.body.file("observations_file").map{file => 
       	val f = new File("public/temp/" + file.filename)
       	file.ref.moveTo(f, true)
@@ -33,20 +32,8 @@ object FileUploadController extends Controller {
         Ok("Structure file cannot be " +
           		"parsed! Upload it again")
       }
+      //TODO remove temporary files
       Ok("All OK")
   }
-  
-  /*def byObservationFileUploadPOST() = Action(parse.multipartFormData) {
-    implicit request =>
-      request.body.file("uploaded_file").map{ file =>
-        println("ObservationFileUploadPOST")
-        val f = new File("public/temp/" + file.filename)
-        file.ref.moveTo(f, true)
-        SpreadsheetsFetcher.loadObservations(f)
-        Ok("Todo bien")
-      }.getOrElse {
-        Ok("Algo fallo")
-      }
-  }*/
 
 }

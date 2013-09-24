@@ -1,22 +1,20 @@
 package es.weso.wiFetcher.dao.poi
 
 import java.io.InputStream
-
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
-
 import org.apache.poi.hssf.util.CellReference
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.RegionDAO
 import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.POIUtils
+import org.apache.poi.ss.usermodel.FormulaEvaluator
 
 /**
  * This class contains the implementation that allows to load all information
@@ -62,21 +60,21 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
     val cellReference = new CellReference(Configuration.getRegionInitialCell)
     logger.info("Begin extraction of region information")
 
-    val regions = loadRegions(sheet, cellReference)
-
+    val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
+    val regions = loadRegions(sheet, cellReference, evaluator)
     for {
       row <- cellReference.getRow() to sheet.getLastRowNum()
       //Extract the name of the region. The column that contains the information
       //is in the properties file
       regionName = POIUtils.extractCellValue(sheet.getRow(row).getCell(
-        Configuration.getRegionNameColumn))
+        Configuration.getRegionNameColumn), evaluator)
 
       region = regions(regionName)
 
       //Extract the country name. The column that contains the name of the 
       //country in in the properties file
       countryName = POIUtils.extractCellValue(sheet.getRow(row).getCell(
-        Configuration.getRegionCountryColumn))
+        Configuration.getRegionCountryColumn), evaluator)
         
       country = SpreadsheetsFetcher.obtainCountry(countryName)
     } {
@@ -92,13 +90,13 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
     regions.toList
   }
 
-  protected def loadRegions(sheet: Sheet, cellReference: CellReference): Map[String, Region] = {
+  protected def loadRegions(sheet: Sheet, cellReference: CellReference, evaluator : FormulaEvaluator): Map[String, Region] = {
     (for {
       row <- cellReference.getRow() to sheet.getLastRowNum()
       //Extract the name of the region. The column that contains the information
       //is in the properties file
       regionName = POIUtils.extractCellValue(sheet.getRow(row).getCell(
-        Configuration.getRegionNameColumn))
+        Configuration.getRegionNameColumn), evaluator)
     } yield {
       regionName -> Region(regionName)
     }).toMap
