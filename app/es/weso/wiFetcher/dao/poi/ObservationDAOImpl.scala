@@ -78,32 +78,34 @@ class ObservationDAOImpl(
     //Obtain the initial cell of observation from properties file
     val initialCell = new CellReference(Configuration.getInitialCellSecondaryObservation)
     val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
+    val indicator = obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)
+    val dataset = SpreadsheetsFetcher.getDatasetById(sheet.getSheetName())
+    val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
+    println(dataset)
+
     for {
       row <- initialCell.getRow() to sheet.getLastRowNum()
       actualRow = sheet.getRow(row)
       if actualRow != null
-      if !POIUtils.extractCellValue(actualRow.getCell(0), evaluator).trim().isEmpty()
-      countryName = POIUtils.extractCellValue(actualRow.getCell(0))
-      //Obtain the indicator corresponds to the observation
-      indicator = obtainIndicator(sheet, Configuration.getIndicatorCell)
+      if !POIUtils.extractCellValue(actualRow.getCell(0), evaluator).trim.isEmpty
+      countryName = POIUtils.extractCellValue(actualRow.getCell(0), evaluator)
+      if countryName != ""
       //Obtain the country corresponds to the observation 
       country = obtainCountry(countryName)
       //If country of the observation is null, there is no observation
       //for this cell
-      if country != null
+      if country.isDefined
       //We have to iterate throw the excel file
       column <- initialCell.getCol() to actualRow.getLastCellNum() - 1
       //TODO Have to extract the year for the spreadsheet
-      year = POIUtils.extractCellValue(sheet.getRow(
-        initialCell.getRow() - 1).getCell(column), evaluator)
+      year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
+        .getCell(column), evaluator)
       value = POIUtils.extractNumericCellValue(actualRow.getCell(column), evaluator)
-      dataset = SpreadsheetsFetcher.getDatasetById(sheet.getSheetName())
-      status = dataset.id.substring(dataset.id.lastIndexOf('-'))
     } yield {
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
-        country.iso3Code + " " + indicator + " " + value)
-      createObservation(dataset, "", country, null,
+        country.get.iso3Code + " " + indicator + " " + value)
+      createObservation(dataset, "", country.get, null,
         indicator, year.toDouble, value, status)
     }
   }
@@ -119,10 +121,15 @@ class ObservationDAOImpl(
    * @param initialCell The initial cell of the observations
    * @return A country corresponds to an observations
    */
-  def obtainCountry(countryName: String): Country = {
+  def obtainCountry(countryName: String): Option[Country] = {
     logger.info("Obtaining country with name: " + countryName)
     //Ask to SpreadsheetFetcher for the country accord to the Web Index name
-    SpreadsheetsFetcher.obtainCountry(countryName)
+    val country = SpreadsheetsFetcher.obtainCountry(countryName)
+    country match {
+      case Some(c) => ""
+      case None => "foo"
+    }
+    country
   }
 
   /**
@@ -135,10 +142,10 @@ class ObservationDAOImpl(
    * @param initialCell The initial cell of the observations
    * @return An indicator
    */
-  def obtainIndicator(sheet: Sheet, cell: String): Indicator = {
+  def obtainIndicator(sheet: Sheet, cell: String, evaluator: FormulaEvaluator): Indicator = {
     val cellReference = new CellReference(cell)
     val indicatorName = POIUtils.extractCellValue(
-      sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()))
+      sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()), evaluator)
     SpreadsheetsFetcher.obtainIndicator(indicatorName)
   }
 
@@ -192,13 +199,13 @@ class ObservationDAOImpl(
    * @param sheet The sheet that contains all observations of a dataset
    * @return The values extracted of the status cell
    */
-  def obtainStatus(cell: String, sheet: Sheet): String = {
+  def obtainStatus(cell: String, sheet: Sheet, evaluator: FormulaEvaluator): String = {
     val cellReference: CellReference = new CellReference(cell)
     val stat = sheet.getRow(cellReference.getRow()).getCell(
       cellReference.getCol())
     if (stat == null)
       throw new IllegalArgumentException("Status cell is empty")
-    POIUtils.extractCellValue(stat)
+    POIUtils.extractCellValue(stat, evaluator)
   }
 
   def getObservations(): List[Observation] = observations.toList

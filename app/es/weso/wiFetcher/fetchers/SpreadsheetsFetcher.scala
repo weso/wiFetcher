@@ -128,27 +128,22 @@ object SpreadsheetsFetcher extends Fetcher {
   }
 
   //Obtain a country given it's name
-  def obtainCountry(regionName: String): Country = {
+  def obtainCountry(regionName: String): Option[Country] = {
     if (regionName == null || regionName.isEmpty()) {
-      logger.error("The name of the country cannot " +
-        "be null o empty")
+      logger.error("The name of the country cannot be null o empty")
       throw new IllegalArgumentException("The name of the country cannot " +
         "be null o empty")
     }
-    var wiName: String = countryReconciliator.searchCountry(regionName)
-    countries.find(c => c.name.equals(wiName)).getOrElse({
-      logger.error("Not exist country with name " +
-        regionName)
-      throw new IllegalArgumentException("Not exist country with name " +
-        regionName)
-    })
+    val wiName: String = countryReconciliator.searchCountry(regionName)
+    
+    countries.find(c => c.name.equals(wiName))
   }
 
   //Obtain an indicator given it's name
   def obtainIndicator(indicatorName: String): Indicator = {
     val indicator = indicatorReconciliator.searchIndicator(indicatorName)
     if (indicator == null)
-      logger.info("Not exist indicator with name " + indicatorName)
+      logger.info(s"Not exist indicator with name ${indicatorName}")
     indicator
   }
 
@@ -159,7 +154,7 @@ object SpreadsheetsFetcher extends Fetcher {
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.id.equals(id))
       .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
-        "id " + id))
+        s"id ${id}"))
   }
 
   def obtainIndicatorByDescription(indicatorDescription: String): Indicator = {
@@ -167,13 +162,14 @@ object SpreadsheetsFetcher extends Fetcher {
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.comment.equalsIgnoreCase(indicatorDescription))
-      .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
-        "description " + indicatorDescription))
+      .getOrElse(throw new IllegalArgumentException("Not exist indicator with "
+        + s"description ${indicatorDescription}"))
   }
 
   //Obtain a component given it's id
   def obtainComponent(componentId: String): Component = {
-    components.find(component => component.id.equals(componentId)).getOrElse(throw new IllegalArgumentException("Not exist component " + componentId))
+    components.find(component => component.id.equals(componentId))
+      .getOrElse(throw new IllegalArgumentException("Not exist component " + componentId))
   }
 
   def getDatasets(): List[Dataset] = {
