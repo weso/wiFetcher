@@ -29,7 +29,7 @@ class ProviderDAOImpl(is: InputStream)
 
   import ProviderDAOImpl._
   
-  private val providers: ListBuffer[Provider] = new ListBuffer[Provider]
+  private val providers: ListBuffer[Provider] = ListBuffer.empty
 
   load(is)
 

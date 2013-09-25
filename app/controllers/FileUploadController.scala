@@ -8,35 +8,33 @@ import play.api.mvc.Controller
 
 object FileUploadController extends Controller {
   
-  def byStructureFileUploadGET() = Action {
+  def byFileUploadGET() = Action {
     implicit request =>
       Ok(views.html.file.structureFileGET())
   }
   
-  def byStructureFileUploadPOST() = Action(parse.multipartFormData) {
+  def byFileUploadPOST() = Action(parse.multipartFormData) {
     implicit request =>
-      request.body.file("uploaded_file").map{file =>
+      request.body.file("structure_file").map{file =>
         val f = new File("public/temp/" + file.filename)
         file.ref.moveTo(f, true)
         SpreadsheetsFetcher.loadStructure(f)
-        Ok(views.html.file.observationsFileGET())
+        Ok(views.html.file.structureFileGET())
       }.getOrElse{
-          Ok(views.html.file.structureFileGET("Structure file cannot be " +
-          		"parsed! Upload it again"))
+          Ok("Structure file cannot be " +
+          		"parsed! Upload it again")
       }
-  }
-  
-  def byObservationFileUploadPOST() = Action(parse.multipartFormData) {
-    implicit request =>
-      request.body.file("uploaded_file").map{ file =>
-        println("ObservationFileUploadPOST")
-        val f = new File("public/temp/" + file.filename)
-        file.ref.moveTo(f, true)
-        SpreadsheetsFetcher.loadObservations(f)
-        Ok("Todo bien")
-      }.getOrElse {
-        Ok("Algo fallo")
+      request.body.file("observations_file").map{file => 
+      	val f = new File("public/temp/" + file.filename)
+      	file.ref.moveTo(f, true)
+      	SpreadsheetsFetcher.loadObservations(f)
+      	Ok("All OK")
+      }.getOrElse{
+        Ok("Structure file cannot be " +
+          		"parsed! Upload it again")
       }
+      //TODO remove temporary files
+      Ok("All OK")
   }
 
 }

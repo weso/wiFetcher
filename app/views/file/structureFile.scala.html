@@ -3,10 +3,14 @@
 <div id="frontforms">
 	
 	<div>
-		@helper.form(action = routes.FileUploadController.byStructureFileUploadPOST, 'enctype -> "multipart/form-data") {
+		@helper.form(action = routes.FileUploadController.byFileUploadPOST, 'enctype -> "multipart/form-data") {
 	      	<p class="instructions">
-	      		<label title="Choose a Local File to Upload and load Web Index structure" for="uploaded_file">File:</label>
-	      		<input type="file" id="uploaded_file" name="uploaded_file"/>
+	      		<label title="Choose a Local File to Upload and load Web Index structure" for="structure_file">Structure file:</label>
+	      		<input type="file" id="structure_file" name="structure_file"/>
+	      	</p>
+	      	<p class="instructions">
+	      		<label title="Choose a Local File to Upload and load Web Index observations" for="observations_file">Observations file:</label>
+	      		<input type="file" id="observations_file" name="observations_file"/>
 	      	</p>
 			<p class="submit_button">
 				<input type="submit" title="Submit for validation" value="Check" class="button"/>

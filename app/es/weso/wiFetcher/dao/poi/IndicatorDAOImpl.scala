@@ -29,7 +29,7 @@ import es.weso.wiFetcher.utils.POIUtils
  * excel file that follows the structure of 2012 Web Index. Maybe we have
  * to change the implementation
  */
-class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO 
+class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
   with PoiDAO[Indicator] {
 
   import IndicatorDAOImpl._
@@ -37,14 +37,12 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
   /**
    *  A list with all primary indicators of the Web Index
    */
-  private val primaryIndicators: ListBuffer[Indicator] =
-    new ListBuffer[Indicator]()
+  private val primaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
 
   /**
    * A list with all secondary indicators of the Web Index
    */
-  private val secondaryIndicators: ListBuffer[Indicator] =
-    new ListBuffer[Indicator]()
+  private val secondaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
 
   load(is)
 
@@ -89,23 +87,23 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
       //In the properties file, we define the number of the columns that 
       //contains each indicator property
       id = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorIdColumn))
+        Configuration.getIndicatorIdColumn), evaluator)
       iType = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorTypeColumn))
+        Configuration.getIndicatorTypeColumn), evaluator)
       name = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorNameColumn))
+        Configuration.getIndicatorNameColumn), evaluator)
       description = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorDescriptionColumn))
+        Configuration.getIndicatorDescriptionColumn), evaluator)
       source = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorSourceColumn))
+        Configuration.getIndicatorSourceColumn), evaluator)
       provider = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorProviderColumn))
+        Configuration.getIndicatorProviderColumn), evaluator)
       weight = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorWeightColumn), evaluator)
       hl = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorHLColumn))
+        Configuration.getIndicatorHLColumn), evaluator)
       component = POIUtils.extractCellValue(actualRow.getCell(
-        Configuration.getIndicatorComponentColumn))
+        Configuration.getIndicatorComponentColumn), evaluator)
     } yield {
       createIndicator(id, iType, name, description, weight, hl, source,
         component, provider)
@@ -131,7 +129,7 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
    * low are preferred
    */
   def createIndicator(id: String, iType: String,
-    name: String, description: String, weight: String, hl: String, 
+    name: String, description: String, weight: String, hl: String,
     source: String, component: String, provider: String): Indicator = {
 
     val componentObj = SpreadsheetsFetcher.obtainComponent(component)
