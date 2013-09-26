@@ -9,21 +9,26 @@ import org.scalatest.junit.JUnitRunner
 import java.io.FileInputStream
 import es.weso.wiFetcher.utils.FileUtils
 import es.weso.wiFetcher.dao.poi.RegionDAOImpl
+import org.scalatest.BeforeAndAfterAll
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import java.io.File
 
 @RunWith(classOf[JUnitRunner])
 class RegionDAOImplSuite extends FunSuite with BeforeAndAfter 
-	with Matchers{
+	with Matchers with BeforeAndAfterAll{
   
   var regionDao : RegionDAO = null
   var emptyDao : RegionDAO = null
   
+  override def beforeAll() {
+    SpreadsheetsFetcher.loadStructure(new File(
+        FileUtils.getFilePath("files/Structure0.4.xlsx", true)))
+  } 
+  
   before{
-    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure0.4.xlsx", 
         true))
     regionDao = new RegionDAOImpl(is)
-    val is2 = new FileInputStream(FileUtils.getFilePath("files/empty.xlsx", 
-        true))
-    emptyDao = new RegionDAOImpl(is2)
   }
 
   test("Try to load data from a non-existing file") {
@@ -41,7 +46,7 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Load data correctly") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure0.4.xlsx", 
         true))
     val regionDao = new RegionDAOImpl(is)
     regionDao should not be null
@@ -51,7 +56,7 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
   test("Obtain all regions") {
     val regions = regionDao.getRegions
     regions should not be null
-    regions.size should be (5)
+    regions.size should be (1)
   }
   
   test("Obtain all regions from empty file") {
@@ -60,7 +65,7 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
     regions.size should be (0)
   }
   
-  test("Validate countries for regions") {
+  /*test("Validate countries for regions") {
     val regions = regionDao.getRegions
     regions.foreach(region => {
       region.name match {
@@ -71,6 +76,6 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
         case "Middle east & Central asia" => region.getCountries.size should be (5)
       } 
     })
-  }
+  }*/
   
 }

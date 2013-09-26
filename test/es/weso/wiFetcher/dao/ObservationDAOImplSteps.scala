@@ -21,22 +21,18 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
   var result : Observation = null
   
   Given("""^I want to load the observations of dataset "([^"]*)" in the year "([^"]*)"$"""){ (datast:String, year:Int) =>
-	val dataset : Dataset = new Dataset
-	dataset.id = datast
+	val dataset : Dataset = Dataset(datast)
 	val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
 	observationDAO = new ObservationDAOImpl(is)
-	observations = observationDAO.getObservationsByDataset(dataset)
   } 
   
   Given("""^I want to load the observations of non-existing dataset "([^"]*)" in the year "([^"]*)"$""") {(datast : String, year:Int) => {
-    val dataset : Dataset = new Dataset
-	dataset.id = datast
+    val dataset : Dataset = Dataset(datast)
 	val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
-	observationDAO = new ObservationDAOImpl(is)
     intercept[IllegalArgumentException] {
-      observations = observationDAO.getObservationsByDataset(dataset)
+	    observationDAO = new ObservationDAOImpl(is)
     }
   }}
   
