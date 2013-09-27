@@ -14,6 +14,7 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.DateUtils
 import es.weso.wiFetcher.entities.Country
 import es.weso.wiFetcher.entities.Region
+import scala.collection.mutable.ListBuffer
 
 object ComputexExample {
   
@@ -100,6 +101,33 @@ object ComputexExample {
   val PROPERTY_QB_SLICE = ResourceFactory.createProperty(PREFIX_QB + "slice")
   
   var id : Int = 1
+  
+  def generateJenaModel() : Model = {
+    val observations : List[Observation] = SpreadsheetsFetcher.observations.toList
+    val primaryIndicators : List[Indicator] = SpreadsheetsFetcher.primaryIndicators.toList
+    val secondaryIndicators : List[Indicator] = SpreadsheetsFetcher.secondaryIndicators.toList
+    val components : List[Component] = SpreadsheetsFetcher.components.toList
+    val subindexes : List[SubIndex] = SpreadsheetsFetcher.subIndexes.toList
+    val datasets : List[Dataset] = SpreadsheetsFetcher.datasets.toList
+    val observationsByDataset : Map[Dataset, ListBuffer[Observation]] = SpreadsheetsFetcher.observations.groupBy(observation => observation.dataset)
+    val countries : List[Country] = SpreadsheetsFetcher.countries.toList
+    val regions : List[Region] = SpreadsheetsFetcher.regions.toList
+    val model = createModel
+    /*var id = 0
+    observations.foreach(obs => {
+      id+=1
+      createObservationTriples(obs, model, id)
+    })*/
+    createDataStructureDefinition(model)
+    primaryIndicators.foreach(indicator => createPrimaryIndicatorTriples(indicator, model))
+    secondaryIndicators.foreach(indicator => createSecondaryIndicatorTriples(indicator, model))
+    components.foreach(comp => createComponentsTriples(comp, model))
+    subindexes.foreach(subindex => createSubindexTriples(subindex, model))
+    datasets.foreach(dataset => createDatasetsTriples(dataset, observationsByDataset, model))
+    countries.foreach(country => createCountriesTriples(country, model))
+    regions.foreach(region => createRegionsTriples(region, model))
+    model
+  }
   
   def main(args: Array[String]): Unit = {
     /*val observations : List[Observation] = SpreadsheetsFetcher.observations
@@ -297,10 +325,11 @@ object ComputexExample {
   }
   
   private def createDatasetsTriples(dataset : Dataset, 
-      observationsByDataset : Map[Dataset, List[Observation]], model : Model) = {
+      observationsByDataset : Map[Dataset, ListBuffer[Observation]], 
+      model : Model) = {
     val datasetResource = model.createResource(PREFIX_DATASET + dataset.id)
     datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "DataSet"))
-    //datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_WI_ONTO + "Dataset"))
+    datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_WI_ONTO + "Dataset"))
     datasetResource.addProperty(PROPERTY_CEX_MD5, ResourceFactory.createTypedLiteral("MD5...", XSDDatatype.XSDstring))
     datasetResource.addProperty(PROPERTY_DCTERMS_CONTRIBUTOR, ResourceFactory.createResource(PREFIX_WI_ORG + "WESO"))
     datasetResource.addProperty(PROPERTY_DCTERMS_ISSUED, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
@@ -310,7 +339,7 @@ object ComputexExample {
     datasetResource.addProperty(PROPERTY_RDFS_LABEL, ResourceFactory.createLangLiteral(dataset.id, "en"))
     datasetResource.addProperty(PROPERTY_RDFS_COMMENT, ResourceFactory.createLangLiteral("Description of dataset " + dataset.id, "en"))
     datasetResource.addProperty(PROPERTY_SMDX_UNITMEASURE, ResourceFactory.createResource("http://dbpedia.org/resource/Year"))
-    /*var anonymousResource = model.createResource()
+    var anonymousResource = model.createResource()
     anonymousResource.addProperty(PROPERTY_QB_DIMENSION, ResourceFactory.createResource(PREFIX_WI_ONTO + "ref-area"))
     anonymousResource.addProperty(PROPERTY_QB_ORDER, ResourceFactory.createTypedLiteral("1", XSDDatatype.XSDinteger))
     datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)
@@ -324,17 +353,23 @@ object ComputexExample {
     datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)
     anonymousResource = model.createResource()
     anonymousResource.addProperty(PROPERTY_QB_MEASURE, ResourceFactory.createResource(PREFIX_CEX + "indicator"))
-    datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)*/
+    datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)
     datasetResource.addProperty(PROPERTY_QB_STRUCTURE, ResourceFactory.createResource(PREFIX_WI_ONTO + "DSD"))
     
-    val observations : List[Observation] = observationsByDataset.get(dataset).getOrElse(throw new IllegalArgumentException("There is no observations by dataset " + dataset.id))
-    val observationsByYear : Map[Int, List[Observation]] = observations.groupBy(observation => observation.year)
+    val observations : ListBuffer[Observation] = observationsByDataset.get(dataset).getOrElse(throw new IllegalArgumentException("There is no observations by dataset " + dataset.id))
+    val observationsByYear : Map[Int, ListBuffer[Observation]] = observations.groupBy(observation => observation.year)
     observationsByYear.keySet.foreach(year => {
-      val sliceResource = model.createResource(PREFIX_SLICE + "Slice-" + observations.head.indicator.id + year.toString + "-" + observations.head.status)
+      println("00000000000000000000000000:  " + observations.head.indicator.id)
+      println("00000000000000000000000000:  " + year.toString)
+      println("00000000000000000000000000:  " + observations.head.status)
+      val sliceResource = model.createResource(PREFIX_SLICE + "Slice-" + 
+          observations.head.indicator.id + year.toString + "-" + observations.head.status)
       sliceResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "Slice"))
-      sliceResource.addProperty(PROPERTY_CEX_INDICATOR, ResourceFactory.createResource(PREFIX_INDICATOR + observations.head.indicator.id))
+      sliceResource.addProperty(PROPERTY_CEX_INDICATOR, ResourceFactory.createResource(PREFIX_INDICATOR + 
+          observations.head.indicator.id))
       sliceResource.addProperty(PROPERTY_WIONTO_REFYEAR, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
-      sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, /*datasetResource*/ResourceFactory.createResource(PREFIX_WI_ONTO + "sliceByArea"))
+      sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, /*datasetResource*/ResourceFactory.createResource(PREFIX_WI_ONTO + 
+          "sliceByArea"))
       observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
         createObservationTriples(obs, model, id)
         sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" + /*obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status*/ id))
