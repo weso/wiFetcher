@@ -50,14 +50,24 @@ object SpreadsheetsFetcher extends Fetcher {
   private val countryReconciliator: CountryReconciliator =
     new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
 
-  
-  def loadAll(structure:File, raw:File) : (Model, Seq[Issue]) =  {
+  def loadAll(structure: File, raw: File): (Model, Seq[Issue]) = {
+    components.clear
+    subIndexes.clear
+    primaryIndicators.clear
+    secondaryIndicators.clear
+    countries.clear
+    regions.clear
+    providers.clear
+    datasets.clear
+    observations.clear
+
+    IssueManagerUtils.clear
+
     loadStructure(structure)
     loadObservations(raw)
     (ModelGenerator.generateJenaModel, IssueManagerUtils.asSeq)
   }
-  
-  
+
   /**
    * This method load all structure about Web Index information
    */
@@ -146,7 +156,7 @@ object SpreadsheetsFetcher extends Fetcher {
         "be null o empty")
     }
     val wiName: String = countryReconciliator.searchCountry(regionName)
-    
+
     countries.find(c => c.name.equals(wiName))
   }
 
