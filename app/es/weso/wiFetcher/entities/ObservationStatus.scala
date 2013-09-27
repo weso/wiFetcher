@@ -10,4 +10,6 @@ object ObservationStatus extends Enumeration {
   val Adjusted = Value("Adjusted")
   val Weighted = Value("Weighted")
   val Ordered = Value("Ordered")
+  
+  val Wrong = Value("Wrong")
 }

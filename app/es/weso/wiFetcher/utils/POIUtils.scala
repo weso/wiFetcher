@@ -37,10 +37,11 @@ object POIUtils {
   def extractNumericCellValue(cell: Cell, evaluator: FormulaEvaluator): Double = {
     val cellValue: CellValue = evaluator.evaluate(cell)
     if (cellValue != null) {
-      cellValue.getCellType() match {
+      cellValue.getCellType match {
         case Cell.CELL_TYPE_NUMERIC => cellValue.getNumberValue
         case Cell.CELL_TYPE_STRING => {
-          cellValue.getStringValue() match {
+          cellValue.getStringValue match {
+            case e if e.isEmpty => -1
             case ".." | "..." | "N/A" => -1
             case s => if (s.forall(_.isDigit)) s.toDouble else -1
           }

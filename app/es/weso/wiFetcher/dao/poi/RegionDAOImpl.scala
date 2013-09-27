@@ -15,6 +15,7 @@ import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.POIUtils
 import org.apache.poi.ss.usermodel.FormulaEvaluator
+import es.weso.wiFetcher.utils.IssueManagerUtils
 
 /**
  * This class contains the implementation that allows to load all information
@@ -42,21 +43,21 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
   protected def load(is: InputStream) {
     val workbook = WorkbookFactory.create(is)
     //Obtain corresponding sheet
-    val sheet: Sheet = workbook.getSheet(SHEET_NAME)
+    val sheet: Sheet = workbook.getSheet(SheetName)
 
     if (sheet == null) {
-      logger.error("Not exist a sheet in the file specified" +
-        s" with the name '${SHEET_NAME}'")
-      throw new IllegalArgumentException("Not exist a sheet in the file " +
-        s"specified with the name '${SHEET_NAME}'")
+      IssueManagerUtils.addError(
+        message = s"The Regions Sheet ${SheetName} does not exist",
+        path = XslxFile)
+    } else {
+      logger.info("Begin region extraction")
+      regions ++= parseData(workbook, sheet)
+      logger.info("Finish region extraction")
     }
-    regions ++= parseData(workbook, sheet)
-
-    logger.info("Finish region extraction")
   }
 
   protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Region] = {
-    val sheet: Sheet = workbook.getSheet(SHEET_NAME)
+    val sheet: Sheet = workbook.getSheet(SheetName)
     val cellReference = new CellReference(Configuration.getRegionInitialCell)
     logger.info("Begin extraction of region information")
 
@@ -75,7 +76,7 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
       //country in in the properties file
       countryName = POIUtils.extractCellValue(sheet.getRow(row).getCell(
         Configuration.getRegionCountryColumn), evaluator)
-        
+
       country = SpreadsheetsFetcher.obtainCountry(countryName)
     } {
       region.addCountry(country.get)
@@ -90,7 +91,7 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
     regions.toList
   }
 
-  protected def loadRegions(sheet: Sheet, cellReference: CellReference, evaluator : FormulaEvaluator): Map[String, Region] = {
+  protected def loadRegions(sheet: Sheet, cellReference: CellReference, evaluator: FormulaEvaluator): Map[String, Region] = {
     (for {
       row <- cellReference.getRow() to sheet.getLastRowNum()
       //Extract the name of the region. The column that contains the information
@@ -109,7 +110,9 @@ object RegionDAOImpl {
   /**
    * The name of the sheet that contains the information about regions
    */
-  private val SHEET_NAME = "Countries"
+  private val SheetName = "Countries"
+
+  private val XslxFile = Some("Structure File")
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
 }
