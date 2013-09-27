@@ -78,8 +78,9 @@ class ObservationDAOImpl(
     //Obtain the initial cell of observation from properties file
     val initialCell = new CellRef(Configuration.getInitialCellSecondaryObservation)
     val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
-    val indicator = obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)
     val dataset = SpreadsheetsFetcher.getDatasetById(sheet.getSheetName())
+    val indicator = SpreadsheetsFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-')))/*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
+    println("000000000000000000000000000: " + indicator)
     val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
     println(dataset)
 
