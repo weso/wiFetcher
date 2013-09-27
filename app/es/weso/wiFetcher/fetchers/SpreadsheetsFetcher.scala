@@ -1,7 +1,6 @@
 package es.weso.wiFetcher.fetchers
 
 import scala.collection.mutable.ListBuffer
-
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -27,6 +26,8 @@ import es.weso.wiFetcher.entities.Provider
 import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.entities.traits.SubIndex
 import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
+import es.weso.wiFetcher.utils.IssueManagerUtils
+import es.weso.wiFetcher.entities.issues.Issue
 
 object SpreadsheetsFetcher extends Fetcher {
 
@@ -47,6 +48,14 @@ object SpreadsheetsFetcher extends Fetcher {
   private val countryReconciliator: CountryReconciliator =
     new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
 
+  
+  def loadAll(structure:File, raw:File) : Seq[Issue] =  {
+    loadStructure(structure)
+    loadObservations(raw)
+    IssueManagerUtils.asSeq
+  }
+  
+  
   /**
    * This method load all structure about Web Index information
    */

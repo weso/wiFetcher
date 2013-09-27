@@ -1,40 +1,57 @@
 package controllers
 
 import java.io.File
-
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import es.weso.wiFetcher.entities.issues.Issue
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.Future
 
 object FileUploadController extends Controller {
-  
+
   def byFileUploadGET() = Action {
     implicit request =>
       Ok(views.html.file.structureFileGET())
   }
-  
-  def byFileUploadPOST() = Action(parse.multipartFormData) {
+
+  def byFileUploadPOST() = Action.async(parse.multipartFormData) {
     implicit request =>
-      request.body.file("structure_file").map{file =>
+
+      val structure = request.body.file("structure_file").map { file =>
         val f = new File("public/temp/" + file.filename)
         file.ref.moveTo(f, true)
-        SpreadsheetsFetcher.loadStructure(f)
-        Ok(views.html.file.structureFileGET())
-      }.getOrElse{
-          Ok("Structure file cannot be " +
-          		"parsed! Upload it again")
+        f
       }
-      request.body.file("observations_file").map{file => 
-      	val f = new File("public/temp/" + file.filename)
-      	file.ref.moveTo(f, true)
-      	SpreadsheetsFetcher.loadObservations(f)
-      	Ok("All OK")
-      }.getOrElse{
-        Ok("Structure file cannot be " +
-          		"parsed! Upload it again")
+
+      val observations = request.body.file("observations_file").map { file =>
+        val f = new File("public/temp/" + file.filename)
+        file.ref.moveTo(f, true)
+        f
       }
-      //TODO remove temporary files
-      Ok("All OK")
+
+      structure match {
+        case Some(s) => observations match {
+          case Some(o) => {
+            val future: Future[Seq[Issue]] = scala.concurrent.Future {
+              SpreadsheetsFetcher.loadAll(s, o)
+            }
+
+            future.map {
+              issues => Ok("" + issues)
+            }
+          }
+          case _ =>
+            scala.concurrent.Future {
+              BadRequest("Onservations file cannot be parsed! Upload it again")
+            }
+        }
+        case _ =>
+          scala.concurrent.Future {
+            BadRequest("Structure file cannot be parsed! Upload it again")
+          }
+      }
+
   }
 
 }
