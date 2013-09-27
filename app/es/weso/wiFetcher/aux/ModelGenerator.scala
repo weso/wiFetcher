@@ -1,6 +1,4 @@
-package es.weso.wiFetcher.computex
-
-import java.io.FileOutputStream
+package es.weso.wiFetcher.aux
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 import com.hp.hpl.jena.rdf.model.Model
 import com.hp.hpl.jena.rdf.model.ModelFactory
@@ -11,12 +9,12 @@ import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.entities.traits.SubIndex
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
-import es.weso.wiFetcher.utils.DateUtils
 import es.weso.wiFetcher.entities.Country
 import es.weso.wiFetcher.entities.Region
 import scala.collection.mutable.ListBuffer
+import es.weso.wiFetcher.utils.DateUtils
 
-object ComputexExample {
+object ModelGenerator {
   
   val PREFIX_OBS = "http://data.webfoundation.org/webindex/v2013/observation/"
   val PREFIX_WI_ONTO = "http://data.webfoundation.org/webindex/ontology/"

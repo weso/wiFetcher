@@ -1,0 +1,32 @@
+@* result Template File *@
+@(model : String, issues : Seq[es.weso.wiFetcher.entities.issues.Issue])
+
+<div>
+	<a href="#ttl">TTL Generated</a>
+@if(!issues.isEmpty) {
+		<a href="#report">View report</a> 	
+}
+</div>
+
+<script>
+$("#download").click(function() {
+	var blob = new Blob([$('#ttl').text()], {
+		type : "text"
+	});
+	window.open(window.URL.createObjectURL(blob), "Chromeless - Editor: New Saved File");
+});
+</script>
+
+	<pre id="ttl">
+			<code class="prettyprint lang-sparql">
+			@for(line <- model.split("\n")){
+@line
+			}
+			</code>
+		</pre>
+		<button id="#download">Download</button>
+		
+		
+<div id="report">
+	@issues
+</div>

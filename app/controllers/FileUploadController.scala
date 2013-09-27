@@ -1,13 +1,13 @@
 package controllers
 
 import java.io.File
-
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import es.weso.wiFetcher.entities.issues.Issue
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
+import java.io.ByteArrayOutputStream
 
 object FileUploadController extends Controller {
 
@@ -34,12 +34,16 @@ object FileUploadController extends Controller {
       structure match {
         case Some(s) => observations match {
           case Some(o) => {
-            val future: Future[Seq[Issue]] = scala.concurrent.Future {
+            val future = scala.concurrent.Future {
               SpreadsheetsFetcher.loadAll(s, o)
             }
 
             future.map {
-              issues => Ok("" + issues)
+              
+              issues => 
+                val out = new ByteArrayOutputStream
+                issues._1.write(out, "TURTLE")
+                Ok(views.html.results.result(out.toString().trim, issues._2))
             }
           }
           case _ =>

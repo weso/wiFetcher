@@ -28,6 +28,8 @@ import es.weso.wiFetcher.entities.traits.SubIndex
 import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
 import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.entities.issues.Issue
+import com.hp.hpl.jena.rdf.model.Model
+import es.weso.wiFetcher.aux.ModelGenerator
 
 object SpreadsheetsFetcher extends Fetcher {
 
@@ -49,10 +51,10 @@ object SpreadsheetsFetcher extends Fetcher {
     new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
 
   
-  def loadAll(structure:File, raw:File) : Seq[Issue] =  {
+  def loadAll(structure:File, raw:File) : (Model, Seq[Issue]) =  {
     loadStructure(structure)
     loadObservations(raw)
-    IssueManagerUtils.asSeq
+    (ModelGenerator.generateJenaModel, IssueManagerUtils.asSeq)
   }
   
   
