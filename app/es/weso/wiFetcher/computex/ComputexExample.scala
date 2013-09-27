@@ -359,9 +359,6 @@ object ComputexExample {
     val observations : ListBuffer[Observation] = observationsByDataset.get(dataset).getOrElse(throw new IllegalArgumentException("There is no observations by dataset " + dataset.id))
     val observationsByYear : Map[Int, ListBuffer[Observation]] = observations.groupBy(observation => observation.year)
     observationsByYear.keySet.foreach(year => {
-      println("00000000000000000000000000:  " + observations.head.indicator.id)
-      println("00000000000000000000000000:  " + year.toString)
-      println("00000000000000000000000000:  " + observations.head.status)
       val sliceResource = model.createResource(PREFIX_SLICE + "Slice-" + 
           observations.head.indicator.id + year.toString + "-" + observations.head.status)
       sliceResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "Slice"))

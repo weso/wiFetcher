@@ -33,7 +33,6 @@ object FileUploadController extends Controller {
         Ok("Structure file cannot be " +
           		"parsed! Upload it again")
       }
-      ComputexExample.generateJenaModel.write(System.out, "TURTLE")
       //TODO remove temporary files
       Ok("All OK")
   }

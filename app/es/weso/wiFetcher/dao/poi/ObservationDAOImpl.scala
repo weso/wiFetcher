@@ -80,9 +80,7 @@ class ObservationDAOImpl(
     val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
     val dataset = SpreadsheetsFetcher.getDatasetById(sheet.getSheetName())
     val indicator = SpreadsheetsFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-')))/*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
-    println("000000000000000000000000000: " + indicator)
     val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
-    println(dataset)
 
     for {
       row <- initialCell.getRow() to sheet.getLastRowNum()
