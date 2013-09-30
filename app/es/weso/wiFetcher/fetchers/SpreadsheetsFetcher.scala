@@ -6,7 +6,6 @@ import java.io.FileInputStream
 import java.io.InputStream
 import scala.collection.mutable.ListBuffer
 import org.apache.log4j.Logger
-import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
@@ -27,9 +26,10 @@ import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.entities.traits.SubIndex
 import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
 import es.weso.wiFetcher.utils.IssueManagerUtils
-import es.weso.wiFetcher.entities.issues.Issue
 import com.hp.hpl.jena.rdf.model.Model
 import es.weso.wiFetcher.aux.ModelGenerator
+import es.weso.reconciliator.CountryReconciliator
+import es.weso.wiFetcher.entities.issues.Issue
 
 object SpreadsheetsFetcher extends Fetcher {
 
@@ -47,7 +47,7 @@ object SpreadsheetsFetcher extends Fetcher {
   val observations: ListBuffer[Observation] = ListBuffer.empty
 
   private val logger: Logger = Logger.getLogger(this.getClass())
-  private val countryReconciliator: CountryReconciliator =
+  private val countryReconciliator =
     new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
 
   def loadAll(structure: File, raw: File): (Model, Seq[Issue]) = {
@@ -57,7 +57,7 @@ object SpreadsheetsFetcher extends Fetcher {
     secondaryIndicators.clear
     countries.clear
     regions.clear
-    providers.clear
+    providers.clear 
     datasets.clear
     observations.clear
 
@@ -155,7 +155,7 @@ object SpreadsheetsFetcher extends Fetcher {
       throw new IllegalArgumentException("The name of the country cannot " +
         "be null o empty")
     }
-    val wiName: String = countryReconciliator.searchCountry(regionName)
+    val wiName = countryReconciliator.searchCountry(regionName)
 
     countries.find(c => c.name.equals(wiName))
   }
