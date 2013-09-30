@@ -15,7 +15,7 @@ object ApplicationBuild extends Build {
    * Dependancies Versions
    */
   val ConfigV = "1.9"
-  val CountryV = "0.2.0-SNAPSHOT"
+  val CountryV = "0.3.0-SNAPSHOT"
   val CucumberV = "1.1.4"
   val JenaV = "2.10.1"
   val JunitV = "4.11"
