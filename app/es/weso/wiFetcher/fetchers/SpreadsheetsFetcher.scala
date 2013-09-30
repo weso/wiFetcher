@@ -50,7 +50,7 @@ object SpreadsheetsFetcher extends Fetcher {
   private val countryReconciliator =
     new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
 
-  def loadAll(structure: File, raw: File): (Model, Seq[Issue]) = {
+  def loadAll(structure: File, raw: File): (String, Seq[Issue]) = {
     components.clear
     subIndexes.clear
     primaryIndicators.clear
