@@ -57,7 +57,7 @@ object SpreadsheetsFetcher extends Fetcher {
     secondaryIndicators.clear
     countries.clear
     regions.clear
-    providers.clear 
+    providers.clear
     datasets.clear
     observations.clear
 
@@ -87,7 +87,7 @@ object SpreadsheetsFetcher extends Fetcher {
     safeLoadInformation(f, loadObservationInformation)
   }
 
-  private def loadDatasetInformation(indicators : List[Indicator]) {
+  private def loadDatasetInformation(indicators: List[Indicator]) {
     val datasetDao = new DatasetDAOImpl(indicators)
     datasets ++= datasetDao.getDatasets
   }
@@ -150,14 +150,15 @@ object SpreadsheetsFetcher extends Fetcher {
 
   //Obtain a country given it's name
   def obtainCountry(regionName: String): Option[Country] = {
-    if (regionName == null || regionName.isEmpty()) {
+    if (regionName == null || regionName.isEmpty) {
       logger.error("The name of the country cannot be null o empty")
       throw new IllegalArgumentException("The name of the country cannot " +
         "be null o empty")
     }
-    val wiName = countryReconciliator.searchCountry(regionName)
-
-    countries.find(c => c.name.equals(wiName))
+    countryReconciliator.searchCountry(regionName) match {
+      case Some(name) => countries.find(c => c.name.equals(name))
+      case None => None
+    }
   }
 
   //Obtain an indicator given it's name
