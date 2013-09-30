@@ -1,0 +1,67 @@
+@(model : String, issues : Seq[es.weso.wiFetcher.entities.issues.Issue])
+
+@import es.weso.wiFetcher.entities.issues._
+
+@main("Report") {
+<div id="results_container">
+	<div>
+		<a href="#ttl">TTL Generated</a>
+		@if(!issues.isEmpty) {
+			<a href="#report">View report</a> 	
+		}
+	</div>
+	<button class="download">Download</button>
+	<textarea id="ttl" disabled>
+			@for(line <- model.split("\n")){
+	@line
+			}
+	</textarea>
+	<button class="download">Download</button>
+	<script>
+		$(".download").click(
+				function() {
+					var blob = new Blob([ $('#ttl').text() ], {
+						type : "text"
+					});
+					window.open(window.URL.createObjectURL(blob),
+							"wiFetcher: Report as TTL");
+				});
+	</script>
+	<div id="result">
+		<table>
+			<thead>
+				<tr>
+					<th>Message</th>
+					<th>Dataset</th>
+					<th>File</th>
+					<th>Sheet Name</th>
+					<th>Column</th>
+					<th>Row</th>
+					<th>Cell</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<th>Message</th>
+					<th>Dataset</th>
+					<th>File</th>
+					<th>Sheet Name</th>
+					<th>Column</th>
+					<th>Row</th>
+					<th>Cell</th>
+				</tr>
+			</tfoot>
+		@for(issue <- issues){
+			<tr>
+				<td>@issue._message</td>
+				<td>@issue._dataset.getOrElse("-")</td>
+				<td>@issue._path.getOrElse("-")</td>
+				<td>@issue._sheetName.getOrElse("-")</td>
+				<td>@issue._col.getOrElse("-")</td>
+				<td>@issue._row.getOrElse("-")</td>
+				<td>@issue._cell.getOrElse("-")</td>
+			</tr>
+		}
+	</div>
+</div>
+}

@@ -22,7 +22,7 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   Given("""^I want to load the observations of dataset "([^"]*)" in the year "([^"]*)"$"""){ (datast:String, year:Int) =>
 	val dataset : Dataset = new Dataset
-	dataset.id = datast
+	dataset.id = datastet
 	val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
 	observationDAO = new ObservationDAOImpl(is)
@@ -31,7 +31,7 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   Given("""^I want to load the observations of non-existing dataset "([^"]*)" in the year "([^"]*)"$""") {(datast : String, year:Int) => {
     val dataset : Dataset = new Dataset
-	dataset.id = datast
+	dataset.id = datastet
 	val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
 	observationDAO = new ObservationDAOImpl(is)

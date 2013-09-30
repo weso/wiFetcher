@@ -1,7 +1,6 @@
 package es.weso.wiFetcher.fetchers
 
 import scala.collection.mutable.ListBuffer
-
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -11,7 +10,7 @@ import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
-import es.weso.wiFetcher.dao.file.DatasetDAOImpl
+import es.weso.wiFetcher.dao.entity.DatasetDAOImpl
 import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
 import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
 import es.weso.wiFetcher.dao.poi.ProviderDAOImpl
@@ -27,6 +26,10 @@ import es.weso.wiFetcher.entities.Provider
 import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.entities.traits.SubIndex
 import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
+import es.weso.wiFetcher.utils.IssueManagerUtils
+import es.weso.wiFetcher.entities.issues.Issue
+import com.hp.hpl.jena.rdf.model.Model
+import es.weso.wiFetcher.aux.ModelGenerator
 
 object SpreadsheetsFetcher extends Fetcher {
 
@@ -47,12 +50,31 @@ object SpreadsheetsFetcher extends Fetcher {
   private val countryReconciliator: CountryReconciliator =
     new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
 
+  def loadAll(structure: File, raw: File): (Model, Seq[Issue]) = {
+    components.clear
+    subIndexes.clear
+    primaryIndicators.clear
+    secondaryIndicators.clear
+    countries.clear
+    regions.clear
+    providers.clear
+    datasets.clear
+    observations.clear
+
+    IssueManagerUtils.clear
+
+    loadStructure(structure)
+    loadObservations(raw)
+    (ModelGenerator.generateJenaModel, IssueManagerUtils.asSeq)
+  }
+
   /**
    * This method load all structure about Web Index information
    */
   def loadStructure(f: File) {
     safeLoadInformation(f, loadSubIndexInformation)
     safeLoadInformation(f, loadIndicatorInformation)
+    loadDatasetInformation(secondaryIndicators.toList)
     loadCountryInformation(Configuration.getCountryFile, true)
     safeLoadInformation(f, loadRegionInformation)
     safeLoadInformation(f, loadProviderInformation)
@@ -62,12 +84,11 @@ object SpreadsheetsFetcher extends Fetcher {
    * This method load all observation form an excel file
    */
   def loadObservations(f: File) {
-    loadDatasetInformation(Configuration.getDatasetFile, true)
     safeLoadInformation(f, loadObservationInformation)
   }
 
-  private def loadDatasetInformation(path: String, relativePath: Boolean) {
-    val datasetDao = new DatasetDAOImpl(path, relativePath)
+  private def loadDatasetInformation(indicators : List[Indicator]) {
+    val datasetDao = new DatasetDAOImpl(indicators)
     datasets ++= datasetDao.getDatasets
   }
 
@@ -135,7 +156,7 @@ object SpreadsheetsFetcher extends Fetcher {
         "be null o empty")
     }
     val wiName: String = countryReconciliator.searchCountry(regionName)
-    
+
     countries.find(c => c.name.equals(wiName))
   }
 

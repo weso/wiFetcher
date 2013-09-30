@@ -1,17 +1,14 @@
 package es.weso.wiFetcher.dao.poi
 
 import java.io.InputStream
-
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
-
 import org.apache.log4j.Logger
-import org.apache.poi.hssf.util.CellReference
+import org.apache.poi.hssf.util.{ CellReference => CellRef }
 import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.ObservationDAO
 import es.weso.wiFetcher.entities.Area
@@ -21,8 +18,10 @@ import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.entities.ObservationStatus
+import es.weso.wiFetcher.entities.issues._
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.POIUtils
+import es.weso.wiFetcher.utils.IssueManagerUtils
 
 /**
  * This class contains the implementation that allows extract all information
@@ -47,41 +46,41 @@ class ObservationDAOImpl(
     val datasets = SpreadsheetsFetcher.getDatasets
 
     if (datasets == null) {
-      logger.error("List of datasets to load their " +
-        "observations is null")
-      throw new IllegalArgumentException("List of datasets to load their " +
-        "observations is null")
-    }
+      IssueManagerUtils.addError(
+        message = "The datasets are not loaded. It is mandatory to load " +
+          "the datasets in order to process the Observations",
+        path = XslxFile)
+    } else {
 
-    logger.info("Begin observations extraction")
+      logger.info("Begin observations extraction")
 
-    val workbook: Workbook = WorkbookFactory.create(is)
-    val obs = for {
-      dataset <- datasets
-      sheet = workbook.getSheet(dataset.id)
-    } yield {
-      if (sheet == null) {
-        ObservationDAOImpl.logger.error("There isn't data for dataset: " +
-          dataset.id)
-        throw new IllegalArgumentException("There isn't data for dataset: " +
-          dataset.id)
+      val workbook: Workbook = WorkbookFactory.create(is)
+      val obs = for {
+        dataset <- datasets
+        sheet = workbook.getSheet(dataset.id)
+      } yield {
+        if (sheet == null) {
+          IssueManagerUtils.addError(
+            message = s"The dataset ${dataset.id} are invalid or empty. It is mandatory to have data " +
+              "within the datasets in order to process the Observations",
+            path = XslxFile)
+          List.empty
+        } else parseData(workbook, sheet)
       }
-      parseData(workbook, sheet)
+      observations ++= obs.foldLeft(ListBuffer[Observation]())((a, b) => a ++= b)
+      logger.info("Finish observations extraction")
     }
-    observations ++= obs.foldLeft(ListBuffer[Observation]())((a, b) => a ++= b)
-    logger.info("Finish observations extraction")
   }
 
   protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Observation] = {
     ObservationDAOImpl.logger.info("Begin observations extraction")
 
     //Obtain the initial cell of observation from properties file
-    val initialCell = new CellReference(Configuration.getInitialCellSecondaryObservation)
+    val initialCell = new CellRef(Configuration.getInitialCellSecondaryObservation)
     val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
-    val indicator = obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)
     val dataset = SpreadsheetsFetcher.getDatasetById(sheet.getSheetName())
+    val indicator = SpreadsheetsFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-')))/*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
     val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
-    println(dataset)
 
     for {
       row <- initialCell.getRow() to sheet.getLastRowNum()
@@ -89,19 +88,25 @@ class ObservationDAOImpl(
       if actualRow != null
       if !POIUtils.extractCellValue(actualRow.getCell(0), evaluator).trim.isEmpty
       countryName = POIUtils.extractCellValue(actualRow.getCell(0), evaluator)
-      if countryName != ""
       //Obtain the country corresponds to the observation 
       country = obtainCountry(countryName)
       //If country of the observation is null, there is no observation
       //for this cell
-      if country.isDefined
+      if {
+        val ret = country.isDefined
+        if (ret == false) {
+          IssueManagerUtils.addError(message = s"Country ${countryName} not definend", path = XslxFile,
+            sheetName = Some(sheet.getSheetName), col = Some(0), `row` = Some(row),
+            cell = Some(countryName))
+        }
+        ret
+      }
       //We have to iterate throw the excel file
-      column <- initialCell.getCol() to actualRow.getLastCellNum() - 1
-      //TODO Have to extract the year for the spreadsheet
-      year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
-        .getCell(column), evaluator)
-      value = POIUtils.extractNumericCellValue(actualRow.getCell(column), evaluator)
+      col <- initialCell.getCol() to sheet.getRow(initialCell.getRow()).getLastCellNum() - 1
     } yield {
+      val year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
+        .getCell(col), evaluator)
+      val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
         country.get.iso3Code + " " + indicator + " " + value)
@@ -143,7 +148,7 @@ class ObservationDAOImpl(
    * @return An indicator
    */
   def obtainIndicator(sheet: Sheet, cell: String, evaluator: FormulaEvaluator): Indicator = {
-    val cellReference = new CellReference(cell)
+    val cellReference = new CellRef(cell)
     val indicatorName = POIUtils.extractCellValue(
       sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()), evaluator)
     SpreadsheetsFetcher.obtainIndicator(indicatorName)
@@ -166,19 +171,19 @@ class ObservationDAOImpl(
 
     val tmpStatus = if (value == -1)
       ObservationStatus.Missed
-    else {
-      status match {
-        case "Raw" => ObservationStatus.Raw
-        case "Imputed" => ObservationStatus.Imputed
-        case "Normalised" => ObservationStatus.Normalised
-        case "Missed" => ObservationStatus.Missed
-        case "Sorted" => ObservationStatus.Sorted
-        case "Adjusted" => ObservationStatus.Adjusted
-        case "Weighted" => ObservationStatus.Weighted
-        case "Ordered" => ObservationStatus.Ordered
-        case _ => throw new IllegalArgumentException("Observation status " +
-          status + " is unknown")
-      }
+    else status match {
+      case "Raw" => ObservationStatus.Raw
+      case "Imputed" => ObservationStatus.Imputed
+      case "Normalised" => ObservationStatus.Normalised
+      case "Missed" => ObservationStatus.Missed
+      case "Sorted" => ObservationStatus.Sorted
+      case "Adjusted" => ObservationStatus.Adjusted
+      case "Weighted" => ObservationStatus.Weighted
+      case "Ordered" => ObservationStatus.Ordered
+      case _ =>
+        IssueManagerUtils.addError(message = "Observation status " +
+          status + " is unknown", path = XslxFile)
+        ObservationStatus.Wrong
     }
 
     Observation(
@@ -192,27 +197,30 @@ class ObservationDAOImpl(
       tmpStatus)
 
   }
-
-  /**
-   * This method has to extract the status of the observations
-   * @param cell The cell where is the status
-   * @param sheet The sheet that contains all observations of a dataset
-   * @return The values extracted of the status cell
-   */
-  def obtainStatus(cell: String, sheet: Sheet, evaluator: FormulaEvaluator): String = {
-    val cellReference: CellReference = new CellReference(cell)
-    val stat = sheet.getRow(cellReference.getRow()).getCell(
-      cellReference.getCol())
-    if (stat == null)
-      throw new IllegalArgumentException("Status cell is empty")
-    POIUtils.extractCellValue(stat, evaluator)
-  }
+  //
+  //  /**
+  //   * This method has to extract the status of the observations
+  //   * @param cell The cell where is the status
+  //   * @param sheet The sheet that contains all observations of a dataset
+  //   * @return The values extracted of the status cell
+  //   */
+  //  def obtainStatus(cell: String, sheet: Sheet, evaluator: FormulaEvaluator): String = {
+  //    val cellReference = new CellRef(cell)
+  //    val stat = sheet.getRow(cellReference.getRow()).getCell(
+  //      cellReference.getCol())
+  //    if (stat == null)
+  //      throw new IllegalArgumentException("Status cell is empty")
+  //    POIUtils.extractCellValue(stat, evaluator)
+  //  }
 
   def getObservations(): List[Observation] = observations.toList
+
 }
 
 object ObservationDAOImpl {
 
-  private val logger: Logger = Logger.getLogger(this.getClass())
+  private val logger: Logger = Logger.getLogger(this.getClass)
+
+  private val XslxFile = Some("Observations File")
 
 }
