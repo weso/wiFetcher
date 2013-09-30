@@ -10,7 +10,7 @@ import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
-import es.weso.wiFetcher.dao.file.DatasetDAOImpl
+import es.weso.wiFetcher.dao.entity.DatasetDAOImpl
 import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
 import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
 import es.weso.wiFetcher.dao.poi.ProviderDAOImpl
@@ -74,6 +74,7 @@ object SpreadsheetsFetcher extends Fetcher {
   def loadStructure(f: File) {
     safeLoadInformation(f, loadSubIndexInformation)
     safeLoadInformation(f, loadIndicatorInformation)
+    loadDatasetInformation(secondaryIndicators.toList)
     loadCountryInformation(Configuration.getCountryFile, true)
     safeLoadInformation(f, loadRegionInformation)
     safeLoadInformation(f, loadProviderInformation)
@@ -83,12 +84,11 @@ object SpreadsheetsFetcher extends Fetcher {
    * This method load all observation form an excel file
    */
   def loadObservations(f: File) {
-    loadDatasetInformation(Configuration.getDatasetFile, true)
     safeLoadInformation(f, loadObservationInformation)
   }
 
-  private def loadDatasetInformation(path: String, relativePath: Boolean) {
-    val datasetDao = new DatasetDAOImpl(path, relativePath)
+  private def loadDatasetInformation(indicators : List[Indicator]) {
+    val datasetDao = new DatasetDAOImpl(indicators)
     datasets ++= datasetDao.getDatasets
   }
 
