@@ -76,10 +76,11 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
       //country in in the properties file
       countryName = POIUtils.extractCellValue(sheet.getRow(row).getCell(
         Configuration.getRegionCountryColumn), evaluator)
-
-      country = SpreadsheetsFetcher.obtainCountry(countryName)
     } {
-      region.addCountry(country.get)
+      SpreadsheetsFetcher.obtainCountry(countryName) match {
+        case Some(country) => region.addCountry(country)
+        case None => None
+      }
     }
     regions.values.toList
   }
