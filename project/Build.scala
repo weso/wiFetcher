@@ -7,7 +7,7 @@ object ApplicationBuild extends Build {
 
   val AppName = "wiFetcher"
   val AppOrg = "es.weso"
-  val AppVersion = "1.1-SNAPSHOT"
+  val AppVersion = "1.1-M1-SNAPSHOT"
 
   val ScalaV = "2.10.2"
 

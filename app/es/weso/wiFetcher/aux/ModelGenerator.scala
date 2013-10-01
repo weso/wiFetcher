@@ -16,6 +16,7 @@ import es.weso.wiFetcher.utils.DateUtils
 import java.util.Date
 import java.io.FileOutputStream
 import java.io.File
+import es.weso.wiFetcher.utils.IssueManagerUtils
 
 object ModelGenerator {
 
@@ -135,8 +136,8 @@ object ModelGenerator {
     model.write(new FileOutputStream(new File(s"public/${path}")), "TURTLE")
     path
   }
-  
-  private def storeModel(model:Model): Model = {
+
+  private def storeModel(model: Model): Model = {
     model
   }
 
@@ -340,24 +341,27 @@ object ModelGenerator {
     datasetResource.addProperty(PROPERTY_QB_COMPONENT, anonymousResource)
     datasetResource.addProperty(PROPERTY_QB_STRUCTURE, ResourceFactory.createResource(PREFIX_WI_ONTO + "DSD"))
 
-    val observations: ListBuffer[Observation] = observationsByDataset.get(dataset).getOrElse(throw new IllegalArgumentException("There is no observations by dataset " + dataset.id))
-    val observationsByYear: Map[Int, ListBuffer[Observation]] = observations.groupBy(observation => observation.year)
-    observationsByYear.keySet.foreach(year => {
-      val sliceResource = model.createResource(PREFIX_SLICE + "Slice-" +
-        observations.head.indicator.id + year.toString + "-" + observations.head.status)
-      sliceResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "Slice"))
-      sliceResource.addProperty(PROPERTY_CEX_INDICATOR, ResourceFactory.createResource(PREFIX_INDICATOR +
-        observations.head.indicator.id))
-      sliceResource.addProperty(PROPERTY_WIONTO_REFYEAR, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
-      sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, /*datasetResource*/ ResourceFactory.createResource(PREFIX_WI_ONTO +
-        "sliceByArea"))
-      observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
-        createObservationTriples(obs, model, id)
-        sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" + /*obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status*/ id))
-        id += 1
-      })
-      datasetResource.addProperty(PROPERTY_QB_SLICE, sliceResource)
-    })
+    observationsByDataset.get(dataset) match {
+      case Some(observations) =>
+        val observationsByYear: Map[Int, ListBuffer[Observation]] = observations.groupBy(observation => observation.year)
+        observationsByYear.keySet.foreach(year => {
+          val sliceResource = model.createResource(PREFIX_SLICE + "Slice-" +
+            observations.head.indicator.id + year.toString + "-" + observations.head.status)
+          sliceResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "Slice"))
+          sliceResource.addProperty(PROPERTY_CEX_INDICATOR, ResourceFactory.createResource(PREFIX_INDICATOR +
+            observations.head.indicator.id))
+          sliceResource.addProperty(PROPERTY_WIONTO_REFYEAR, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
+          sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, /*datasetResource*/ ResourceFactory.createResource(PREFIX_WI_ONTO +
+            "sliceByArea"))
+          observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
+            createObservationTriples(obs, model, id)
+            sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" + /*obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status*/ id))
+            id += 1
+          })
+          datasetResource.addProperty(PROPERTY_QB_SLICE, sliceResource)
+        })
+      case None => IssueManagerUtils.addError(message=s"No observations for the dataset ${dataset.id}", path = Some("RAW File"))
+    }
   }
 
   private def createModel: com.hp.hpl.jena.rdf.model.Model = {
