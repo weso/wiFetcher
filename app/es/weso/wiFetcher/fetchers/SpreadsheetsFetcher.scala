@@ -30,6 +30,7 @@ import com.hp.hpl.jena.rdf.model.Model
 import es.weso.wiFetcher.aux.ModelGenerator
 import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.entities.issues.Issue
+import es.weso.wiFetcher.persistence.jena.JenaModelDAOImpl
 
 object SpreadsheetsFetcher extends Fetcher {
 
@@ -65,7 +66,9 @@ object SpreadsheetsFetcher extends Fetcher {
 
     loadStructure(structure)
     loadObservations(raw)
-    (ModelGenerator.generateJenaModel, IssueManagerUtils.asSeq)
+    val modelResult = ModelGenerator.generateJenaModel
+    JenaModelDAOImpl.store(modelResult)
+    (modelResult, IssueManagerUtils.asSeq)
   }
 
   /**

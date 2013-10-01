@@ -155,6 +155,18 @@ object Configuration {
   def getProviderSourceColumn(): Int = {
     Config.getInt("provider_source_column")
   }
+  
+  def getVirtuosoServer() : String = {
+    Config.getString("virt_server")
+  }
+  
+  def getVirtuosoUser() : String = {
+    Config.getString("virt_user")
+  }
+  
+  def getVirtuosoPass() : String = {
+    Config.getString("virt_pass")
+  }
 
   def loadConfigure() = {
     val config = new CompositeConfiguration
@@ -165,6 +177,7 @@ object Configuration {
     config.append(new PropertiesConfiguration("conf/subindexes.properties"))
     config.append(new PropertiesConfiguration("conf/regions.properties"))
     config.append(new PropertiesConfiguration("conf/providers.properties"))
+    config.append(new PropertiesConfiguration("conf/virtuoso.properties"))
     config
   }
 
