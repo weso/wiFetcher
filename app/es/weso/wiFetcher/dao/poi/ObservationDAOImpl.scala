@@ -53,12 +53,12 @@ class ObservationDAOImpl(
     } else {
 
       logger.info("Begin observations extraction")
-
       val workbook: Workbook = WorkbookFactory.create(is)
       val obs = for {
         dataset <- datasets
         sheet = workbook.getSheet(dataset.id)
       } yield {
+        println(dataset.id)
         if (sheet == null) {
           IssueManagerUtils.addError(
             message = s"The dataset ${dataset.id} are invalid or empty. It is mandatory to have data " +
