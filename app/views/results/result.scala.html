@@ -1,32 +1,12 @@
-@(model : String, issues : Seq[es.weso.wiFetcher.entities.issues.Issue])
+@(path : String, issues : Seq[es.weso.wiFetcher.entities.issues.Issue])
 
 @import es.weso.wiFetcher.entities.issues._
 
 @main("Report") {
 <div id="results_container">
-	<div>
-		<a href="#ttl">TTL Generated</a>
-		@if(!issues.isEmpty) {
-			<a href="#report">View report</a> 	
-		}
-	</div>
-	<button class="download">Download</button>
-	<textarea id="ttl" disabled>
-			@for(line <- model.split("\n")){
-	@line
-			}
-	</textarea>
-	<button class="download">Download</button>
-	<script>
-		$(".download").click(
-				function() {
-					var blob = new Blob([ $('#ttl').text() ], {
-						type : "text"
-					});
-					window.open(window.URL.createObjectURL(blob),
-							"wiFetcher: Report as TTL");
-				});
-	</script>
+	<p class="instructions">
+		<a class="download" title="TTL Report" href="@routes.Assets.at(path)">Download TTL Report</a>
+	</p>
 	<div id="result">
 		<table>
 			<thead>

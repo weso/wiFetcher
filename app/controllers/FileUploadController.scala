@@ -41,9 +41,7 @@ object FileUploadController extends Controller {
             future.map {
               
               issues => 
-                val out = new ByteArrayOutputStream
-                issues._1.write(out, "TURTLE")
-                Ok(views.html.results.result(out.toString().trim, issues._2))
+                Ok(views.html.results.result(issues._1, issues._2))
             }
           }
           case _ =>

@@ -1,6 +1,6 @@
 header#banner {
 	margin: 0em;
-	background: #007bd7;
+	background: #7AB800;
 	overflow: auto;
 	height: 118px;
 }
@@ -9,14 +9,22 @@ header h1 {
 	margin-bottom: 0px;
 }
 
+header h1#title {
+	background-color: #7AB800;
+}
+
 header h1#title img {
 	margin: 0.4em;
 	height: 100px;
 	width: 100px
 }
 
+header h1#title a {
+	background-color: #7AB800;
+}
+
 header a {
-	background: #007bd7;
+	background: #7AB800;
 }
 
 header a:link {
@@ -49,7 +57,7 @@ span.validation {
 	text-align: center;
 	text-decoration: none;
 	padding-top: 30px;
-	color: #007bd7
+	color: #7AB800
 }
 
 .circle-link {
@@ -77,7 +85,7 @@ span.validation {
 	margin-right: 20px;
 }
 
-#frontforms > nav {
+#frontforms>nav {
 	height: 100px;
 	width: 450px;
 	margin: 0px auto 0px auto;
@@ -120,7 +128,7 @@ ul#tabset_tabs.pills li a:link,ul#tabset_tabs.pills li a:visited {
 
 .doc h2 {
 	font-family: 'Advent Pro', sans-serif;
-	color: #007bd7;
+	color: #7AB800;
 	font-size: 2em;
 	text-decoration: none;
 	margin-top: 1em;
@@ -226,6 +234,14 @@ div#results_container {
 	padding-top: 0;
 }
 
+div#results_container .instructions {
+	text-align: center;
+}
+
+div#results_container th {
+	text-align: left;	
+}
+
 div#result {
 	padding: 0;
 }
@@ -294,22 +310,23 @@ h3.valid {
 	max-width: 33%;
 	width: 33%;
 	line-brak: break-word;
-	border: 2px solid #007bd7;
+	border: 2px solid #7AB800;
 }
 
 #earl td a {
-	color: #007bd7;
+	color: #7AB800;
 }
 
 div#frontforms form {
 	font-size: 1.5em;
 }
- 
+
 div#frontforms input {
 	background: #ffffff;
 }
 
-div#frontforms input[type=text], div#frontforms input[type=file], div#frontforms textarea {
+div#frontforms input[type=text],div#frontforms input[type=file],div#frontforms textarea
+	{
 	margin-top: 10px;
 }
 
@@ -318,5 +335,5 @@ div#frontforms select {
 }
 
 div#frontforms input.button {
-	background: #007bd7;
+	background: #7AB800;
 }
