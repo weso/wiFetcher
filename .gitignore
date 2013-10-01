@@ -12,6 +12,7 @@ bin/
 project/project
 project/target
 public/temp
+public/reports/*.ttl
 
 .target
 .history

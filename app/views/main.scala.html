@@ -22,6 +22,16 @@
         <link href="http://fonts.googleapis.com/css?family=Raleway:400" rel="stylesheet" type="text/css">
     </head>
     <body onload="prettyPrint()">
+    	<header id="banner">
+    		<a id="weso-logo" href="/"><img alt="WESO" width="100" height="100" id="logo" src="@routes.Assets.at("images/weso.png")"></a>
+    		<div>
+				<h1 id="title">
+					<a href="/"><span class="computex">wiFetcher</span> <span class="validation">Upload Service</span></a>
+	      		</h1>
+	      		<p id="tagline">The Web Index, World Wide Web Foundation</p>
+    		</div>
+      	</header>
+      	<div id="main">
         @content
     </body>
 </html>

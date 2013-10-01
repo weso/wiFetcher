@@ -4,7 +4,9 @@
 
 @main("Report") {
 <div id="results_container">
-	<a class="download" title="TTL Report" href="@routes.Assets.at(path)">Download TTL Report</a>
+	<p class="instructions">
+		<a class="download" title="TTL Report" href="@routes.Assets.at(path)">Download TTL Report</a>
+	</p>
 	<div id="result">
 		<table>
 			<thead>
@@ -41,6 +43,5 @@
 			</tr>
 		}
 	</div>
-	<a class="download" title="TTL Report" href="@routes.Assets.at(path)">Download TTL Report</a>
 </div>
 }

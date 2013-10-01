@@ -131,9 +131,8 @@ object ModelGenerator {
 
   private def saveModel(model: Model): String = {
     val timestamp = new Date().getTime()
-    val fileName = s"report-${timestamp}.ttl"
-    val path = s"public/reports/${fileName}"
-    model.write(new FileOutputStream(new File(s"public/reports/${fileName}")), "TURTLE")
+    val path = s"reports/report-${timestamp}.ttl"
+    model.write(new FileOutputStream(new File(s"public/${path}")), "TURTLE")
     path
   }
   

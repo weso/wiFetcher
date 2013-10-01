@@ -65,7 +65,7 @@ object SpreadsheetsFetcher extends Fetcher {
 
     loadStructure(structure)
     loadObservations(raw)
-    (ModelGenerator.generateJenaModel, IssueManagerUtils.asSeq)
+    (ModelGenerator.generateJenaModel(), IssueManagerUtils.asSeq)
   }
 
   /**

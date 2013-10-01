@@ -19,6 +19,7 @@ object ApplicationBuild extends Build {
   val CucumberV = "1.1.4"
   val JenaV = "2.10.1"
   val JunitV = "4.11"
+  val NScalaV = "0.6.0"
   val PoiV = "3.9"
   val SeleniumV = "2.35.0"
   val ScalatestV = "2.0.M8"
@@ -42,6 +43,7 @@ object ApplicationBuild extends Build {
 
     /*Scala Dependencies*/
     "es.weso" %% "countryreconciliator" % CountryV,
+    "com.github.nscala-time" %% "nscala-time" % NScalaV,
 
     /*Java Dependencies*/
     "commons-configuration" % "commons-configuration" % ConfigV,
