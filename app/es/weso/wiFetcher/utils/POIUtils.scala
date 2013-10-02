@@ -4,6 +4,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.CellValue
 import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.formula.eval.NotImplementedException
 
 object POIUtils {
 
@@ -28,7 +29,12 @@ object POIUtils {
         } else EmptyString
       } catch {
         case e: IllegalArgumentException =>
-          cell.getSheet.getSheetName
+          IssueManagerUtils.addError(message = "Some errors detected within the formula"
+            +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
+            col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
+            `cell` = Some(cell.toString))
+          EmptyString
+        case e: NotImplementedException =>
           IssueManagerUtils.addError(message = "Some errors detected within the formula"
             +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
             col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
@@ -63,7 +69,12 @@ object POIUtils {
       }
     } catch {
       case e: IllegalArgumentException =>
-        cell.getSheet.getSheetName
+        IssueManagerUtils.addError(message = "Some errors detected within the formula: "
+          +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
+          col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
+          `cell` = Some(cell.toString))
+        -1
+      case e: NotImplementedException => 
         IssueManagerUtils.addError(message = "Some errors detected within the formula: "
           +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
           col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
