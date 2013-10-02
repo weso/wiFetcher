@@ -103,13 +103,16 @@ class ObservationDAOImpl(
       }
       //We have to iterate throw the excel file
       col <- initialCell.getCol() to sheet.getRow(initialCell.getRow()).getLastCellNum() - 1
-    } yield {
-      val year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
+      year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
         .getCell(col), evaluator)
+      if(!year.isEmpty())
+    } yield {
+      /*val year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
+        .getCell(col), evaluator)*/
       val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
-        country.get.iso3Code + " " + indicator + " " + value)
+        country.get.iso3Code + " " + year + " " + indicator.id + " " + value)
       createObservation(dataset, "", country.get, null,
         indicator, year.toDouble, value, status)
     }
