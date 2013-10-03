@@ -222,7 +222,7 @@ object ModelGenerator {
   }
 
   def createSecondaryIndicatorTriples(indicator: Indicator, model: Model) = {
-    val indicatorResource = model.createResource(PREFIX_INDICATOR + indicator.id)
+    val indicatorResource = model.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", ""))
     indicatorResource.addProperty(PROPERTY_CEX_MD5,
       ResourceFactory.createLangLiteral("MD5 checksum for indicator " + indicator.id, "en"))
     indicatorResource.addProperty(PROPERTY_CEX_COMPONENT,
@@ -242,7 +242,7 @@ object ModelGenerator {
   }
 
   def createPrimaryIndicatorTriples(indicator: Indicator, model: Model) = {
-    val indicatorResource = model.createResource(PREFIX_INDICATOR + indicator.id)
+    val indicatorResource = model.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", ""))
     indicatorResource.addProperty(PROPERTY_CEX_MD5,
       ResourceFactory.createLangLiteral("MD5 checksum for indicator " + indicator.id, "en"))
     indicatorResource.addProperty(PROPERTY_CEX_COMPONENT,
