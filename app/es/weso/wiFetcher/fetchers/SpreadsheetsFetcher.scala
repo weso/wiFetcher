@@ -27,7 +27,7 @@ import es.weso.wiFetcher.entities.traits.SubIndex
 import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
 import es.weso.wiFetcher.utils.IssueManagerUtils
 import com.hp.hpl.jena.rdf.model.Model
-import es.weso.wiFetcher.aux.ModelGenerator
+import es.weso.wiFetcher.generator.ModelGenerator
 import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.entities.issues.Issue
 
