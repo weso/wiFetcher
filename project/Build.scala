@@ -42,7 +42,7 @@ object ApplicationBuild extends Build {
     "info.cukes" %% "cucumber-scala" % CucumberV % "test",
 
     /*Scala Dependencies*/
-    "es.weso" %% "countryreconciliator" % CountryV,
+    "es.weso" % "countryreconciliator_2.10" % CountryV,
     "com.github.nscala-time" %% "nscala-time" % NScalaV,
 
     /*Java Dependencies*/
