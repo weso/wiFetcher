@@ -103,27 +103,25 @@ object ModelGenerator {
   val PROPERTY_SMDX_UNITMEASURE = ResourceFactory.createProperty(PREFIX_SMDX_ATTRIBUTE + "unitMeasure")
   val PROPERTY_QB_SLICE = ResourceFactory.createProperty(PREFIX_QB + "slice")
 
-  var id: Int = 1
-
-  def generateJenaModel(): String = {
+  def generateJenaModel(spreadsheetsFetcher:SpreadsheetsFetcher): String = {
     //val observations : List[Observation] = SpreadsheetsFetcher.observations.toList
-    val observationsByDataset = SpreadsheetsFetcher.observations.groupBy(
+    val observationsByDataset = spreadsheetsFetcher.observations.groupBy(
       observation => observation.dataset)
     val model = createModel
     createDataStructureDefinition(model)
-    SpreadsheetsFetcher.primaryIndicators.toList.foreach(
+    spreadsheetsFetcher.primaryIndicators.toList.foreach(
       indicator => createPrimaryIndicatorTriples(indicator, model))
-    SpreadsheetsFetcher.secondaryIndicators.toList.foreach(
+    spreadsheetsFetcher.secondaryIndicators.toList.foreach(
       indicator => createSecondaryIndicatorTriples(indicator, model))
-    SpreadsheetsFetcher.components.foreach(
+    spreadsheetsFetcher.components.foreach(
       comp => createComponentsTriples(comp, model))
-    SpreadsheetsFetcher.subIndexes.foreach(
+    spreadsheetsFetcher.subIndexes.foreach(
       subindex => createSubindexTriples(subindex, model))
-    SpreadsheetsFetcher.datasets.foreach(
+    spreadsheetsFetcher.datasets.foreach(
       dataset => createDatasetsTriples(dataset, observationsByDataset, model))
-    SpreadsheetsFetcher.countries.foreach(
+    spreadsheetsFetcher.countries.foreach(
       country => createCountriesTriples(country, model))
-    SpreadsheetsFetcher.regions.foreach(
+    spreadsheetsFetcher.regions.foreach(
       region => createRegionsTriples(region, model))
 
     storeModel(model)
@@ -355,10 +353,10 @@ object ModelGenerator {
           sliceResource.addProperty(PROPERTY_WIONTO_REFYEAR, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
           sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, /*datasetResource*/ ResourceFactory.createResource(PREFIX_WI_ONTO +
             "sliceByArea"))
-          observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
-            createObservationTriples(obs, model, id)
-            sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" + /*obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status*/ id))
-            id += 1
+          observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).zipWithIndex.foreach(obs => {
+            val id = obs._2+1
+            createObservationTriples(obs._1, model, id)
+            sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" +  id))
           })
           datasetResource.addProperty(PROPERTY_QB_SLICE, sliceResource)
         })
@@ -367,7 +365,7 @@ object ModelGenerator {
   }
 
   private def createModel: com.hp.hpl.jena.rdf.model.Model = {
-    var model: Model = ModelFactory.createDefaultModel
+    val model = ModelFactory.createDefaultModel
     model.setNsPrefix("obs", PREFIX_OBS)
     model.setNsPrefix("wi-onto", PREFIX_WI_ONTO)
     model.setNsPrefix("dcterms", PREFIX_DCTERMS)

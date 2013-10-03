@@ -33,7 +33,8 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
  *
  */
 class ObservationDAOImpl(
-  is: InputStream) extends ObservationDAO with PoiDAO[Observation] {
+  is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
+  extends ObservationDAO with PoiDAO[Observation] {
 
   import ObservationDAOImpl._
 
@@ -43,7 +44,7 @@ class ObservationDAOImpl(
 
   protected def load(is: InputStream) {
 
-    val datasets = SpreadsheetsFetcher.getDatasets
+    val datasets = sFetcher.getDatasets
 
     if (datasets == null) {
       IssueManagerUtils.addError(
@@ -78,8 +79,8 @@ class ObservationDAOImpl(
     //Obtain the initial cell of observation from properties file
     val initialCell = new CellRef(Configuration.getInitialCellSecondaryObservation)
     val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
-    val dataset = SpreadsheetsFetcher.getDatasetById(sheet.getSheetName())
-    val indicator = SpreadsheetsFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-')))/*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
+    val dataset = sFetcher.getDatasetById(sheet.getSheetName())
+    val indicator = sFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-')))/*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
     val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
 
     for {
@@ -129,7 +130,7 @@ class ObservationDAOImpl(
   def obtainCountry(countryName: String): Option[Country] = {
     logger.info("Obtaining country with name: " + countryName)
     //Ask to SpreadsheetFetcher for the country accord to the Web Index name
-    val country = SpreadsheetsFetcher.obtainCountry(countryName)
+    val country = sFetcher.obtainCountry(countryName)
     country match {
       case Some(c) => ""
       case None => "foo"
@@ -151,7 +152,7 @@ class ObservationDAOImpl(
     val cellReference = new CellRef(cell)
     val indicatorName = POIUtils.extractCellValue(
       sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()), evaluator)
-    SpreadsheetsFetcher.obtainIndicator(indicatorName)
+    sFetcher.obtainIndicator(indicatorName)
   }
 
   /**

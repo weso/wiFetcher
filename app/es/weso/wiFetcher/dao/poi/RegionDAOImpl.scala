@@ -25,7 +25,8 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
  * excel file that follows the structure of 2012 Web Index. Maybe we have to
  * change the implementation
  */
-class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
+class RegionDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
+extends RegionDAO with PoiDAO[Region] {
 
   import RegionDAOImpl._
 
@@ -77,7 +78,7 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
       countryName = POIUtils.extractCellValue(sheet.getRow(row).getCell(
         Configuration.getRegionCountryColumn), evaluator)
     } {
-      SpreadsheetsFetcher.obtainCountry(countryName) match {
+      sFetcher.obtainCountry(countryName) match {
         case Some(country) => region.addCountry(country)
         case None => None
       }

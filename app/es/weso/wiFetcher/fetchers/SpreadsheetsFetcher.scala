@@ -31,8 +31,14 @@ import es.weso.wiFetcher.aux.ModelGenerator
 import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.entities.issues.Issue
 
-object SpreadsheetsFetcher extends Fetcher {
+case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
+  
+  import SpreadsheetsFetcher._
 
+  private implicit val currentFetcher = this
+  
+  private val indicatorReconciliator = new IndicatorReconciliator
+  
   val components: ListBuffer[Component] = ListBuffer.empty
   val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
   val primaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
@@ -40,38 +46,19 @@ object SpreadsheetsFetcher extends Fetcher {
   val countries: ListBuffer[Country] = ListBuffer.empty
   val regions: ListBuffer[Region] = ListBuffer.empty
   val providers: ListBuffer[Provider] = ListBuffer.empty
-  //Create an indicator reconciliator
-  val indicatorReconciliator: IndicatorReconciliator =
-    new IndicatorReconciliator
   val datasets: ListBuffer[Dataset] = ListBuffer.empty
   val observations: ListBuffer[Observation] = ListBuffer.empty
 
-  private val logger: Logger = Logger.getLogger(this.getClass())
-  private val countryReconciliator =
-    new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
+  loadStructure(structure)
+  loadObservations(raw)
 
-  def loadAll(structure: File, raw: File): (String, Seq[Issue]) = {
-    components.clear
-    subIndexes.clear
-    primaryIndicators.clear
-    secondaryIndicators.clear
-    countries.clear
-    regions.clear
-    providers.clear
-    datasets.clear
-    observations.clear
-
-    IssueManagerUtils.clear
-
-    loadStructure(structure)
-    loadObservations(raw)
-    (ModelGenerator.generateJenaModel(), IssueManagerUtils.asSeq)
-  }
+  def getAll: (String, Seq[Issue]) = 
+    (ModelGenerator.generateJenaModel(this), IssueManagerUtils.asSeq)
 
   /**
    * This method load all structure about Web Index information
    */
-  def loadStructure(f: File) {
+  private def loadStructure(f: File) {
     safeLoadInformation(f, loadSubIndexInformation)
     safeLoadInformation(f, loadIndicatorInformation)
     loadDatasetInformation(secondaryIndicators.toList)
@@ -83,7 +70,7 @@ object SpreadsheetsFetcher extends Fetcher {
   /**
    * This method load all observation form an excel file
    */
-  def loadObservations(f: File) {
+  private def loadObservations(f: File) {
     safeLoadInformation(f, loadObservationInformation)
   }
 
@@ -211,5 +198,13 @@ object SpreadsheetsFetcher extends Fetcher {
       throw new IllegalArgumentException("There is no component with id " +
         componentId))
   }
+}
+
+object SpreadsheetsFetcher {
+
+  private val countryReconciliator =
+    new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
+
+  private val logger: Logger = Logger.getLogger(this.getClass())
 
 }
