@@ -124,14 +124,14 @@ object ModelGenerator {
     spreadsheetsFetcher.regions.foreach(
       region => createRegionsTriples(region, model))
 
-    storeModel(model)
+    //storeModel(model)
     saveModel(model)
 
   }
 
   private def saveModel(model: Model): String = {
     val timestamp = new Date().getTime()
-    val path = s"reports/report-${timestamp}.ttl"
+    val path = s"reports/dataset-${timestamp}.ttl"
     model.write(new FileOutputStream(new File(s"public/${path}")), "TURTLE")
     path
   }
