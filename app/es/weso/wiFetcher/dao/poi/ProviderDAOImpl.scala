@@ -14,6 +14,7 @@ import es.weso.wiFetcher.dao.ProviderDAO
 import es.weso.wiFetcher.entities.Provider
 import es.weso.wiFetcher.utils.POIUtils
 import es.weso.wiFetcher.utils.IssueManagerUtils
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 
 /**
  * This class contains the implementation that allows to load all information
@@ -22,7 +23,7 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
  * At the moment, the information is extracted from an excel file that follows
  * the structure of the 2012 Web Index. Maybe the implementation has to change
  */
-class ProviderDAOImpl(is: InputStream)
+class ProviderDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
   extends ProviderDAO with PoiDAO[Provider] {
 
   import ProviderDAOImpl._

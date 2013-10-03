@@ -23,7 +23,7 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
  * This class using Apache Lucene to index a list of indicators, and search
  * over them given a string
  */
-class IndicatorReconciliator {
+class IndicatorReconciliator(implicit val sFetcher: SpreadsheetsFetcher) {
 
   import IndicatorReconciliator._
 
@@ -99,7 +99,7 @@ class IndicatorReconciliator {
     } else {
       val doc: Document = indexSearcher.doc(scoreDocs.head.doc)
       val id = doc.getField(IndicatorIdField).stringValue()
-      SpreadsheetsFetcher.obtainIndicatorById(id)
+      sFetcher.obtainIndicatorById(id)
     }
   }
 

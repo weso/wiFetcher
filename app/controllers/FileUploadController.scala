@@ -35,12 +35,12 @@ object FileUploadController extends Controller {
         case Some(s) => observations match {
           case Some(o) => {
             val future = scala.concurrent.Future {
-              SpreadsheetsFetcher.loadAll(s, o)
+              SpreadsheetsFetcher(s, o).getAll
             }
 
             future.map {
-              
-              issues => 
+
+              issues =>
                 Ok(views.html.results.result(issues._1, issues._2))
             }
           }

@@ -16,8 +16,9 @@ import es.weso.wiFetcher.dao.SubIndexDAO
 import es.weso.wiFetcher.entities.Entity
 import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.traits.SubIndex
-import es.weso.wiFetcher.utils.POIUtils
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.IssueManagerUtils
+import es.weso.wiFetcher.utils.POIUtils
 
 /**
  * This class contains the implementation that allows to load all information
@@ -26,7 +27,7 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
  * At the moment, the information is extracted from an excel file that follows
  * the structure of the 2012 Web Index. Maybe the implementation has to change
  */
-class SubIndexDAOImpl(is: InputStream) extends SubIndexDAO
+class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher) extends SubIndexDAO
   with PoiDAO[Entity] {
 
   import SubIndexDAOImpl._

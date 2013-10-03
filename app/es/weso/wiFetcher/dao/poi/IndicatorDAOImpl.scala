@@ -27,7 +27,7 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
  * excel file that follows the structure of 2012 Web Index. Maybe we have
  * to change the implementation
  */
-class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
+class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher) extends IndicatorDAO
   with PoiDAO[Indicator] {
 
   import IndicatorDAOImpl._
@@ -146,7 +146,7 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
     name: String, description: String, weight: String, hl: String,
     source: String, component: String, provider: String): Indicator = {
 
-    val componentObj = SpreadsheetsFetcher.obtainComponent(component)
+    val componentObj = sFetcher.obtainComponent(component)
     val indicator = Indicator(
       id, iType match {
         case "Primary" => IndicatorType.Primary
