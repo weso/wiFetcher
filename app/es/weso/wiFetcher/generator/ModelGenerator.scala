@@ -1,4 +1,4 @@
-package es.weso.wiFetcher.aux
+package es.weso.wiFetcher.generator
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 import com.hp.hpl.jena.rdf.model.Model
 import com.hp.hpl.jena.rdf.model.ModelFactory
