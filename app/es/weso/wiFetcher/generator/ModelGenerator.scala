@@ -104,8 +104,8 @@ object ModelGenerator {
   val PROPERTY_QB_SLICE = ResourceFactory.createProperty(PREFIX_QB + "slice")
 
   private var id: Int = 1
-  
-  def generateJenaModel(spreadsheetsFetcher:SpreadsheetsFetcher): String = {
+
+  def generateJenaModel(spreadsheetsFetcher: SpreadsheetsFetcher): String = {
     //val observations : List[Observation] = SpreadsheetsFetcher.observations.toList
     val observationsByDataset = spreadsheetsFetcher.observations.groupBy(
       observation => observation.dataset)
@@ -357,11 +357,12 @@ object ModelGenerator {
             "sliceByArea"))
           observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
             createObservationTriples(obs, model, id)
-            sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" +  id))
+            sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" + id))
+            id += 1
           })
           datasetResource.addProperty(PROPERTY_QB_SLICE, sliceResource)
         })
-      case None => IssueManagerUtils.addError(message=s"No observations for the dataset ${dataset.id}", path = Some("RAW File"))
+      case None => IssueManagerUtils.addError(message = s"No observations for the dataset ${dataset.id}", path = Some("RAW File"))
     }
   }
 
