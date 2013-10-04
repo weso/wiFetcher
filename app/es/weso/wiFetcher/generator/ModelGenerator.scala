@@ -174,7 +174,7 @@ object ModelGenerator {
   }
 
   def createRegionsTriples(region: Region, model: Model) = {
-    val regionResource = model.createResource(PREFIX_REGION + region.name.replace("& ", "").replace(" ", "-"))
+    val regionResource = model.createResource(PREFIX_REGION + region.name.replace("& ", "").replace(" ", "_"))
     regionResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_WI_ONTO + "Region"))
     regionResource.addProperty(PROPERTY_DCTERMS_CONTRIBUTOR, ResourceFactory.createResource(PREFIX_WI_ONTO + "WESO"))
     regionResource.addProperty(PROPERTY_DCTERMS_PUBLISHER, ResourceFactory.createResource(PREFIX_WI_ONTO + "WebFoundation"))
@@ -207,24 +207,24 @@ object ModelGenerator {
       " during " + obs.year, "en"))
     obsResource.addProperty(PROPERTY_WIONTO_REFAREA, ResourceFactory.createResource(PREFIX_COUNTRY + obs.area.iso3Code))
     obsResource.addProperty(PROPERTY_WIONTO_REFCOMPUTATION, ResourceFactory.createResource(PREFIX_CEX + obs.status))
-    obsResource.addProperty(PROPERTY_CEX_INDICATOR, ResourceFactory.createResource(PREFIX_INDICATOR + obs.indicator.id.replace(" ", "")))
+    obsResource.addProperty(PROPERTY_CEX_INDICATOR, ResourceFactory.createResource(PREFIX_INDICATOR + obs.indicator.id.replace(" ", "_")))
     obsResource.addProperty(PROPERTY_WIONTO_REFYEAR, ResourceFactory.createTypedLiteral(
       String.valueOf(obs.year), XSDDatatype.XSDinteger))
     obsResource.addProperty(PROPERTY_CEX_VALUE, ResourceFactory.createTypedLiteral(
       String.valueOf(obs.value), XSDDatatype.XSDdouble))
     obsResource.addProperty(PROPERTY_SMDX_OBSSTATUS, ResourceFactory.createResource(PREFIX_CEX + obs.status))
-    obsResource.addProperty(PROPERTY_QB_DATASET, ResourceFactory.createResource(PREFIX_DATASET + obs.dataset.id))
+    obsResource.addProperty(PROPERTY_QB_DATASET, ResourceFactory.createResource(PREFIX_DATASET + obs.dataset.id.replace(" ", "_")))
     obsResource.addProperty(PROPERTY_WIONTO_SHEETTYPE, ResourceFactory.createResource(PREFIX_WI_ONTO + obs.status))
     obsResource.addProperty(PROPERTY_CEX_MD5, ResourceFactory.createLangLiteral(
       "MD5 checksum for observation " + id, "en"))
   }
 
   def createSecondaryIndicatorTriples(indicator: Indicator, model: Model) = {
-    val indicatorResource = model.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", ""))
+    val indicatorResource = model.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", "_"))
     indicatorResource.addProperty(PROPERTY_CEX_MD5,
       ResourceFactory.createLangLiteral("MD5 checksum for indicator " + indicator.id, "en"))
     indicatorResource.addProperty(PROPERTY_CEX_COMPONENT,
-      ResourceFactory.createResource(PREFIX_COMPONENT + indicator.component.id.replace(" ", "")))
+      ResourceFactory.createResource(PREFIX_COMPONENT + indicator.component.id.replace(" ", "_")))
     indicatorResource.addProperty(PROPERTY_CEX_HIGHLOW, ResourceFactory.createResource(PREFIX_CEX + indicator.highLow))
     indicatorResource.addProperty(PROPERTY_DCTERMS_SOURCE, indicator.source)
     indicatorResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "Indicator"))
@@ -240,11 +240,11 @@ object ModelGenerator {
   }
 
   def createPrimaryIndicatorTriples(indicator: Indicator, model: Model) = {
-    val indicatorResource = model.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", ""))
+    val indicatorResource = model.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", "_"))
     indicatorResource.addProperty(PROPERTY_CEX_MD5,
       ResourceFactory.createLangLiteral("MD5 checksum for indicator " + indicator.id, "en"))
     indicatorResource.addProperty(PROPERTY_CEX_COMPONENT,
-      ResourceFactory.createResource(PREFIX_COMPONENT + indicator.component.id.replace(" ", "")))
+      ResourceFactory.createResource(PREFIX_COMPONENT + indicator.component.id.replace(" ", "_")))
     indicatorResource.addProperty(PROPERTY_CEX_HIGHLOW, ResourceFactory.createResource(PREFIX_CEX + indicator.highLow))
     indicatorResource.addProperty(PROPERTY_DCTERMS_SOURCE, indicator.source)
     indicatorResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "Indicator"))
@@ -264,13 +264,13 @@ object ModelGenerator {
     weightResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "WeightSchema"))
     val anonymousResource = model.createResource()
     anonymousResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "Weight"))
-    anonymousResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", "")))
+    anonymousResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", "_")))
     anonymousResource.addProperty(PROPERTY_CEX_VALUE, ResourceFactory.createTypedLiteral(indicator.weight.toString, XSDDatatype.XSDdouble))
     weightResource.addProperty(PROPERTY_CEX_WEIGHT, anonymousResource)
   }
 
   def createComponentsTriples(component: Component, model: Model) = {
-    val componentResource = model.createResource(PREFIX_COMPONENT + component.id.replace(" ", ""))
+    val componentResource = model.createResource(PREFIX_COMPONENT + component.id.replace(" ", "_"))
     componentResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "Component"))
     componentResource.addProperty(PROPERTY_CEX_MD5, ResourceFactory.createLangLiteral("MD5 for" + component.name, "en"))
     componentResource.addProperty(PROPERTY_DCTERMS_CONTRIBUTOR, ResourceFactory.createResource(PREFIX_WI_ORG + "WESO"))
@@ -279,32 +279,32 @@ object ModelGenerator {
     componentResource.addProperty(PROPERTY_RDFS_LABEL, ResourceFactory.createLangLiteral(component.name, "en"))
     componentResource.addProperty(PROPERTY_DCTERMS_ISSUED, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     component.getIndicators.foreach(indicator => {
-      componentResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", "")))
+      componentResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_INDICATOR + indicator.id.replace(" ", "_")))
     })
 
     val weightComponent = model.createResource(PREFIX_WEIGHTSCHEMA + "componentWeights")
     weightComponent.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "WeightSchema"))
     val anonymousResource = model.createResource()
     anonymousResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "Weight"))
-    anonymousResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_COMPONENT + component.id.replace(" ", "")))
+    anonymousResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_COMPONENT + component.id.replace(" ", "_")))
     anonymousResource.addProperty(PROPERTY_CEX_VALUE, ResourceFactory.createTypedLiteral(component.weight.toString, XSDDatatype.XSDdouble))
     weightComponent.addProperty(PROPERTY_CEX_WEIGHT, anonymousResource)
   }
 
   def createSubindexTriples(subindex: SubIndex, model: Model) {
-    val subindexResource = model.createResource(PREFIX_SUBINDEX + subindex.id.replace(" ", ""))
+    val subindexResource = model.createResource(PREFIX_SUBINDEX + subindex.id.replace(" ", "_"))
     subindexResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "SubIndex"))
     subindexResource.addProperty(PROPERTY_RDFS_LABEL, ResourceFactory.createLangLiteral(subindex.name, "en"))
     subindexResource.addProperty(PROPERTY_RDFS_COMMENT, ResourceFactory.createLangLiteral(subindex.description, "en"))
     subindex.getComponents.foreach(component => {
-      subindexResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_COMPONENT + component.id.replace(" ", "")))
+      subindexResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_COMPONENT + component.id.replace(" ", "_")))
     })
 
     val weightSubindex = model.createResource(PREFIX_WEIGHTSCHEMA + "subindexWeights")
     weightSubindex.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX))
     val anonymousResource = model.createResource
     anonymousResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_CEX + "Weight"))
-    anonymousResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_SUBINDEX + subindex.id.replace(" ", "")))
+    anonymousResource.addProperty(PROPERTY_CEX_ELEMENT, ResourceFactory.createResource(PREFIX_SUBINDEX + subindex.id.replace(" ", "_")))
     anonymousResource.addProperty(PROPERTY_CEX_VALUE, ResourceFactory.createTypedLiteral(subindex.weight.toString, XSDDatatype.XSDdouble))
     weightSubindex.addProperty(PROPERTY_CEX_WEIGHT, anonymousResource)
   }
@@ -312,7 +312,7 @@ object ModelGenerator {
   private def createDatasetsTriples(dataset: Dataset,
     observationsByDataset: Map[Dataset, ListBuffer[Observation]],
     model: Model) = {
-    val datasetResource = model.createResource(PREFIX_DATASET + dataset.id.replace(" ", ""))
+    val datasetResource = model.createResource(PREFIX_DATASET + dataset.id.replace(" ", "_"))
     datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "DataSet"))
     datasetResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_WI_ONTO + "Dataset"))
     datasetResource.addProperty(PROPERTY_CEX_MD5, ResourceFactory.createTypedLiteral("MD5...", XSDDatatype.XSDstring))
@@ -346,10 +346,10 @@ object ModelGenerator {
         val observationsByYear: Map[Int, ListBuffer[Observation]] = observations.groupBy(observation => observation.year)
         observationsByYear.keySet.foreach(year => {
           val sliceResource = model.createResource(PREFIX_SLICE + "Slice-" +
-            observations.head.indicator.id.replace(" ", "") + year.toString + "-" + observations.head.status)
+            observations.head.indicator.id.replace(" ", "_") + year.toString + "-" + observations.head.status)
           sliceResource.addProperty(PROPERTY_RDF_TYPE, ResourceFactory.createResource(PREFIX_QB + "Slice"))
           sliceResource.addProperty(PROPERTY_CEX_INDICATOR, ResourceFactory.createResource(PREFIX_INDICATOR +
-            observations.head.indicator.id.replace(" ", "")))
+            observations.head.indicator.id.replace(" ", "_")))
           sliceResource.addProperty(PROPERTY_WIONTO_REFYEAR, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
           sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, /*datasetResource*/ ResourceFactory.createResource(PREFIX_WI_ONTO +
             "sliceByArea"))
