@@ -103,6 +103,8 @@ object ModelGenerator {
   val PROPERTY_SMDX_UNITMEASURE = ResourceFactory.createProperty(PREFIX_SMDX_ATTRIBUTE + "unitMeasure")
   val PROPERTY_QB_SLICE = ResourceFactory.createProperty(PREFIX_QB + "slice")
 
+  private var id: Int = 1
+  
   def generateJenaModel(spreadsheetsFetcher:SpreadsheetsFetcher): String = {
     //val observations : List[Observation] = SpreadsheetsFetcher.observations.toList
     val observationsByDataset = spreadsheetsFetcher.observations.groupBy(
@@ -353,9 +355,8 @@ object ModelGenerator {
           sliceResource.addProperty(PROPERTY_WIONTO_REFYEAR, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
           sliceResource.addProperty(PROPERTY_QB_SLICESTRUCTURE, /*datasetResource*/ ResourceFactory.createResource(PREFIX_WI_ONTO +
             "sliceByArea"))
-          observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).zipWithIndex.foreach(obs => {
-            val id = obs._2+1
-            createObservationTriples(obs._1, model, id)
+          observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
+            createObservationTriples(obs, model, id)
             sliceResource.addProperty(PROPERTY_QB_OBSERVATION, ResourceFactory.createResource(PREFIX_OBS + "obs" +  id))
           })
           datasetResource.addProperty(PROPERTY_QB_SLICE, sliceResource)
