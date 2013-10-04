@@ -52,8 +52,10 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   loadStructure(structure)
   loadObservations(raw)
 
-  def getAll: (String, Seq[Issue]) = 
-    (ModelGenerator.generateJenaModel(this), IssueManagerUtils.asSeq)
+  def issues: Seq[Issue] = IssueManagerUtils.asSeq
+    
+  def storeAsTTL(store:Boolean=false) = 
+    ModelGenerator.generateJenaModel(this,store)
 
   /**
    * This method load all structure about Web Index information
@@ -84,7 +86,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     observations ++= observationDao.getObservations
   }
 
-  def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
+  private def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
     val is = new FileInputStream(file)
     try {
       proccess(is)

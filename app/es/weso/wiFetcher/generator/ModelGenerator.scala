@@ -105,7 +105,7 @@ object ModelGenerator {
 
   private var id: Int = 1
 
-  def generateJenaModel(spreadsheetsFetcher: SpreadsheetsFetcher): String = {
+  def generateJenaModel(spreadsheetsFetcher: SpreadsheetsFetcher, store: Boolean): String = {
     //val observations : List[Observation] = SpreadsheetsFetcher.observations.toList
     val observationsByDataset = spreadsheetsFetcher.observations.groupBy(
       observation => observation.dataset)
@@ -126,9 +126,9 @@ object ModelGenerator {
     spreadsheetsFetcher.regions.foreach(
       region => createRegionsTriples(region, model))
 
-    //storeModel(model)
+    if (store) storeModel(model)
+    
     saveModel(model)
-
   }
 
   private def saveModel(model: Model): String = {
