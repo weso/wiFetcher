@@ -19,12 +19,14 @@ import play.api.mvc.MultipartFormData
 
 object FileUploadController extends Controller {
 
-  case class FileForm(val store: Option[Int], val baseUri: String)
+  case class FileForm(val baseUri: String, val year: Int, val namespace: String, val store: Option[Int])
 
   val fileInputForm: Form[FileForm] = Form(
     mapping(
-      "load_file" -> optional(number),
-      "base_uri" -> text)(FileForm.apply)(FileForm.unapply))
+      "base_uri" -> text,
+      "year_uri" -> number,
+      "namespace_uri" -> text,
+      "load_file" -> optional(number))(FileForm.apply)(FileForm.unapply))
 
   def byFileUploadGET() = Action {
     implicit request =>
@@ -40,7 +42,13 @@ object FileUploadController extends Controller {
           val store = fileInput.store.getOrElse(0) != 0
           val structure = loadFile("structure_file")
           val observations = loadFile("observations_file")
-          val baseUri = fileInput.baseUri
+
+          val baseUri = if (fileInput.baseUri.endsWith("/"))
+            fileInput.baseUri.substring(0, fileInput.baseUri.length - 1)
+          else fileInput.baseUri
+
+          val uri = new StringBuilder(baseUri).append("/v")
+            .append(fileInput.year).append("/").toString
           structure match {
             case Some(s) => observations match {
               case Some(o) => {
@@ -49,7 +57,7 @@ object FileUploadController extends Controller {
                 }
                 future.map {
                   sf =>
-                    Ok(views.html.results.result(sf.storeAsTTL(baseUri, store), sf.issues))
+                    Ok(views.html.results.result(sf.storeAsTTL(uri, fileInput.namespace), sf.issues))
                 }
               }
               case _ => concurrentFuture("Onservations file cannot be parsed! Upload it again")

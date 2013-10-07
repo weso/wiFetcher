@@ -19,31 +19,31 @@ import java.io.FileOutputStream
 import java.io.File
 import es.weso.wiFetcher.utils.IssueManagerUtils
 
-case class ModelGenerator(baseUri: String) {
+case class ModelGenerator(baseUri: String, namespace: String) {
   import ModelGenerator._
 
   val PrefixObs = new StringBuilder(baseUri)
-    .append("webindex/v2013/observation/").toString
+    .append(namespace).append("/observation/").toString
   val PrefixWiOnto = new StringBuilder(baseUri)
-    .append("webindex/ontology/").toString
+    .append(namespace).append("/ontology/").toString
   val PrefixWiOrg = new StringBuilder(baseUri)
-    .append("webindex/organization/").toString
+   .append(namespace).append("/organization/").toString
   val PrefixCountry = new StringBuilder(baseUri)
-    .append("webindex/v2013/country/").toString
+    .append(namespace).append("/country/").toString
   val PrefixRegion = new StringBuilder(baseUri)
-    .append("webindex/v2013/region/").toString
+    .append(namespace).append("/region/").toString
   val PrefixIndicator = new StringBuilder(baseUri)
-    .append("webindex/v2013/indicator/").toString
+    .append(namespace).append("/indicator/").toString
   val PrefixDataset = new StringBuilder(baseUri)
-    .append("webindex/v2013/dataset/").toString
+    .append(namespace).append("/dataset/").toString
   val PrefixComponent = new StringBuilder(baseUri)
-    .append("webindex/v2013/component/").toString
+    .append(namespace).append("/component/").toString
   val PrefixSubindex = new StringBuilder(baseUri)
-    .append("webindex/v2013/subindex/").toString
+    .append(namespace).append("/subindex/").toString
   val PrefixWeightSchema = new StringBuilder(baseUri)
-    .append("webindex/v2013/weightSchema/").toString
+    .append(namespace).append("/weightSchema/").toString
   val PrefixSlice = new StringBuilder(baseUri)
-    .append("webindex/v2013/slice/").toString
+    .append(namespace).append("/slice/").toString
 
   val PropertyWiOntoRefarea = ResourceFactory.createProperty(PrefixWiOnto
     + "ref-area")
