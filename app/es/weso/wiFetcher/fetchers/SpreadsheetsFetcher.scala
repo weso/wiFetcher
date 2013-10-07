@@ -32,13 +32,13 @@ import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.entities.issues.Issue
 
 case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
-  
+
   import SpreadsheetsFetcher._
 
   private implicit val currentFetcher = this
-  
+
   private val indicatorReconciliator = new IndicatorReconciliator
-  
+
   val components: ListBuffer[Component] = ListBuffer.empty
   val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
   val primaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
@@ -53,9 +53,9 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   loadObservations(raw)
 
   def issues: Seq[Issue] = IssueManagerUtils.asSeq
-    
-  def storeAsTTL(store:Boolean=false) = 
-    ModelGenerator.generateJenaModel(this,store)
+
+  def storeAsTTL(baseUri: String, store: Boolean = false) =
+    ModelGenerator(baseUri).generateJenaModel(this, store)
 
   /**
    * This method load all structure about Web Index information

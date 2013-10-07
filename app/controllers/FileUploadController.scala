@@ -13,16 +13,18 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.number
 import play.api.data.Forms.optional
+import play.api.data.Forms.text
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc.MultipartFormData
 
 object FileUploadController extends Controller {
 
-  case class FileForm(val store: Option[Int])
+  case class FileForm(val store: Option[Int], val baseUri: String)
 
   val fileInputForm: Form[FileForm] = Form(
     mapping(
-      "load_file" -> optional(number))(FileForm.apply)(FileForm.unapply))
+      "load_file" -> optional(number),
+      "base_uri" -> text)(FileForm.apply)(FileForm.unapply))
 
   def byFileUploadGET() = Action {
     implicit request =>
@@ -38,7 +40,7 @@ object FileUploadController extends Controller {
           val store = fileInput.store.getOrElse(0) != 0
           val structure = loadFile("structure_file")
           val observations = loadFile("observations_file")
-
+          val baseUri = fileInput.baseUri
           structure match {
             case Some(s) => observations match {
               case Some(o) => {
@@ -47,7 +49,7 @@ object FileUploadController extends Controller {
                 }
                 future.map {
                   sf =>
-                    Ok(views.html.results.result(sf.storeAsTTL(store), sf.issues))
+                    Ok(views.html.results.result(sf.storeAsTTL(baseUri, store), sf.issues))
                 }
               }
               case _ => concurrentFuture("Onservations file cannot be parsed! Upload it again")
