@@ -337,3 +337,12 @@ div#frontforms select {
 div#frontforms input.button {
 	background: #7AB800;
 }
+
+.error{
+	background:transparent;
+}
+
+.error .message {
+	color: #c60f13;
+	font-size: 0.8em;
+}

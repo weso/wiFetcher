@@ -66,5 +66,7 @@ object ApplicationBuild extends Build {
     
     /*Local Repositories*/
     resolvers += Resolver.url("Local Ivy Repository", url("file://" + Path.userHome.absolutePath + "/.ivy2/local/"))(Resolver.ivyStylePatterns),
-    resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository")
+    resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
+    
+    templatesImport += "controllers.FileUploadController._")
 }
