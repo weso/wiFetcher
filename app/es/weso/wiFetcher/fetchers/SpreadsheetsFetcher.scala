@@ -207,4 +207,5 @@ object SpreadsheetsFetcher {
 
   private val logger: Logger = Logger.getLogger(this.getClass())
 
+  val fetcher = new SpreadsheetsFetcher(null,null)
 }

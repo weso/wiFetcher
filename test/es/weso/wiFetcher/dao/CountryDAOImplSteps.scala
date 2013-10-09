@@ -7,15 +7,19 @@ import es.weso.wiFetcher.entities.Country
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import org.apache.poi.ss.SpreadsheetVersion
 
 @RunWith(classOf[JUnitRunner])
 class CountryDAOImplSteps extends ScalaDsl with EN with Matchers{
+  
   
   var countryDao : CountryDAO = null
   var result : Country = null
   
   Given("""^I want to load names and iso-codes for all countries presents in WebIndex$""") { () =>
-    countryDao = new CountryDAOImpl("files/countryCodes.tsv", true)
+    val currentFetcher : SpreadsheetsFetcher = SpreadsheetsFetcher.fetcher
+    countryDao = new CountryDAOImpl("files/countryCodes.tsv", true)(currentFetcher)
   }
   
   When("""^I check the country with the "([^"]*)" "([^"]*)"$""") { (comparator : String, value : String) =>
