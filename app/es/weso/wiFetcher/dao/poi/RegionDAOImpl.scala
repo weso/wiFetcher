@@ -50,7 +50,7 @@ class RegionDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
     val sheet: Sheet = workbook.getSheet(SheetName)
 
     if (sheet == null) {
-      IssueManagerUtils.addError(
+      sFetcher.issueManager.addError(
         message = new StringBuilder("The Regions Sheet ").append(SheetName)
           .append(" does not exist").toString, path = XslxFile)
     } else {

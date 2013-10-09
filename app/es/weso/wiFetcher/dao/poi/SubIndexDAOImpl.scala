@@ -49,7 +49,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
     //Obtain the corresponding sheet
     val sheet = workbook.getSheet(SheetName)
     if (sheet == null) {
-      IssueManagerUtils.addError(
+      sFetcher.issueManager.addError(
         message = new StringBuilder("The Subindex Sheet ").append(SheetName)
         .append(" does not exist").toString, path = XslxFile)
     } else {
@@ -115,7 +115,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
     entities.head match {
       case e: SubIndex => inner(e, entities.tail)
       case _ =>
-        IssueManagerUtils.addError(message = s"The head element is not a SubIndex",
+        sFetcher.issueManager.addError(message = s"The head element is not a SubIndex",
           path = XslxFile)
         List.empty
     }
@@ -136,7 +136,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
       case e if (e == ComponentType) =>
         createComponent(id, weight, name, description)
       case _ =>
-        IssueManagerUtils.addError(message = new StringBuilder("Unknown type '")
+        sFetcher.issueManager.addError(message = new StringBuilder("Unknown type '")
         .append(eType).append(" in Structure Sheet").toString, path = XslxFile,
           sheetName = Some(SheetName), cell = Some(eType))
         createWrongEntity

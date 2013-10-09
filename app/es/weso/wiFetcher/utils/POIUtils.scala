@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.CellValue
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.formula.eval.NotImplementedException
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 
 object POIUtils {
 
@@ -14,7 +15,8 @@ object POIUtils {
    * This function extract the content from a given cell as a string, using
    * a FormulaEvaluator
    */
-  def extractCellValue(cell: Cell, evaluator: FormulaEvaluator): String = {
+  def extractCellValue(cell: Cell, evaluator: FormulaEvaluator)
+  (implicit sFetcher: SpreadsheetsFetcher): String = {
     if (cell != null) {
       try {
         val cellValue: CellValue = evaluator.evaluate(cell)
@@ -29,13 +31,13 @@ object POIUtils {
         } else EmptyString
       } catch {
         case e: IllegalArgumentException =>
-          IssueManagerUtils.addError(message = "Some errors detected within the formula"
+          sFetcher.issueManager.addError(message = "Some errors detected within the formula"
             +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
             col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
             `cell` = Some(cell.toString))
           EmptyString
         case e: NotImplementedException =>
-          IssueManagerUtils.addError(message = "Some errors detected within the formula"
+          sFetcher.issueManager.addError(message = "Some errors detected within the formula"
             +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
             col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
             `cell` = Some(cell.toString))
@@ -48,7 +50,8 @@ object POIUtils {
    * This method extract from a given a cell, its content as a number. In case
    * that the content not be a number, its return "-1"
    */
-  def extractNumericCellValue(cell: Cell, evaluator: FormulaEvaluator): Double = {
+  def extractNumericCellValue(cell: Cell, evaluator: FormulaEvaluator)
+  (implicit sFetcher: SpreadsheetsFetcher): Double = {
     try {
       val cellValue: CellValue = evaluator.evaluate(cell)
       if (cellValue != null) {
@@ -69,13 +72,13 @@ object POIUtils {
       }
     } catch {
       case e: IllegalArgumentException =>
-        IssueManagerUtils.addError(message = "Some errors detected within the formula: "
+        sFetcher.issueManager.addError(message = "Some errors detected within the formula: "
           +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
           col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
           `cell` = Some(cell.toString))
         -1
       case e: NotImplementedException => 
-        IssueManagerUtils.addError(message = "Some errors detected within the formula: "
+        sFetcher.issueManager.addError(message = "Some errors detected within the formula: "
           +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
           col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
           `cell` = Some(cell.toString))

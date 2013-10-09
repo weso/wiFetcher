@@ -80,7 +80,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
     val sheet: Sheet = workbook.getSheet(SheetName)
 
     if (sheet == null) {
-      IssueManagerUtils.addError(
+      sFetcher.issueManager.addError(
         message = s"The Indicators Sheet ${SheetName} does not exist",
         path = XslxFile)
       None
@@ -152,7 +152,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
         case "Primary" => IndicatorType.Primary
         case "Secondary" => IndicatorType.Secondary
         case _ =>
-          IssueManagerUtils.addError(message = s"Indicator type '${iType}' is unknown",
+          sFetcher.issueManager.addError(message = s"Indicator type '${iType}' is unknown",
             path = XslxFile, sheetName = Some(SheetName), cell = Some(iType))
           IndicatorType.Wrong
       },
@@ -162,7 +162,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
         case "High" => IndicatorHighLow.High
         case "Low" => IndicatorHighLow.Low
         case _ =>
-          IssueManagerUtils.addError(message = s"Indicator HighLow '${iType}' is unknown",
+          sFetcher.issueManager.addError(message = s"Indicator HighLow '${iType}' is unknown",
             path = XslxFile, sheetName = Some(SheetName), cell = Some(hl))
           IndicatorHighLow.Wrong
       },

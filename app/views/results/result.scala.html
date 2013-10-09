@@ -11,6 +11,7 @@
 		<table>
 			<thead>
 				<tr>
+					<th>Type</th>
 					<th>Message</th>
 					<th>Dataset</th>
 					<th>File</th>
@@ -22,6 +23,7 @@
 			</thead>
 			<tfoot>
 				<tr>
+					<th>Type</th>
 					<th>Message</th>
 					<th>Dataset</th>
 					<th>File</th>
@@ -31,15 +33,28 @@
 					<th>Cell</th>
 				</tr>
 			</tfoot>
-		@for(issue <- issues){
+		@for(issue <- issues.filter(_.isInstanceOf[Error])){
 			<tr>
-				<td>@issue._message</td>
-				<td>@issue._dataset.getOrElse("-")</td>
-				<td>@issue._path.getOrElse("-")</td>
-				<td>@issue._sheetName.getOrElse("-")</td>
-				<td>@issue._col.getOrElse("-")</td>
-				<td>@issue._row.getOrElse("-")</td>
-				<td>@issue._cell.getOrElse("-")</td>
+				<td>Error</td>
+				<td>@issue.message</td>
+				<td>@issue.dataset.getOrElse("-")</td>
+				<td>@issue.path.getOrElse("-")</td>
+				<td>@issue.sheetName.getOrElse("-")</td>
+				<td>@issue.col.getOrElse("-")</td>
+				<td>@issue.row.getOrElse("-")</td>
+				<td>@issue.cell.getOrElse("-")</td>
+			</tr>
+		}
+		@for(issue <- issues.filter(_.isInstanceOf[Warn])){
+			<tr>
+				<td>Warn</td>
+				<td>@issue.message</td>
+				<td>@issue.dataset.getOrElse("-")</td>
+				<td>@issue.path.getOrElse("-")</td>
+				<td>@issue.sheetName.getOrElse("-")</td>
+				<td>@issue.col.getOrElse("-")</td>
+				<td>@issue.row.getOrElse("-")</td>
+				<td>@issue.cell.getOrElse("-")</td>
 			</tr>
 		}
 	</div>

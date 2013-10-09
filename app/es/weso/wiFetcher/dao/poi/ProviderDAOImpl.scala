@@ -42,7 +42,7 @@ class ProviderDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
     val sheet = workbook.getSheet(SheetName)
 
     if (sheet == null) {
-      IssueManagerUtils.addError(
+      sFetcher.issueManager.addError(
         message = s"The Indicators Sheet ${SheetName} does not exist",
         path = XslxFile)
     } else {
