@@ -118,6 +118,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
         Configuration.getIndicatorHLColumn), evaluator)
       component = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorComponentColumn), evaluator)
+      if(!id.isEmpty() && !component.isEmpty())
     } yield {
       createIndicator(id, iType, name, description, weight, hl, source,
         component, provider)
@@ -145,7 +146,6 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
   def createIndicator(id: String, iType: String,
     name: String, description: String, weight: String, hl: String,
     source: String, component: String, provider: String): Indicator = {
-
     val componentObj = sFetcher.obtainComponent(component)
     val indicator = Indicator(
       id, iType match {
