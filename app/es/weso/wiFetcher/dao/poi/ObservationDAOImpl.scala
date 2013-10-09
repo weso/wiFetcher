@@ -1,14 +1,17 @@
 package es.weso.wiFetcher.dao.poi
 
 import java.io.InputStream
+
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
+
 import org.apache.log4j.Logger
 import org.apache.poi.hssf.util.{ CellReference => CellRef }
 import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
+
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.ObservationDAO
 import es.weso.wiFetcher.entities.Area
@@ -18,7 +21,6 @@ import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.entities.ObservationStatus
-import es.weso.wiFetcher.entities.issues._
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.POIUtils
 import es.weso.wiFetcher.utils.IssueManagerUtils
@@ -80,7 +82,7 @@ class ObservationDAOImpl(
     val initialCell = new CellRef(Configuration.getInitialCellSecondaryObservation)
     val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
     val dataset = sFetcher.getDatasetById(sheet.getSheetName())
-    val indicator = sFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-')))/*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
+    val indicator = sFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-'))) /*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
     val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
 
     for {
@@ -96,7 +98,8 @@ class ObservationDAOImpl(
       if {
         val ret = country.isDefined
         if (ret == false) {
-          IssueManagerUtils.addError(message = s"Country ${countryName} not definend", path = XslxFile,
+          IssueManagerUtils.addError(message = new StringBuilder("Country ")
+            .append(countryName).append(" is not defined").toString, path = XslxFile,
             sheetName = Some(sheet.getSheetName), col = Some(0), `row` = Some(row),
             cell = Some(countryName))
         }
@@ -106,10 +109,8 @@ class ObservationDAOImpl(
       col <- initialCell.getCol() to sheet.getRow(initialCell.getRow()).getLastCellNum() - 1
       year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
         .getCell(col), evaluator)
-      if(!year.isEmpty())
+      if (!year.isEmpty())
     } yield {
-      /*val year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
-        .getCell(col), evaluator)*/
       val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +

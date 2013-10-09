@@ -1,21 +1,24 @@
 package es.weso.wiFetcher.dao.poi
 
 import java.io.InputStream
+
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
+
 import org.apache.poi.hssf.util.CellReference
+import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.RegionDAO
 import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
-import es.weso.wiFetcher.utils.POIUtils
-import org.apache.poi.ss.usermodel.FormulaEvaluator
 import es.weso.wiFetcher.utils.IssueManagerUtils
+import es.weso.wiFetcher.utils.POIUtils
 
 /**
  * This class contains the implementation that allows to load all information
@@ -26,7 +29,7 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
  * change the implementation
  */
 class RegionDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
-extends RegionDAO with PoiDAO[Region] {
+  extends RegionDAO with PoiDAO[Region] {
 
   import RegionDAOImpl._
 
@@ -48,8 +51,8 @@ extends RegionDAO with PoiDAO[Region] {
 
     if (sheet == null) {
       IssueManagerUtils.addError(
-        message = s"The Regions Sheet ${SheetName} does not exist",
-        path = XslxFile)
+        message = new StringBuilder("The Regions Sheet ").append(SheetName)
+          .append(" does not exist").toString, path = XslxFile)
     } else {
       logger.info("Begin region extraction")
       regions ++= parseData(workbook, sheet)
@@ -93,7 +96,8 @@ extends RegionDAO with PoiDAO[Region] {
     regions.toList
   }
 
-  protected def loadRegions(sheet: Sheet, cellReference: CellReference, evaluator: FormulaEvaluator): Map[String, Region] = {
+  protected def loadRegions(sheet: Sheet, cellReference: CellReference,
+    evaluator: FormulaEvaluator): Map[String, Region] = {
     (for {
       row <- cellReference.getRow() to sheet.getLastRowNum()
       //Extract the name of the region. The column that contains the information
