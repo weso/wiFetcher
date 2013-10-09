@@ -8,49 +8,60 @@ import org.apache.log4j.Logger
 import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
+import es.weso.wiFetcher.dao.entity.DatasetDAOImpl
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
-import es.weso.wiFetcher.dao.file.DatasetDAOImpl
 import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
 import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
 import es.weso.wiFetcher.dao.poi.ProviderDAOImpl
 import es.weso.wiFetcher.dao.poi.RegionDAOImpl
 import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
-import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.Country
 import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Indicator
+import es.weso.wiFetcher.entities.issues._
 import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.entities.ObservationStatus.ObservationStatus
 import es.weso.wiFetcher.entities.Provider
 import es.weso.wiFetcher.entities.Region
+import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.traits.SubIndex
-import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
+import es.weso.wiFetcher.generator.ModelGenerator
+import es.weso.wiFetcher.utils.IssueManagerUtils
 
-object SpreadsheetsFetcher extends Fetcher {
 
-  var components: List[Component] = null
-  var subIndexes: List[SubIndex] = null
-  var primaryIndicators: List[Indicator] = null
-  var secondaryIndicators: List[Indicator] = null
-  var countries: List[Country] = null
-  var regions: List[Region] = null
-  var providers: List[Provider] = null
-  //Create an indicator reconciliator
-  val indicatorReconciliator: IndicatorReconciliator =
-    new IndicatorReconciliator
-  var datasets: List[Dataset] = null
-  var observations: List[Observation] = null
+case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 
-  private val logger: Logger = Logger.getLogger(this.getClass())
-  private val countryReconciliator: CountryReconciliator =
-    new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
+  import SpreadsheetsFetcher._
+
+  private implicit val currentFetcher = this
+
+  private val indicatorReconciliator = new IndicatorReconciliator
+
+  val components: ListBuffer[Component] = ListBuffer.empty
+  val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
+  val primaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
+  val secondaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
+  val countries: ListBuffer[Country] = ListBuffer.empty
+  val regions: ListBuffer[Region] = ListBuffer.empty
+  val providers: ListBuffer[Provider] = ListBuffer.empty
+  val datasets: ListBuffer[Dataset] = ListBuffer.empty
+  val observations: ListBuffer[Observation] = ListBuffer.empty
+
+  loadStructure(structure)
+  loadObservations(raw)
+
+  def issues: Seq[Issue] = IssueManagerUtils.asSeq
+
+  def storeAsTTL(baseUri: String, namespace:String, store: Boolean = false) =
+    ModelGenerator(baseUri, namespace).generateJenaModel(this, store)
 
   /**
    * This method load all structure about Web Index information
    */
-  def loadStructure(f: File) {
+  private def loadStructure(f: File) {
     safeLoadInformation(f, loadSubIndexInformation)
     safeLoadInformation(f, loadIndicatorInformation)
+    loadDatasetInformation(secondaryIndicators.toList)
     loadCountryInformation(Configuration.getCountryFile, true)
     safeLoadInformation(f, loadRegionInformation)
     safeLoadInformation(f, loadProviderInformation)
@@ -59,22 +70,21 @@ object SpreadsheetsFetcher extends Fetcher {
   /**
    * This method load all observation form an excel file
    */
-  def loadObservations(f: File) {
-    loadDatasetInformation(Configuration.getDatasetFile, true)
+  private def loadObservations(f: File) {
     safeLoadInformation(f, loadObservationInformation)
   }
 
-  private def loadDatasetInformation(path: String, relativePath: Boolean) {
-    val datasetDao = new DatasetDAOImpl(path, relativePath)
-    datasets = datasetDao.getDatasets
+  private def loadDatasetInformation(indicators: List[Indicator]) {
+    val datasetDao = new DatasetDAOImpl(indicators)
+    datasets ++= datasetDao.getDatasets
   }
 
   private def loadObservationInformation(is: InputStream) {
     val observationDao = new ObservationDAOImpl(is)
-    observations = observationDao.getObservations
+    observations ++= observationDao.getObservations
   }
 
-  def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
+  private def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
     val is = new FileInputStream(file)
     try {
       proccess(is)
@@ -88,8 +98,8 @@ object SpreadsheetsFetcher extends Fetcher {
    */
   private def loadSubIndexInformation(is: InputStream) {
     val subIndexDao = new SubIndexDAOImpl(is)
-    components = subIndexDao.getComponents
-    subIndexes = subIndexDao.getSubIndexes
+    components ++= subIndexDao.getComponents
+    subIndexes ++= subIndexDao.getSubIndexes
   }
 
   /**
@@ -97,11 +107,11 @@ object SpreadsheetsFetcher extends Fetcher {
    */
   private def loadIndicatorInformation(is: InputStream) {
     val indicatorDao = new IndicatorDAOImpl(is)
-    primaryIndicators = indicatorDao.getPrimaryIndicators
-    secondaryIndicators = indicatorDao.getSecondaryIndicators
+    primaryIndicators ++= indicatorDao.getPrimaryIndicators
+    secondaryIndicators ++= indicatorDao.getSecondaryIndicators
     //Index all indicators in the reconciliator in order to search indicators
-    indicatorReconciliator.indexIndicators(primaryIndicators)
-    indicatorReconciliator.indexIndicators(secondaryIndicators)
+    indicatorReconciliator.indexIndicators(primaryIndicators.toList)
+    indicatorReconciliator.indexIndicators(secondaryIndicators.toList)
   }
 
   /**
@@ -109,7 +119,7 @@ object SpreadsheetsFetcher extends Fetcher {
    */
   private def loadCountryInformation(uri: String, relativePath: Boolean) {
     val countryDao = new CountryDAOImpl(uri, relativePath)
-    countries = countryDao.getCountries
+    countries ++= countryDao.getCountries
   }
 
   /**
@@ -117,36 +127,32 @@ object SpreadsheetsFetcher extends Fetcher {
    */
   private def loadRegionInformation(is: InputStream) {
     val regionDao = new RegionDAOImpl(is)
-    regions = regionDao.getRegions
+    regions ++= regionDao.getRegions
   }
 
   private def loadProviderInformation(is: InputStream) {
     val providerDao = new ProviderDAOImpl(is)
-    providers = providerDao.getProviders
+    providers ++= providerDao.getProviders
   }
 
   //Obtain a country given it's name
-  def obtainCountry(regionName: String): Country = {
-    if (regionName == null || regionName.isEmpty()) {
-      logger.error("The name of the country cannot " +
-        "be null o empty")
+  def obtainCountry(regionName: String): Option[Country] = {
+    if (regionName == null || regionName.isEmpty) {
+      logger.error("The name of the country cannot be null o empty")
       throw new IllegalArgumentException("The name of the country cannot " +
         "be null o empty")
     }
-    var wiName: String = countryReconciliator.searchCountry(regionName)
-    countries.find(c => c.name.equals(wiName)).getOrElse({
-      logger.error("Not exist country with name " +
-        regionName)
-      throw new IllegalArgumentException("Not exist country with name " +
-        regionName)
-    })
+    countryReconciliator.searchCountry(regionName) match {
+      case Some(name) => countries.find(c => c.name.equals(name))
+      case None => None
+    }
   }
 
   //Obtain an indicator given it's name
   def obtainIndicator(indicatorName: String): Indicator = {
     val indicator = indicatorReconciliator.searchIndicator(indicatorName)
     if (indicator == null)
-      logger.info("Not exist indicator with name " + indicatorName)
+      logger.info(s"Not exist indicator with name ${indicatorName}")
     indicator
   }
 
@@ -157,7 +163,7 @@ object SpreadsheetsFetcher extends Fetcher {
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.id.equals(id))
       .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
-        "id " + id))
+        s"id ${id}"))
   }
 
   def obtainIndicatorByDescription(indicatorDescription: String): Indicator = {
@@ -165,23 +171,26 @@ object SpreadsheetsFetcher extends Fetcher {
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.comment.equalsIgnoreCase(indicatorDescription))
-      .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
-        "description " + indicatorDescription))
+      .getOrElse(throw new IllegalArgumentException("Not exist indicator with "
+        + s"description ${indicatorDescription}"))
   }
 
   //Obtain a component given it's id
   def obtainComponent(componentId: String): Component = {
-    components.find(component => component.id.equals(componentId)).getOrElse(throw new IllegalArgumentException("Not exist component " + componentId))
+    components.find(component => component.id.equals(componentId))
+      .getOrElse(throw new IllegalArgumentException("Not exist component " + componentId))
   }
 
   def getDatasets(): List[Dataset] = {
-    return datasets
+    return datasets.toList
   }
-  
+
+  def getDatasetById(id: String): Dataset = {
+    datasets.filter(_.id == id).head
+  }
+
   def getObservationsByStatus(status: ObservationStatus): List[Observation] = {
-    val results: ListBuffer[Observation] = new ListBuffer[Observation]
-    results.toList
-    
+    observations.filter(_.status == status).toList
   }
 
   def getComponentById(componentId: String): Component = {
@@ -189,5 +198,13 @@ object SpreadsheetsFetcher extends Fetcher {
       throw new IllegalArgumentException("There is no component with id " +
         componentId))
   }
+}
+
+object SpreadsheetsFetcher {
+
+  private val countryReconciliator =
+    new CountryReconciliator(Configuration.getCountryReconciliatorFile, true)
+
+  private val logger: Logger = Logger.getLogger(this.getClass())
 
 }

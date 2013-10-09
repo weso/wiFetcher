@@ -4,6 +4,7 @@ import java.io.InputStream
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 import org.apache.poi.hssf.util.CellReference
+import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
@@ -13,6 +14,7 @@ import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.RegionDAO
 import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.utils.POIUtils
 import org.apache.poi.ss.usermodel.FormulaEvaluator
 
@@ -24,12 +26,13 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator
  * excel file that follows the structure of 2012 Web Index. Maybe we have to
  * change the implementation
  */
-class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
+class RegionDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
+  extends RegionDAO with PoiDAO[Region] {
 
   import RegionDAOImpl._
 
   //A list with all regions  
-  private val regions: ListBuffer[Region] = new ListBuffer[Region]()
+  private val regions: ListBuffer[Region] = ListBuffer.empty
 
   load(is)
 
@@ -42,21 +45,21 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
   protected def load(is: InputStream) {
     val workbook = WorkbookFactory.create(is)
     //Obtain corresponding sheet
-    val sheet: Sheet = workbook.getSheet(SHEET_NAME)
+    val sheet: Sheet = workbook.getSheet(SheetName)
 
     if (sheet == null) {
-      logger.error("Not exist a sheet in the file specified" +
-        s" with the name '${SHEET_NAME}'")
-      throw new IllegalArgumentException("Not exist a sheet in the file " +
-        s"specified with the name '${SHEET_NAME}'")
+      IssueManagerUtils.addError(
+        message = new StringBuilder("The Regions Sheet ").append(SheetName)
+          .append(" does not exist").toString, path = XslxFile)
+    } else {
+      logger.info("Begin region extraction")
+      regions ++= parseData(workbook, sheet)
+      logger.info("Finish region extraction")
     }
-    regions ++= parseData(workbook, sheet)
-
-    logger.info("Finish region extraction")
   }
 
   protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Region] = {
-    val sheet: Sheet = workbook.getSheet(SHEET_NAME)
+    val sheet: Sheet = workbook.getSheet(SheetName)
     val cellReference = new CellReference(Configuration.getRegionInitialCell)
     logger.info("Begin extraction of region information")
 
@@ -75,10 +78,11 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
       //country in in the properties file
       countryName = POIUtils.extractCellValue(sheet.getRow(row).getCell(
         Configuration.getRegionCountryColumn), evaluator)
-        
-      country = SpreadsheetsFetcher.obtainCountry(countryName)
     } {
-      region.addCountry(country)
+      sFetcher.obtainCountry(countryName) match {
+        case Some(country) => region.addCountry(country)
+        case None => None
+      }
     }
     regions.values.toList
   }
@@ -90,7 +94,8 @@ class RegionDAOImpl(is: InputStream) extends RegionDAO with PoiDAO[Region] {
     regions.toList
   }
 
-  protected def loadRegions(sheet: Sheet, cellReference: CellReference, evaluator : FormulaEvaluator): Map[String, Region] = {
+  protected def loadRegions(sheet: Sheet, cellReference: CellReference,
+    evaluator: FormulaEvaluator): Map[String, Region] = {
     (for {
       row <- cellReference.getRow() to sheet.getLastRowNum()
       //Extract the name of the region. The column that contains the information
@@ -109,7 +114,9 @@ object RegionDAOImpl {
   /**
    * The name of the sheet that contains the information about regions
    */
-  private val SHEET_NAME = "Countries"
+  private val SheetName = "Countries"
+
+  private val XslxFile = Some("Structure File")
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
 }

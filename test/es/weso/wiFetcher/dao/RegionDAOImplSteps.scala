@@ -20,7 +20,7 @@ class RegionDAOImplSteps extends ScalaDsl with EN with Matchers{
   Given("""I want to load all information about regions$""") {() =>
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
-    val regionsDao : RegionDAO = new RegionDAOImpl(is)
+    val regionsDao : RegionDAO = new RegionDAOImpl(is)(null)
     regions = regionsDao.getRegions
   }
   

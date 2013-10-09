@@ -7,7 +7,7 @@ object ApplicationBuild extends Build {
 
   val AppName = "wiFetcher"
   val AppOrg = "es.weso"
-  val AppVersion = "1.1-SNAPSHOT"
+  val AppVersion = "1.1-M1-SNAPSHOT"
 
   val ScalaV = "2.10.2"
 
@@ -15,10 +15,11 @@ object ApplicationBuild extends Build {
    * Dependancies Versions
    */
   val ConfigV = "1.9"
-  val CountryV = "0.2.0-SNAPSHOT"
+  val CountryV = "0.3.0-SNAPSHOT"
   val CucumberV = "1.1.4"
   val JenaV = "2.10.1"
   val JunitV = "4.11"
+  val NScalaV = "0.6.0"
   val PoiV = "3.9"
   val SeleniumV = "2.35.0"
   val ScalatestV = "2.0.M8"
@@ -41,7 +42,8 @@ object ApplicationBuild extends Build {
     "info.cukes" %% "cucumber-scala" % CucumberV % "test",
 
     /*Scala Dependencies*/
-    "es.weso" %% "countryreconciliator" % CountryV,
+    "es.weso" % "countryreconciliator_2.10" % CountryV,
+    "com.github.nscala-time" %% "nscala-time" % NScalaV,
 
     /*Java Dependencies*/
     "commons-configuration" % "commons-configuration" % ConfigV,
@@ -64,5 +66,7 @@ object ApplicationBuild extends Build {
     
     /*Local Repositories*/
     resolvers += Resolver.url("Local Ivy Repository", url("file://" + Path.userHome.absolutePath + "/.ivy2/local/"))(Resolver.ivyStylePatterns),
-    resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository")
+    resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
+    
+    templatesImport += "controllers.FileUploadController._")
 }

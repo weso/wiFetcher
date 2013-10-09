@@ -20,35 +20,30 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
   var regionDao : RegionDAO = null
   var emptyDao : RegionDAO = null
   
-  override def beforeAll() {
-    SpreadsheetsFetcher.loadStructure(new File(
-        FileUtils.getFilePath("files/Structure0.4.xlsx", true)))
-  } 
-  
   before{
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure0.4.xlsx", 
         true))
-    regionDao = new RegionDAOImpl(is)
+    regionDao = new RegionDAOImpl(is)(null)
   }
 
   test("Try to load data from a non-existing file") {
     intercept[FileNotFoundException] {
       val is = new FileInputStream(FileUtils.getFilePath("", true))
-      new RegionDAOImpl(is)
+      new RegionDAOImpl(is)(null)
     }
   }
   
   test("Try to load data from null file") {
     intercept[IllegalArgumentException] {
       val is = new FileInputStream(FileUtils.getFilePath(null, true))
-      new RegionDAOImpl(is)
+      new RegionDAOImpl(is)(null)
     }
   }
   
   test("Load data correctly") {
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure0.4.xlsx", 
         true))
-    val regionDao = new RegionDAOImpl(is)
+    val regionDao = new RegionDAOImpl(is)(null)
     regionDao should not be null
     regionDao.getRegions.size should not be(0)
   }

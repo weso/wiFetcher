@@ -21,29 +21,29 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   before {
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
-    subIndexDao = new SubIndexDAOImpl(is)
+    subIndexDao = new SubIndexDAOImpl(is)(null)
     val is2 = new FileInputStream(FileUtils.getFilePath("files/empty.xlsx", 
         true))
-    emptyDao = new SubIndexDAOImpl(is2)
+    emptyDao = new SubIndexDAOImpl(is2)(null)
   }
 
   test("Try to load subindexes data from inexisting file") {
     intercept[FileNotFoundException] {
       val is = new FileInputStream(FileUtils.getFilePath("test.xlsx", true))
-      val subindexdao = new SubIndexDAOImpl(is) 
+      val subindexdao = new SubIndexDAOImpl(is)(null) 
     }
   }
   
   test("Try to load subindexes data from null path") {
     intercept[IllegalArgumentException] {
       val is = new FileInputStream(FileUtils.getFilePath(null, true))
-      val subindexdao = new SubIndexDAOImpl(is)
+      val subindexdao = new SubIndexDAOImpl(is)(null)
     }
   }
   
   test("Load all subindex data from correct excel file") {
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", true))
-    subIndexDao = new SubIndexDAOImpl(is)
+    subIndexDao = new SubIndexDAOImpl(is)(null)
     subIndexDao should not be (null)
     subIndexDao.getSubIndexes.size should not be (0)
     subIndexDao.getComponents.size should not be (0)

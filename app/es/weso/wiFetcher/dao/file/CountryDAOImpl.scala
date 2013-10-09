@@ -2,10 +2,10 @@ package es.weso.wiFetcher.dao.file
 
 import scala.collection.immutable.List
 import scala.io.Source
-
 import es.weso.wiFetcher.dao.CountryDAO
 import es.weso.wiFetcher.entities.Country
 import es.weso.wiFetcher.utils.FileUtils
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 
 /**
  * This class contains the implementation that allows to load all information
@@ -15,7 +15,7 @@ import es.weso.wiFetcher.utils.FileUtils
  * temporally, we use a TSV file that contains the minimum information about
  * countries. Their name, iso-2 code and iso-3 code.
  */
-class CountryDAOImpl(path: String, relativePath: Boolean)
+class CountryDAOImpl(path: String, relativePath: Boolean)(implicit val sFetcher: SpreadsheetsFetcher)
   extends CountryDAO with FileDAO[Country] {
 
   private val countries: List[Country] = load(FileUtils.getFilePath(path, relativePath))

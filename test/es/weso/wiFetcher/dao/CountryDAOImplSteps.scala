@@ -15,7 +15,7 @@ class CountryDAOImplSteps extends ScalaDsl with EN with Matchers{
   var result : Country = null
   
   Given("""^I want to load names and iso-codes for all countries presents in WebIndex$""") { () =>
-    countryDao = new CountryDAOImpl("files/countryCodes.tsv", true)
+    countryDao = new CountryDAOImpl("files/countryCodes.tsv", true)(null)
   }
   
   When("""^I check the country with the "([^"]*)" "([^"]*)"$""") { (comparator : String, value : String) =>

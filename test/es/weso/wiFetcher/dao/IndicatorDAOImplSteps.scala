@@ -21,7 +21,7 @@ class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
   Given("""^I want to load all information about indicators in the WebIndex$""") { () =>
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
-    indicatorDao = new IndicatorDAOImpl(is)
+    indicatorDao = new IndicatorDAOImpl(is)(null)
     indicators ++= indicatorDao.getPrimaryIndicators
     indicators ++= indicatorDao.getSecondaryIndicators
   }

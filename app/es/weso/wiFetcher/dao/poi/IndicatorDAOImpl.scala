@@ -1,10 +1,8 @@
 package es.weso.wiFetcher.dao.poi
 
 import java.io.InputStream
-
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
-
 import org.apache.poi.hssf.util.CellReference
 import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.Sheet
@@ -12,7 +10,6 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.IndicatorDAO
 import es.weso.wiFetcher.entities.Indicator
@@ -20,6 +17,7 @@ import es.weso.wiFetcher.entities.IndicatorHighLow
 import es.weso.wiFetcher.entities.IndicatorType
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.POIUtils
+import es.weso.wiFetcher.utils.IssueManagerUtils
 
 /**
  * This class contains the implementation that allows to load all information
@@ -29,7 +27,7 @@ import es.weso.wiFetcher.utils.POIUtils
  * excel file that follows the structure of 2012 Web Index. Maybe we have
  * to change the implementation
  */
-class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO 
+class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher) extends IndicatorDAO
   with PoiDAO[Indicator] {
 
   import IndicatorDAOImpl._
@@ -37,29 +35,14 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
   /**
    *  A list with all primary indicators of the Web Index
    */
-  private val primaryIndicators: ListBuffer[Indicator] =
-    new ListBuffer[Indicator]()
+  private val primaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
 
   /**
    * A list with all secondary indicators of the Web Index
    */
-  private val secondaryIndicators: ListBuffer[Indicator] =
-    new ListBuffer[Indicator]()
+  private val secondaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
 
   load(is)
-
-  protected def load(is: InputStream) {
-    val workbook = WorkbookFactory.create(is)
-    val indicators = parseData(workbook, extractSheet(null, workbook))
-    for (indicator <- indicators) {
-      indicator.indicatorType match {
-        case IndicatorType.Primary =>
-          primaryIndicators += indicator
-        case IndicatorType.Secondary =>
-          secondaryIndicators += indicator
-      }
-    }
-  }
 
   /**
    * This method returns a list with all primary indicators
@@ -73,6 +56,35 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
    */
   def getSecondaryIndicators(): List[Indicator] = {
     secondaryIndicators.toList
+  }
+
+  protected def load(is: InputStream) {
+    val workbook = WorkbookFactory.create(is)
+    extractSheet(null, workbook) match {
+      case Some(sheet) =>
+        val indicators = parseData(workbook, sheet)
+        for (indicator <- indicators) {
+          indicator.indicatorType match {
+            case IndicatorType.Primary =>
+              primaryIndicators += indicator
+            case IndicatorType.Secondary =>
+              secondaryIndicators += indicator
+          }
+        }
+      case _ =>
+    }
+  }
+
+  private def extractSheet(path: Option[String], workbook: Workbook): Option[Sheet] = {
+    //Obtain the sheet corresponding with indicators
+    val sheet: Sheet = workbook.getSheet(SheetName)
+
+    if (sheet == null) {
+      IssueManagerUtils.addError(
+        message = s"The Indicators Sheet ${SheetName} does not exist",
+        path = XslxFile)
+      None
+    } else Some(sheet)
   }
 
   protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Indicator] = {
@@ -106,6 +118,7 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
         Configuration.getIndicatorHLColumn), evaluator)
       component = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorComponentColumn), evaluator)
+      if(!id.isEmpty() && !component.isEmpty())
     } yield {
       createIndicator(id, iType, name, description, weight, hl, source,
         component, provider)
@@ -131,38 +144,31 @@ class IndicatorDAOImpl(is: InputStream) extends IndicatorDAO
    * low are preferred
    */
   def createIndicator(id: String, iType: String,
-    name: String, description: String, weight: String, hl: String, 
+    name: String, description: String, weight: String, hl: String,
     source: String, component: String, provider: String): Indicator = {
-
-    val componentObj = SpreadsheetsFetcher.obtainComponent(component)
+    val componentObj = sFetcher.obtainComponent(component)
     val indicator = Indicator(
       id, iType match {
-        case "Primary" => { IndicatorType.Primary }
-        case "Secondary" => { IndicatorType.Secondary }
-        case _ => throw new IllegalArgumentException(s"Indicator type '${iType}' is unknown")
+        case "Primary" => IndicatorType.Primary
+        case "Secondary" => IndicatorType.Secondary
+        case _ =>
+          IssueManagerUtils.addError(message = s"Indicator type '${iType}' is unknown",
+            path = XslxFile, sheetName = Some(SheetName), cell = Some(iType))
+          IndicatorType.Wrong
       },
       name, //lab,
       description, //comme,
       null, null, 0, weight.toDouble, hl match {
-        case "High" => { IndicatorHighLow.High }
-        case "Low" => { IndicatorHighLow.Low }
-        case _ => throw new IllegalArgumentException("Incorrect value for indicator property High/Low")
+        case "High" => IndicatorHighLow.High
+        case "Low" => IndicatorHighLow.Low
+        case _ =>
+          IssueManagerUtils.addError(message = s"Indicator HighLow '${iType}' is unknown",
+            path = XslxFile, sheetName = Some(SheetName), cell = Some(hl))
+          IndicatorHighLow.Wrong
       },
       source, componentObj, provider)
     componentObj.addIndicator(indicator)
     indicator
-  }
-
-  private def extractSheet(path: Option[String], workbook: Workbook): Sheet = {
-    //Obtain the sheet corresponding with indicators
-    val sheet: Sheet = workbook.getSheet(SheetName)
-    if (sheet == null) {
-      logger.error(s"Not exist a sheet in the file ${path.get} with the name "
-        + SheetName)
-      throw new IllegalArgumentException("Not exist a sheet in the file " +
-        s"'${path.get}' with the name '${SheetName}'")
-    }
-    sheet
   }
 
 }
@@ -173,6 +179,8 @@ object IndicatorDAOImpl {
    * The name of the sheet that contains all indicators data
    */
   private val SheetName: String = "Indicators"
+
+  private val XslxFile = Some("Structure File")
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
 

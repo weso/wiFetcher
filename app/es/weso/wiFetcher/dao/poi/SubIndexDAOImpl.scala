@@ -16,6 +16,8 @@ import es.weso.wiFetcher.dao.SubIndexDAO
 import es.weso.wiFetcher.entities.Entity
 import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.traits.SubIndex
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.utils.POIUtils
 
 /**
@@ -25,15 +27,15 @@ import es.weso.wiFetcher.utils.POIUtils
  * At the moment, the information is extracted from an excel file that follows
  * the structure of the 2012 Web Index. Maybe the implementation has to change
  */
-class SubIndexDAOImpl(is: InputStream) extends SubIndexDAO 
-  with PoiDAO[Entity] {
+class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
+  extends SubIndexDAO with PoiDAO[Entity] {
 
   import SubIndexDAOImpl._
 
   //A list with all components loaded
-  private val components: ListBuffer[Component] = new ListBuffer[Component]
+  private val components: ListBuffer[Component] = ListBuffer.empty
   //A list with all sub-indexes loaded
-  private val subIndexes: ListBuffer[SubIndex] = new ListBuffer[SubIndex]
+  private val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
 
   load(is)
 
@@ -46,15 +48,15 @@ class SubIndexDAOImpl(is: InputStream) extends SubIndexDAO
     val workbook = WorkbookFactory.create(is)
     //Obtain the corresponding sheet
     val sheet = workbook.getSheet(SheetName)
-
     if (sheet == null) {
-      logger.error("Sheet {} does not exist in the file specified", SheetName)
-      throw new IllegalArgumentException(s"Sheet ${SheetName} does not " +
-        "exist in the file specified")
+      IssueManagerUtils.addError(
+        message = new StringBuilder("The Subindex Sheet ").append(SheetName)
+        .append(" does not exist").toString, path = XslxFile)
+    } else {
+      val entities = parseData(workbook, sheet)
+      enchainEntities(entities)
+      logger.info("Finish extraction of sub-indexes and components")
     }
-    val entities = parseData(workbook, sheet)
-    enchainEntities(entities)
-    logger.info("Finish extraction of sub-indexes and components")
   }
 
   /**
@@ -105,13 +107,17 @@ class SubIndexDAOImpl(is: InputStream) extends SubIndexDAO
           case c: Component =>
             subIdex.addComponent(c)
             inner(subIdex, tail)
+          case _ =>
         }
         case _ =>
       }
     }
     entities.head match {
       case e: SubIndex => inner(e, entities.tail)
-      case _ => throw new IllegalArgumentException
+      case _ =>
+        IssueManagerUtils.addError(message = s"The head element is not a SubIndex",
+          path = XslxFile)
+        List.empty
     }
   }
   /**
@@ -129,7 +135,11 @@ class SubIndexDAOImpl(is: InputStream) extends SubIndexDAO
         createSubIndex(id, weight, name, description)
       case e if (e == ComponentType) =>
         createComponent(id, weight, name, description)
-      case _ => throw new IllegalArgumentException("Subindex-Type: Unknown")
+      case _ =>
+        IssueManagerUtils.addError(message = new StringBuilder("Unknown type '")
+        .append(eType).append(" in Structure Sheet").toString, path = XslxFile,
+          sheetName = Some(SheetName), cell = Some(eType))
+        createWrongEntity
     }
   }
 
@@ -165,6 +175,8 @@ class SubIndexDAOImpl(is: InputStream) extends SubIndexDAO
     component
   }
 
+  def createWrongEntity = Entity("wrong", "wrong", "wrong", 0)
+
   /**
    * This method returns a list with all components
    */
@@ -186,10 +198,11 @@ object SubIndexDAOImpl {
   /**
    * The name of the sheet that contains the information
    */
-  val SheetName = "Structure"
+  private val SheetName = "Structure"
+  private val XslxFile = Some("Structure File")
 
-  val SubindexType = "subindex"
-  val ComponentType = "component"
+  private val SubindexType = "subindex"
+  private val ComponentType = "component"
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
 }

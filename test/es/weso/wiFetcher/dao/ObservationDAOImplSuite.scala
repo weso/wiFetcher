@@ -18,35 +18,23 @@ import org.scalatest.BeforeAndAfterAll
 @RunWith(classOf[JUnitRunner])
 class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter 
 	with Matchers with BeforeAndAfterAll{
-
-  var observationDAO : ObservationDAO = null
-  var dataset1 : Dataset = null
-  var dataset2 : Dataset = null
-  
-  override def beforeAll() {
-    SpreadsheetsFetcher.loadStructure(new File(
-        FileUtils.getFilePath("files/Structure0.4.xlsx", true)))
-    SpreadsheetsFetcher.loadObservations(new File(
-	    FileUtils.getFilePath("files/Raw0.1.xlsx", true)))
-  }
-  
-  before {
-    dataset1 = Dataset("")
-    dataset2 = Dataset("")
-  }
   
   test("Try to load a non-existing spreadsheet") {
     intercept[FileNotFoundException]{
       val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/text.xlsx", true)))
-      observationDAO  = new ObservationDAOImpl(is)
+      val observationDAO  = new ObservationDAOImpl(is)(null)
     }
   }
   
   test("Load a correct and an existing spreadsheet") {
+    val fetcher = SpreadsheetsFetcher(
+        new File(FileUtils.getFilePath("files/structure.xlsx", true)),
+        new File(FileUtils.getFilePath("files/example.xlsx", true)))
     val is = new FileInputStream(new File(
-	    FileUtils.getFilePath("files/Raw0.1.xlsx", true)))
-    observationDAO = new ObservationDAOImpl(is)
+	    FileUtils.getFilePath("files/example.xlsx", true)))
+    val observationDAO = new ObservationDAOImpl(is)(fetcher)
+    observationDAO.getObservations.size should be (120)
   }
   
 }
