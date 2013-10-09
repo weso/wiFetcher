@@ -3,11 +3,8 @@ package es.weso.wiFetcher.fetchers
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
-
 import scala.collection.mutable.ListBuffer
-
 import org.apache.log4j.Logger
-
 import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
@@ -29,6 +26,7 @@ import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.traits.SubIndex
 import es.weso.wiFetcher.generator.ModelGenerator
+import es.weso.wiFetcher.utils.IssueManagerUtils
 
 
 case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
