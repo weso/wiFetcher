@@ -24,7 +24,7 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   Given("""^I want to load all information about subindexes in the WebIndex$""") {() => 
     
     subIndexDAO = new SubIndexDAOImpl(new FileInputStream(
-        FileUtils.getFilePath("files/Structure.xlsx", true)))(null)
+        FileUtils.getFilePath("files/structure.xlsx", true)))(null)
     subIndexDAO should not be (null)
   }
   
