@@ -27,7 +27,7 @@ import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.traits.SubIndex
 import es.weso.wiFetcher.generator.ModelGenerator
 import es.weso.wiFetcher.utils.IssueManagerUtils
-
+import es.weso.wiFetcher.utils.FilterIssue
 
 case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 
@@ -36,6 +36,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   private implicit val currentFetcher = this
 
   private val indicatorReconciliator = new IndicatorReconciliator
+  val issueManager = new IssueManagerUtils()
 
   val components: ListBuffer[Component] = ListBuffer.empty
   val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
@@ -50,7 +51,13 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   loadStructure(structure)
   loadObservations(raw)
 
-  def issues: Seq[Issue] = IssueManagerUtils.asSeq
+  def issues: Seq[Issue] = {
+    issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("MEAN")))
+    issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("SD")))
+    issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("OBSERVATIONS")))
+    issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("MEAN OF COUNTRIES WITH 5 YEARS DATA")))
+    issueManager.filteredAsSeq
+  }
 
   def storeAsTTL(baseUri: String, namespace:String, store: Boolean = false) =
     ModelGenerator(baseUri, namespace).generateJenaModel(this, store)

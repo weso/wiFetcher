@@ -19,7 +19,7 @@ import java.io.FileOutputStream
 import java.io.File
 import es.weso.wiFetcher.utils.IssueManagerUtils
 
-case class ModelGenerator(baseUri: String, namespace: String) {
+case class ModelGenerator(baseUri: String, namespace: String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
 
   val PrefixObs = new StringBuilder(baseUri)
@@ -27,7 +27,7 @@ case class ModelGenerator(baseUri: String, namespace: String) {
   val PrefixWiOnto = new StringBuilder(baseUri)
     .append(namespace).append("/ontology/").toString
   val PrefixWiOrg = new StringBuilder(baseUri)
-   .append(namespace).append("/organization/").toString
+    .append(namespace).append("/organization/").toString
   val PrefixCountry = new StringBuilder(baseUri)
     .append(namespace).append("/country/").toString
   val PrefixRegion = new StringBuilder(baseUri)
@@ -318,7 +318,7 @@ case class ModelGenerator(baseUri: String, namespace: String) {
           })
           datasetResource.addProperty(PropertyQbSlice, sliceResource)
         })
-      case None => IssueManagerUtils.addError(message = s"No observations for the dataset ${dataset.id}", path = Some("RAW File"))
+      case None => sFetcher.issueManager.addError(message = s"No observations for the dataset ${dataset.id}", path = Some("RAW File"))
     }
   }
 

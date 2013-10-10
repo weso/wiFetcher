@@ -49,7 +49,7 @@ class ObservationDAOImpl(
     val datasets = sFetcher.getDatasets
 
     if (datasets == null) {
-      IssueManagerUtils.addError(
+      sFetcher.issueManager.addError(
         message = "The datasets are not loaded. It is mandatory to load " +
           "the datasets in order to process the Observations",
         path = XslxFile)
@@ -63,7 +63,7 @@ class ObservationDAOImpl(
       } yield {
         println(dataset.id)
         if (sheet == null) {
-          IssueManagerUtils.addError(
+          sFetcher.issueManager.addError(
             message = s"The dataset ${dataset.id} are invalid or empty. It is mandatory to have data " +
               "within the datasets in order to process the Observations",
             path = XslxFile)
@@ -98,7 +98,7 @@ class ObservationDAOImpl(
       if {
         val ret = country.isDefined
         if (ret == false) {
-          IssueManagerUtils.addError(message = new StringBuilder("Country ")
+          sFetcher.issueManager.addError(message = new StringBuilder("Country ")
             .append(countryName).append(" is not defined").toString, path = XslxFile,
             sheetName = Some(sheet.getSheetName), col = Some(0), `row` = Some(row),
             cell = Some(countryName))
@@ -186,7 +186,7 @@ class ObservationDAOImpl(
       case "Weighted" => ObservationStatus.Weighted
       case "Ordered" => ObservationStatus.Ordered
       case _ =>
-        IssueManagerUtils.addError(message = "Observation status " +
+        sFetcher.issueManager.addError(message = "Observation status " +
           status + " is unknown", path = XslxFile)
         ObservationStatus.Wrong
     }
