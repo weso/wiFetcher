@@ -10,18 +10,23 @@ import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.utils.FileUtils
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import java.io.File
 
 @RunWith(classOf[JUnitRunner])
 class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
 
+  val fetcher : SpreadsheetsFetcher = SpreadsheetsFetcher(
+      new File(FileUtils.getFilePath("files/Structure0.4.xlsx", true)), 
+      new File(FileUtils.getFilePath("files/Raw0.3.xlsx", true)))
   var indicatorDao : IndicatorDAO = null
-  var indicators : ListBuffer[Indicator] = new ListBuffer[Indicator]()
+  val indicators : ListBuffer[Indicator] = ListBuffer.empty
   var result : Indicator = null
   
   Given("""^I want to load all information about indicators in the WebIndex$""") { () =>
-    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure0.4.xlsx", 
         true))
-    indicatorDao = new IndicatorDAOImpl(is)
+    indicatorDao = new IndicatorDAOImpl(is)(fetcher)
     indicators ++= indicatorDao.getPrimaryIndicators
     indicators ++= indicatorDao.getSecondaryIndicators
   }

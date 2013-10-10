@@ -6,8 +6,8 @@ Feature: Cucumber
   Scenario: Validate the data loading from indicators excel File
     
   	Given I want to load all information about indicators in the WebIndex
-  	When I check the indicator with "id" "FHA"
-    Then the indicator "name" should be "Political rights"
+  	When I check the indicator with "id" "FH A"
+    Then the indicator "type" should be "Secondary"
     
     Given I want to load all information about indicators in the WebIndex
     When I check the indicator with "name" "Information on jobs"
@@ -15,14 +15,14 @@ Feature: Cucumber
     
     Given I want to load all information about indicators in the WebIndex
     When I check the indicator with "name" "Information on jobs"  
-    Then the indicator "id" should not be "FHA" 
+    Then the indicator "id" should not be "FH A" 
     
     Given I want to load all information about indicators in the WebIndex
     When I check the indicator with "description" "Survey Question: How free is the press in your country? [1 = totally restricted; 7 = completely free]"
-    Then the indicator "id" should be "WEFC"  
+    Then the indicator "id" should be "WEF C"  
     
     Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "id" "WIKIA"
+    When I check the indicator with "id" "WIKI A"
     Then the indicator "type" should be "Secondary"
     
     Given I want to load all information about indicators in the WebIndex
@@ -30,9 +30,9 @@ Feature: Cucumber
     Then the indicator "weight" should be "1"
     
     Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "id" "RSFA"
+    When I check the indicator with "id" "RSF A"
     Then the indicator "source" should be "RSF"
     
     Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "id" "ITUA"
+    When I check the indicator with "id" "ITU A"
     Then the indicator "hl" should be "High"
