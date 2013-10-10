@@ -108,11 +108,11 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)(fetcher)
-    val before = IssueManagerUtils.asSeq.size
+    val before = fetcher.issueManager.asSeq.size
     indicatorDAO.createIndicator("test", "AAAA", "Test indicator", 
       "Test description", "0.5", "High", "Source", 
       "Q2", "provider")
-    val after = IssueManagerUtils.asSeq.size
+    val after = fetcher.issueManager.asSeq.size
     after should be (before + 1)
   }
   
@@ -120,11 +120,11 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)(fetcher)
-    val before = IssueManagerUtils.asSeq.size
+    val before = fetcher.issueManager.asSeq.size
     indicatorDAO.createIndicator("test", "Primary", "Test indicator", 
 	  "Test description", "0.5", "BBBB", "Source", 
       "Q2", "provider")
-    val after = IssueManagerUtils.asSeq.size
+    val after = fetcher.issueManager.asSeq.size
     after should be (before + 1)
   }  
 
