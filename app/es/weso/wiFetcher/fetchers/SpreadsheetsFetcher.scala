@@ -1,44 +1,42 @@
 package es.weso.wiFetcher.fetchers
 
-import scala.collection.mutable.ListBuffer
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 import scala.collection.mutable.ListBuffer
 import org.apache.log4j.Logger
+import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
-import es.weso.wiFetcher.dao.file.CountryDAOImpl
 import es.weso.wiFetcher.dao.entity.DatasetDAOImpl
+import es.weso.wiFetcher.dao.file.CountryDAOImpl
 import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
 import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
 import es.weso.wiFetcher.dao.poi.ProviderDAOImpl
 import es.weso.wiFetcher.dao.poi.RegionDAOImpl
 import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
-import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.Country
 import es.weso.wiFetcher.entities.Dataset
 import es.weso.wiFetcher.entities.Indicator
+import es.weso.wiFetcher.entities.issues._
 import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.entities.ObservationStatus.ObservationStatus
 import es.weso.wiFetcher.entities.Provider
 import es.weso.wiFetcher.entities.Region
+import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.traits.SubIndex
-import com.hp.hpl.jena.assembler.exceptions.NoImplementationException
-import es.weso.wiFetcher.utils.IssueManagerUtils
-import com.hp.hpl.jena.rdf.model.Model
 import es.weso.wiFetcher.generator.ModelGenerator
-import es.weso.reconciliator.CountryReconciliator
-import es.weso.wiFetcher.entities.issues.Issue
+import es.weso.wiFetcher.utils.IssueManagerUtils
+
 
 case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
-  
+
   import SpreadsheetsFetcher._
 
   private implicit val currentFetcher = this
-  
+
   private val indicatorReconciliator = new IndicatorReconciliator
-  
+
   val components: ListBuffer[Component] = ListBuffer.empty
   val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
   val primaryIndicators: ListBuffer[Indicator] = ListBuffer.empty
@@ -53,9 +51,9 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   loadObservations(raw)
 
   def issues: Seq[Issue] = IssueManagerUtils.asSeq
-    
-  def storeAsTTL(store:Boolean=false) = 
-    ModelGenerator.generateJenaModel(this,store)
+
+  def storeAsTTL(baseUri: String, namespace:String, store: Boolean = false) =
+    ModelGenerator(baseUri, namespace).generateJenaModel(this, store)
 
   /**
    * This method load all structure about Web Index information

@@ -1,44 +1,57 @@
 package controllers
 
 import java.io.File
+
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
-import play.api.mvc.Action
-import play.api.mvc.Controller
-import play.api.mvc.Request
-import es.weso.wiFetcher.entities.issues.Issue
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.Future
-import java.io.ByteArrayOutputStream
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.number
 import play.api.data.Forms.optional
+import play.api.data.Forms.text
+import play.api.data.validation.Constraints.max
+import play.api.data.validation.Constraints.min
+import play.api.data.validation.Constraints.nonEmpty
 import play.api.libs.Files.TemporaryFile
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.mvc.Action
+import play.api.mvc.Controller
 import play.api.mvc.MultipartFormData
+import play.api.mvc.Request
 
 object FileUploadController extends Controller {
 
-  case class FileForm(val store: Option[Int])
+  case class FileForm(val baseUri: String, val year: Int, val namespace: String, val store: Option[Int])
 
   val fileInputForm: Form[FileForm] = Form(
     mapping(
+      "base_uri" -> text.verifying(nonEmpty),
+      "year_uri" -> number.verifying(min(2001), max(2013)),
+      "namespace_uri" -> text.verifying(nonEmpty),
       "load_file" -> optional(number))(FileForm.apply)(FileForm.unapply))
 
   def byFileUploadGET() = Action {
     implicit request =>
-      Ok(views.html.file.structureFileGET())
+      Ok(views.html.file.upload(fileInputForm))
   }
 
   def byFileUploadPOST() = Action.async(parse.multipartFormData) {
     implicit request =>
       fileInputForm.bindFromRequest.fold(
-        errors => concurrentFuture("Structure file cannot be parsed! Upload it again"),
+        formWithErrors => scala.concurrent.Future {
+          Ok(views.html.file.upload(formWithErrors))
+        },
         fileInput => {
 
           val store = fileInput.store.getOrElse(0) != 0
           val structure = loadFile("structure_file")
           val observations = loadFile("observations_file")
 
+          val baseUri = if (fileInput.baseUri.endsWith("/"))
+            fileInput.baseUri.substring(0, fileInput.baseUri.length - 1)
+          else fileInput.baseUri
+
+          val uri = new StringBuilder(baseUri).append("/v")
+            .append(fileInput.year).append("/").toString
           structure match {
             case Some(s) => observations match {
               case Some(o) => {
@@ -47,7 +60,7 @@ object FileUploadController extends Controller {
                 }
                 future.map {
                   sf =>
-                    Ok(views.html.results.result(sf.storeAsTTL(store), sf.issues))
+                    Ok(views.html.results.result(sf.storeAsTTL(uri, fileInput.namespace), sf.issues))
                 }
               }
               case _ => concurrentFuture("Onservations file cannot be parsed! Upload it again")

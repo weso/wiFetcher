@@ -27,8 +27,8 @@ import es.weso.wiFetcher.utils.POIUtils
  * At the moment, the information is extracted from an excel file that follows
  * the structure of the 2012 Web Index. Maybe the implementation has to change
  */
-class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher) extends SubIndexDAO
-  with PoiDAO[Entity] {
+class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
+  extends SubIndexDAO with PoiDAO[Entity] {
 
   import SubIndexDAOImpl._
 
@@ -50,8 +50,8 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
     val sheet = workbook.getSheet(SheetName)
     if (sheet == null) {
       IssueManagerUtils.addError(
-        message = s"The Subindex Sheet ${SheetName} does not exist",
-        path = XslxFile)
+        message = new StringBuilder("The Subindex Sheet ").append(SheetName)
+        .append(" does not exist").toString, path = XslxFile)
     } else {
       val entities = parseData(workbook, sheet)
       enchainEntities(entities)
@@ -136,8 +136,8 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
       case e if (e == ComponentType) =>
         createComponent(id, weight, name, description)
       case _ =>
-        IssueManagerUtils.addError(message = s"Unknown type '${eType}'"
-          + " in Structure Sheet", path = XslxFile,
+        IssueManagerUtils.addError(message = new StringBuilder("Unknown type '")
+        .append(eType).append(" in Structure Sheet").toString, path = XslxFile,
           sheetName = Some(SheetName), cell = Some(eType))
         createWrongEntity
     }
