@@ -1,6 +1,18 @@
-@(path : String, issues : Seq[es.weso.wiFetcher.entities.issues.Issue])
+@(path : String, issues : Seq[Issue])
 
-@import es.weso.wiFetcher.entities.issues._
+@printIssues(name:String, issues : Seq[Issue])={
+		@for(issue <- issues){
+			<tr>
+				<td>@name</td>
+				<td>@issue.message</td>
+				<td>@issue.path.getOrElse("-")</td>
+				<td>@issue.sheetName.getOrElse("-")</td>
+				<td>@issue.col.getOrElse("-")</td>
+				<td>@issue.row.getOrElse("-")</td>
+				<td>@issue.cell.getOrElse("-")</td>
+			</tr>
+		}
+}
 
 @main("Report") {
 <div id="results_container">
@@ -13,7 +25,6 @@
 				<tr>
 					<th>Type</th>
 					<th>Message</th>
-					<th>Dataset</th>
 					<th>File</th>
 					<th>Sheet Name</th>
 					<th>Column</th>
@@ -25,7 +36,6 @@
 				<tr>
 					<th>Type</th>
 					<th>Message</th>
-					<th>Dataset</th>
 					<th>File</th>
 					<th>Sheet Name</th>
 					<th>Column</th>
@@ -33,30 +43,11 @@
 					<th>Cell</th>
 				</tr>
 			</tfoot>
-		@for(issue <- issues.filter(_.isInstanceOf[Error])){
-			<tr>
-				<td>Error</td>
-				<td>@issue.message</td>
-				<td>@issue.dataset.getOrElse("-")</td>
-				<td>@issue.path.getOrElse("-")</td>
-				<td>@issue.sheetName.getOrElse("-")</td>
-				<td>@issue.col.getOrElse("-")</td>
-				<td>@issue.row.getOrElse("-")</td>
-				<td>@issue.cell.getOrElse("-")</td>
-			</tr>
-		}
-		@for(issue <- issues.filter(_.isInstanceOf[Warn])){
-			<tr>
-				<td>Warn</td>
-				<td>@issue.message</td>
-				<td>@issue.dataset.getOrElse("-")</td>
-				<td>@issue.path.getOrElse("-")</td>
-				<td>@issue.sheetName.getOrElse("-")</td>
-				<td>@issue.col.getOrElse("-")</td>
-				<td>@issue.row.getOrElse("-")</td>
-				<td>@issue.cell.getOrElse("-")</td>
-			</tr>
-		}
+			<tbody>
+				@printIssues("Error", issues.filter(_.isInstanceOf[Error]))
+				@printIssues("Warn", issues.filter(_.isInstanceOf[Warn]))
+			</tbody>
+		</table>
 	</div>
 </div>
 }

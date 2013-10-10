@@ -7,7 +7,6 @@ import org.slf4j.Logger
 
 case class FilterIssue(
   val message: Option[String] = None,
-  val dataset: Option[String] = None,
   val path: Option[String] = None,
   val sheetName: Option[String] = None,
   val col: Option[Int] = None,
@@ -15,20 +14,18 @@ case class FilterIssue(
   val cell: Option[String] = None) {
 
   def filter(issue: Issue): Boolean = {
-    if (dataset.isDefined && ((dataset == issue.dataset) == false))
+    if (message.isDefined && ((message == issue.message) == false))
       return false
     if (path.isDefined && ((path == issue.path) == false))
       return false
     if (sheetName.isDefined && ((sheetName == issue.sheetName) == false))
       return false
-    if (col.isDefined)
-      if ((col == issue.col) == false)
-        return false
+    if (col.isDefined && ((col == issue.col) == false))
+      return false
     if (row.isDefined && ((row == issue.row) == false))
       return false
-    if (cell.isDefined)
-      if ((cell == issue.cell) == false)
-        return false
+    if (cell.isDefined && ((cell == issue.cell) == false))
+      return false
     true
   }
 }
@@ -57,37 +54,21 @@ class IssueManagerUtils() {
     filters += filter
   }
 
-  def addError(message: String, dataset: Option[String] = None,
-    path: Option[String] = None, sheetName: Option[String] = None,
-    col: Option[Int] = None, row: Option[Int] = None,
-    cell: Option[String] = None): Unit = {
+  def addError(message: String, path: Option[String] = None,
+    sheetName: Option[String] = None, col: Option[Int] = None,
+    row: Option[Int] = None, cell: Option[String] = None): Unit = {
 
     logger.error(message)
-    issues += Error(
-      message,
-      dataset,
-      path,
-      sheetName,
-      col,
-      row,
-      cell)
+    issues += Error(message, path, sheetName, col, row, cell)
 
   }
 
-  def addWarn(message: String, dataset: Option[String] = None,
-    path: Option[String] = None, sheetName: Option[String] = None,
-    col: Option[Int] = None, row: Option[Int] = None,
-    cell: Option[String] = None): Unit = {
+  def addWarn(message: String, path: Option[String] = None,
+    sheetName: Option[String] = None, col: Option[Int] = None,
+    row: Option[Int] = None, cell: Option[String] = None): Unit = {
 
     logger.info(message)
-    Warn(
-      message,
-      dataset,
-      path,
-      sheetName,
-      col,
-      row,
-      cell)
+    Warn(message, path, sheetName, col, row, cell)
 
   }
 
@@ -99,9 +80,14 @@ class IssueManagerUtils() {
     } yield {
       issue
     }
+    val finalIssues = for (issue <- issues) yield {
+      if (filteredIssues.contains(issue)) {
+        Warn(issue.message, issue.path, issue.sheetName,
+          issue.col, issue.row, issue.cell)
+      } else issue
+    }
 
-    issues.filterNot(filteredIssues.contains _).toList
-
+    finalIssues.toList
   }
 
   def asSeq: List[Issue] = issues.toList

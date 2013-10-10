@@ -41,7 +41,6 @@ object FileUploadController extends Controller {
           Ok(views.html.file.upload(formWithErrors))
         },
         fileInput => {
-
           val store = fileInput.store.getOrElse(0) != 0
           val structure = loadFile("structure_file")
           val observations = loadFile("observations_file")
