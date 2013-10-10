@@ -1,10 +1,8 @@
 package es.weso.wiFetcher.dao.poi
 
 import java.io.InputStream
-
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
-
 import org.apache.poi.hssf.util.CellReference
 import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.Sheet
@@ -12,13 +10,13 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.RegionDAO
 import es.weso.wiFetcher.entities.Region
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.utils.POIUtils
+import org.apache.poi.ss.usermodel.FormulaEvaluator
 
 /**
  * This class contains the implementation that allows to load all information
@@ -50,9 +48,9 @@ class RegionDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
     val sheet: Sheet = workbook.getSheet(SheetName)
 
     if (sheet == null) {
-      IssueManagerUtils.addError(
+      sFetcher.issueManager.addError(
         message = new StringBuilder("The Regions Sheet ").append(SheetName)
-          .append(" does not exist").toString, path = XslxFile)
+          .append(" does not exist").toString, path = XslxFile, sheetName = Some(SheetName))
     } else {
       logger.info("Begin region extraction")
       regions ++= parseData(workbook, sheet)

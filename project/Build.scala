@@ -68,5 +68,6 @@ object ApplicationBuild extends Build {
     resolvers += Resolver.url("Local Ivy Repository", url("file://" + Path.userHome.absolutePath + "/.ivy2/local/"))(Resolver.ivyStylePatterns),
     resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
     
+    templatesImport += "es.weso.wiFetcher.entities.issues._",
     templatesImport += "controllers.FileUploadController._")
 }

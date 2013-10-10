@@ -10,6 +10,7 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.FileUtils
 import java.io.FileInputStream
 import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
+import java.io.File
 
 @RunWith(classOf[JUnitRunner])
 class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter 
@@ -17,33 +18,36 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   
   var subIndexDao : SubIndexDAO = null
   var emptyDao : SubIndexDAO = null
+  val fetcher : SpreadsheetsFetcher = SpreadsheetsFetcher(
+      new File(FileUtils.getFilePath("files/structure.xlsx", true)),
+      new File(FileUtils.getFilePath("files/example.xlsx", true)))
   
   before {
-    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
         true))
-    subIndexDao = new SubIndexDAOImpl(is)
+    subIndexDao = new SubIndexDAOImpl(is)(fetcher)
     val is2 = new FileInputStream(FileUtils.getFilePath("files/empty.xlsx", 
         true))
-    emptyDao = new SubIndexDAOImpl(is2)
+    emptyDao = new SubIndexDAOImpl(is2)(fetcher)
   }
 
   test("Try to load subindexes data from inexisting file") {
     intercept[FileNotFoundException] {
       val is = new FileInputStream(FileUtils.getFilePath("test.xlsx", true))
-      val subindexdao = new SubIndexDAOImpl(is) 
+      val subindexdao = new SubIndexDAOImpl(is)(fetcher) 
     }
   }
   
   test("Try to load subindexes data from null path") {
     intercept[IllegalArgumentException] {
       val is = new FileInputStream(FileUtils.getFilePath(null, true))
-      val subindexdao = new SubIndexDAOImpl(is)
+      val subindexdao = new SubIndexDAOImpl(is)(fetcher)
     }
   }
   
   test("Load all subindex data from correct excel file") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", true))
-    subIndexDao = new SubIndexDAOImpl(is)
+    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", true))
+    subIndexDao = new SubIndexDAOImpl(is)(fetcher)
     subIndexDao should not be (null)
     subIndexDao.getSubIndexes.size should not be (0)
     subIndexDao.getComponents.size should not be (0)
@@ -51,12 +55,12 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   
   test("Obtain all subindexes") {
     subIndexDao.getSubIndexes should not be (null)
-    subIndexDao.getSubIndexes.size should be (7)
+    subIndexDao.getSubIndexes.size should be (2)
   }
   
   test("Obtain all components") {
     subIndexDao.getComponents should not be (null)
-    subIndexDao.getComponents.size should be (11)
+    subIndexDao.getComponents.size should be (4)
   }
   
   test("Obtain subindexes from empty excel file") {
@@ -71,20 +75,19 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   
   test("Validate components by subindexes") {
     subIndexDao.getSubIndexes.foreach(subindex => {
+      println(subindex.getComponents)
       subindex.id match {
         case "Readiness" => subindex.getComponents.size should be (2)
         case "TheWeb" => subindex.getComponents.size should be (2)
         case "Impact" => subindex.getComponents.size should be (3)
-        case "AB" => subindex.getComponents.size should be (1)
-        case "C" => subindex.getComponents.size should be (1)
-        case "DQ1" => subindex.getComponents.size should be (1)
-        case "Q2" => subindex.getComponents.size should be (1)
+        case "ABQ2" => subindex.getComponents.size should be (2)
+        case "CDQ1" => subindex.getComponents.size should be (2)
       }
     })
   }
   
   test("Validate indicators by components") {
-    /*SpreadsheetsFetcher.components.foreach(component => {
+    fetcher.components.foreach(component => {
       component.id match {
         case "CommunicationsInfrastructure" => component.getIndicators.size should be (13)
         case "InstitutionalInfrastructure" => component.getIndicators.size should be (24)
@@ -93,10 +96,11 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
         case "Social" => component.getIndicators.size should be (5)
         case "Economic" => component.getIndicators.size should be (8)
         case "Political" => component.getIndicators.size should be (4)
-        case "ABQ2" => component.getIndicators.size should be (3)
-        case "CDQ1" => component.getIndicators.size should be (3)
+        case "AB" => component.getIndicators.size should be (2)
+        case "Q2" => component.getIndicators.size should be (1)
+        case "C" => component.getIndicators.size should be (1)
+        case "DQ1" => component.getIndicators.size should be (2)
       }
-    })*/
-    throw new Exception("Incomplete test")
+    })
   }
 }

@@ -24,7 +24,7 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   Given("""^I want to load all information about subindexes in the WebIndex$""") {() => 
     
     subIndexDAO = new SubIndexDAOImpl(new FileInputStream(
-        FileUtils.getFilePath("files/Structure.xlsx", true)))
+        FileUtils.getFilePath("files/structure.xlsx", true)))(null)
     subIndexDAO should not be (null)
   }
   
@@ -48,7 +48,7 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   }
   
   When("""^I check the number of indicators of component "([^"]*)"$""") {(component : String) =>
-    this.component = SpreadsheetsFetcher.getComponentById(component)
+    this.component = null
   }
   
   When("""^I check the component with "([^"]*)" "([^"]*)"$""") { (property : String, value : String) =>

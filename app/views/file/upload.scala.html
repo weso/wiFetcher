@@ -4,7 +4,9 @@
 <div id="frontforms">
 	
 	<div>
-		@helper.form(action = routes.FileUploadController.byFileUploadPOST, 'enctype -> "multipart/form-data") {
+		@helper.form(action = routes.FileUploadController.byFileUploadPOST, 
+			'enctype -> "multipart/form-data", 
+			'oninput->"uri.value = base_uri.value + '/v' + year_uri.value + '/' + namespace_uri.value") {
 			<div class="">
 		      	<p class="instructions">
 		      		<label title="Choose a Local File to Upload and load Web Index structure" for="structure_file">Structure file:</label>
@@ -18,25 +20,39 @@
 		      	</p>
 	      	</div>
 	      	<hr/>
+	      	<p class="instructions">
+	      		<label for="uri">Namespace:</label>
+	      		<output name="uri"></output>
+	      	</p>
 			@fileForm.forField("base_uri"){value =>
 				<p class="instructions @if(value.hasErrors){error}">
 					<label for="base_uri">Base Uri:</label>
 					<span class="message">@for(error<-value.errors){@Messages(error.message,error.args: _*)}</span>
-					<input type="url" id="base_uri" name="base_uri" value="@value.value"/>
+					<input list="base_uri" type="url" name="base_uri" value="@value.value"/>
+					<datalist id="base_uri">
+						<option>http://data.webfoundation.org</option>
+					</datalist>
 				</p>
 			}
 			@fileForm.forField("year_uri"){value =>
 				<p class="instructions @if(value.hasErrors){error}">
 					<label for="year_uri">Year:</label>
 					<span class="message">@for(error<-value.errors){@Messages(error.message,error.args: _*)}</span>
-					<input type="number" id="year_uri" name="year_uri" value="@value.value"/>
+					<input list="year_uri" type="number" name="year_uri" value="@value.value"/>
+					<datalist id="year_uri">
+					@for(year <- 2001 to 2013){<option value="@year">}
+					</datalist>
 				</p>
 				}
 			@fileForm.forField("namespace_uri"){value =>
 				<p class="instructions @if(value.hasErrors){error}">
 					<label for="namespace_uri">NameSpace:</label>
 					<span class="message">@for(error<-value.errors){@Messages(error.message,error.args: _*)}</span>
-					<input type="text" id="namespace_uri" name="namespace_uri" value="@value.value"/>
+					<input list="namespace_uri" type="text" name="namespace_uri" value="@value.value"/>
+					<datalist id="namespace_uri">
+					   <option value="webindex">
+					   <option value="odb">
+					</datalist>
 				</p>
 			}
 	      	<p class="instructions">
