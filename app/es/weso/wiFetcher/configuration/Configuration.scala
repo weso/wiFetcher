@@ -167,6 +167,18 @@ object Configuration {
   def getVirtuosoPass() : String = {
     Config.getString("virt_pass")
   }
+  
+  def getInicialCellPrimaryIndicator() : String = {
+    Config.getString("initial_cell_primary_indicator")
+  }
+  
+  def getPrimaryIndicatorRow() : Int = {
+    Config.getInt("primary_indicator_row")
+  }
+  
+  def getPrimaryIndicatorLastCol() : Int = {
+    Config.getInt("primary_indicator_last_col")
+  }
 
   def loadConfigure() = {
     val config = new CompositeConfiguration

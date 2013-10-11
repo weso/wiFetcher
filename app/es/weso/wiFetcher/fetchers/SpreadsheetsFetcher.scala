@@ -11,7 +11,7 @@ import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.entity.DatasetDAOImpl
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
 import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
-import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
+import es.weso.wiFetcher.dao.poi.SecondaryObservationDAOImpl
 import es.weso.wiFetcher.dao.poi.ProviderDAOImpl
 import es.weso.wiFetcher.dao.poi.RegionDAOImpl
 import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
@@ -28,6 +28,7 @@ import es.weso.wiFetcher.entities.traits.SubIndex
 import es.weso.wiFetcher.generator.ModelGenerator
 import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.utils.FilterIssue
+import es.weso.wiFetcher.dao.poi.PrimaryObservationDAOImpl
 
 case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 
@@ -53,7 +54,9 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 
   def issues: Seq[Issue] = {
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("MEAN")))
+    issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("Mean")))
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("SD")))
+    issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("s.d.")))
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("OBSERVATIONS")))
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("MEAN OF COUNTRIES WITH 5 YEARS DATA")))
     issueManager.filteredAsSeq
@@ -78,7 +81,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
    * This method load all observation form an excel file
    */
   private def loadObservations(f: File) {
-    safeLoadInformation(f, loadObservationInformation)
+    safeLoadInformation(f, loadSecondaryObservationInformation)
+    safeLoadInformation(f, loadPrimaryObservationInformation)
   }
 
   private def loadDatasetInformation(indicators: List[Indicator]) {
@@ -86,9 +90,14 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     datasets ++= datasetDao.getDatasets
   }
 
-  private def loadObservationInformation(is: InputStream) {
-    val observationDao = new ObservationDAOImpl(is)
-    observations ++= observationDao.getObservations
+  private def loadPrimaryObservationInformation(is : InputStream) {
+    val primaryObservationDao = new PrimaryObservationDAOImpl(is)
+    observations ++= primaryObservationDao.getObservations
+  }
+ 
+  private def loadSecondaryObservationInformation(is: InputStream) {
+    val secondaryObservationDao = new SecondaryObservationDAOImpl(is)
+    observations ++= secondaryObservationDao.getObservations
   }
 
   private def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
@@ -144,6 +153,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 
   //Obtain a country given it's name
   def obtainCountry(regionName: String): Option[Country] = {
+    logger.info("Obtaining country with name: " + regionName)
     if (regionName == null || regionName.isEmpty) {
       logger.error("The name of the country cannot be null o empty")
       throw new IllegalArgumentException("The name of the country cannot " +
@@ -156,7 +166,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
 
   //Obtain an indicator given it's name
-  def obtainIndicator(indicatorName: String): Indicator = {
+  def obtainIndicator(indicatorName: String): Option[Indicator] = {
     val indicator = indicatorReconciliator.searchIndicator(indicatorName)
     if (indicator == null)
       logger.info(s"Not exist indicator with name ${indicatorName}")
@@ -164,13 +174,11 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
 
   //Obtain an indicator given it's id
-  def obtainIndicatorById(id: String): Indicator = {
+  def obtainIndicatorById(id: String): Option[Indicator] = {
     val combined: ListBuffer[Indicator] = new ListBuffer
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.id.equals(id))
-      .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
-        s"id ${id}"))
   }
 
   def obtainIndicatorByDescription(indicatorDescription: String): Indicator = {
