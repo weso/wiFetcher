@@ -106,10 +106,10 @@ class ObservationDAOImpl(
         ret
       }
       //We have to iterate throw the excel file
-      col <- initialCell.getCol() to sheet.getRow(initialCell.getRow()).getLastCellNum() - 1
+      col <- initialCell.getCol() to sheet.getRow(0).getLastCellNum() - 1
       year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
         .getCell(col), evaluator)
-      if (!year.isEmpty())
+      //if (!year.isEmpty())
     } yield {
       val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
       //Create the observation with the extracted data

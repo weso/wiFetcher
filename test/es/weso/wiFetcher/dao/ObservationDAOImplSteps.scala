@@ -13,7 +13,6 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
 
-@RunWith(classOf[JUnitRunner])
 class ObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var observationDAO : ObservationDAO = null

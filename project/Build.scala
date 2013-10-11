@@ -22,7 +22,7 @@ object ApplicationBuild extends Build {
   val NScalaV = "0.6.0"
   val PoiV = "3.9"
   val SeleniumV = "2.35.0"
-  val ScalatestV = "2.0.M8"
+  val ScalatestV = "2.0.RC1"
   val LuceneV = "4.0.0"
   val TypeConfigV = "1.0.1"
 
@@ -58,7 +58,6 @@ object ApplicationBuild extends Build {
   val main = play.Project(AppName, AppVersion, appDependencies).settings(
 
     scalaVersion := ScalaV,
-    
     /*Extern Repositories*/
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Typesafe snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
