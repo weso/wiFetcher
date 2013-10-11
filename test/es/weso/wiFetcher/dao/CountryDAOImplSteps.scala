@@ -8,7 +8,6 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
 
-@RunWith(classOf[JUnitRunner])
 class CountryDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var countryDao : CountryDAO = null

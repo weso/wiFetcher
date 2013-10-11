@@ -12,7 +12,6 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
 
-@RunWith(classOf[JUnitRunner])
 class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var subIndexDAO : SubIndexDAO = null

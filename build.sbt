@@ -2,7 +2,7 @@ name:="wiFetcher"
 
 organization:="es.weso"
 
-seq(cucumberSettingsWithTestPhaseIntegration : _*)
+seq(cucumberSettings : _*)
 
 cucumberMaxMemory := "1024M"
 

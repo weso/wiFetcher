@@ -39,7 +39,7 @@ class SpreadsheetsFetcherSuite extends FunSuite with BeforeAndAfter
     val totalIndicators = fetcher.primaryIndicators.size + 
     	fetcher.secondaryIndicators.size
 	totalIndicators should be (indicators)
-    val obsByDataset = fetcher.observations.groupBy(observation => observation.dataset)
+    val obsByDataset = fetcher.observations.groupBy(observation => observation.dataset.id)
     fetcher.datasets.foreach(dataset => {
       obsByDataset.get(dataset.id).isEmpty should be (false)
     })

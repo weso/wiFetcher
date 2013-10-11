@@ -13,7 +13,6 @@ import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import java.io.File
 
-@RunWith(classOf[JUnitRunner])
 class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
 
   val fetcher : SpreadsheetsFetcher = SpreadsheetsFetcher(
