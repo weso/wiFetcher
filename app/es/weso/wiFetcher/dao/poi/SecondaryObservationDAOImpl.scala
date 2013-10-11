@@ -34,11 +34,11 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
  * Maybe the implementation has to change.
  *
  */
-class ObservationDAOImpl(
+class SecondaryObservationDAOImpl(
   is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
   extends ObservationDAO with PoiDAO[Observation] {
 
-  import ObservationDAOImpl._
+  import SecondaryObservationDAOImpl._
 
   private val observations: ListBuffer[Observation] = ListBuffer.empty
 
@@ -76,7 +76,7 @@ class ObservationDAOImpl(
   }
 
   protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Observation] = {
-    ObservationDAOImpl.logger.info("Begin observations extraction")
+    SecondaryObservationDAOImpl.logger.info("Begin observations extraction")
 
     //Obtain the initial cell of observation from properties file
     val initialCell = new CellRef(Configuration.getInitialCellSecondaryObservation)
@@ -107,39 +107,17 @@ class ObservationDAOImpl(
       }
       //We have to iterate throw the excel file
       col <- initialCell.getCol() to sheet.getRow(0).getLastCellNum() - 1
-      year = POIUtils.extractCellValue(sheet.getRow(initialCell.getRow() - 1)
+      year = POIUtils.extractNumericCellValue(sheet.getRow(initialCell.getRow() - 1)
         .getCell(col), evaluator)
-      //if (!year.isEmpty())
+      if (year != -1)
     } yield {
       val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
         country.get.iso3Code + " " + year + " " + indicator.id + " " + value)
       createObservation(dataset, "", country.get, null,
-        indicator, year.toDouble, value, status)
+        indicator, year.toDouble, value, status, XslxFile)
     }
-  }
-
-  /**
-   * This method has to extract the name of the country corresponding to the
-   * observation.
-   * @param sheet The sheet that contains all observation of a dataset
-   * @param dataset A dataset corresponds to the excel sheet from we have to
-   * extract the country name
-   * @param column The column corresponds to an observation
-   * @param row The row corresponds to an observation
-   * @param initialCell The initial cell of the observations
-   * @return A country corresponds to an observations
-   */
-  def obtainCountry(countryName: String): Option[Country] = {
-    logger.info("Obtaining country with name: " + countryName)
-    //Ask to SpreadsheetFetcher for the country accord to the Web Index name
-    val country = sFetcher.obtainCountry(countryName)
-    country match {
-      case Some(c) => ""
-      case None => "foo"
-    }
-    country
   }
 
   /**
@@ -159,49 +137,6 @@ class ObservationDAOImpl(
     sFetcher.obtainIndicator(indicatorName)
   }
 
-  /**
-   * This method has to create an observation
-   * @param dataset The dataset corresponds to an observation
-   * @param label
-   * @param area The area that refers the observation
-   * @param computation
-   * @param indicator The indicator measured at the observations
-   * @param year The year of the observation
-   * @param value The value of the observation
-   * @param status The status of the observation
-   */
-  def createObservation(dataset: Dataset, label: String, area: Area,
-    computation: Computation, indicator: Indicator, year: Double,
-    value: Double, status: String): Observation = {
-
-    val tmpStatus = if (value == -1)
-      ObservationStatus.Missed
-    else status match {
-      case "Raw" => ObservationStatus.Raw
-      case "Imputed" => ObservationStatus.Imputed
-      case "Normalised" => ObservationStatus.Normalised
-      case "Missed" => ObservationStatus.Missed
-      case "Sorted" => ObservationStatus.Sorted
-      case "Adjusted" => ObservationStatus.Adjusted
-      case "Weighted" => ObservationStatus.Weighted
-      case "Ordered" => ObservationStatus.Ordered
-      case _ =>
-        sFetcher.issueManager.addError(message = "Observation status " +
-          status + " is unknown", path = XslxFile)
-        ObservationStatus.Wrong
-    }
-
-    Observation(
-      dataset,
-      label,
-      area,
-      computation,
-      indicator,
-      year.toInt,
-      value,
-      tmpStatus)
-
-  }
   //
   //  /**
   //   * This method has to extract the status of the observations
@@ -222,7 +157,7 @@ class ObservationDAOImpl(
 
 }
 
-object ObservationDAOImpl {
+object SecondaryObservationDAOImpl {
 
   private val logger: Logger = Logger.getLogger(this.getClass)
 

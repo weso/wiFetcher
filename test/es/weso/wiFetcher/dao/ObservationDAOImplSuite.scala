@@ -11,19 +11,19 @@ import es.weso.wiFetcher.entities.Dataset
 import java.io.FileInputStream
 import java.io.File
 import es.weso.wiFetcher.utils.FileUtils
-import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
+import es.weso.wiFetcher.dao.poi.SecondaryObservationDAOImpl
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import org.scalatest.BeforeAndAfterAll
 
 @RunWith(classOf[JUnitRunner])
-class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter 
+class SecondaryObservationDAOImplSuite extends FunSuite with BeforeAndAfter 
 	with Matchers with BeforeAndAfterAll{
   
   test("Try to load a non-existing spreadsheet") {
     intercept[FileNotFoundException]{
       val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/text.xlsx", true)))
-      val observationDAO  = new ObservationDAOImpl(is)(null)
+      val observationDAO  = new SecondaryObservationDAOImpl(is)(null)
     }
   }
   
@@ -33,7 +33,7 @@ class ObservationDAOImplSuite extends FunSuite with BeforeAndAfter
         new File(FileUtils.getFilePath("files/example.xlsx", true)))
     val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/example.xlsx", true)))
-    val observationDAO = new ObservationDAOImpl(is)(fetcher)
+    val observationDAO = new SecondaryObservationDAOImpl(is)(fetcher)
     observationDAO.getObservations.size should be (120)
   }
   

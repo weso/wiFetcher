@@ -11,9 +11,9 @@ import java.io.File
 import es.weso.wiFetcher.utils.FileUtils
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import es.weso.wiFetcher.dao.poi.ObservationDAOImpl
+import es.weso.wiFetcher.dao.poi.SecondaryObservationDAOImpl
 
-class ObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
+class SecondaryObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var observationDAO : ObservationDAO = null
   var observations : List[Observation] = null
@@ -23,7 +23,7 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
 	val dataset : Dataset = Dataset(datast)
 	val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
-	observationDAO = new ObservationDAOImpl(is)(null)
+	observationDAO = new SecondaryObservationDAOImpl(is)(null)
   } 
   
   Given("""^I want to load the observations of non-existing dataset "([^"]*)" in the year "([^"]*)"$""") {(datast : String, year:Int) => {
@@ -31,7 +31,7 @@ class ObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
 	val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
     intercept[IllegalArgumentException] {
-	    observationDAO = new ObservationDAOImpl(is)(null)
+	    observationDAO = new SecondaryObservationDAOImpl(is)(null)
     }
   }}
   
