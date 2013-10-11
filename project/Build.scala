@@ -30,6 +30,7 @@ object ApplicationBuild extends Build {
 
     jdbc,
     anorm,
+    filters,
 
     /*Test Dependencies*/
     "junit" % "junit" % JunitV % "test",

@@ -9,8 +9,11 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Akka
 import akka.actor.Props
 import actors.AutoremoveActor
+import play.api._
+import play.api.mvc._
+import play.filters.gzip.GzipFilter
 
-object Global extends GlobalSettings {
+object Global extends WithFilters(new GzipFilter) with GlobalSettings {
 
   override def onStart(app: Application) {
     super.onStart(app)
