@@ -49,8 +49,8 @@ object FileUploadController extends Controller {
             fileInput.baseUri.substring(0, fileInput.baseUri.length - 1)
           else fileInput.baseUri
 
-          val uri = new StringBuilder(baseUri).append("/v")
-            .append(fileInput.year).append("/").toString
+          val uri = new StringBuilder(baseUri).append("/")
+            .append(fileInput.namespace).append("/v").append(fileInput.year).toString
           structure match {
             case Some(s) => observations match {
               case Some(o) => {
@@ -59,7 +59,7 @@ object FileUploadController extends Controller {
                 }
                 future.map {
                   sf =>
-                    Ok(views.html.results.result(sf.storeAsTTL(uri, fileInput.namespace), sf.issues))
+                    Ok(views.html.results.result(sf.storeAsTTL(uri), sf.issues))
                 }
               }
               case _ => concurrentFuture("Onservations file cannot be parsed! Upload it again")
