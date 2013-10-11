@@ -81,8 +81,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
    * This method load all observation form an excel file
    */
   private def loadObservations(f: File) {
-    safeLoadInformation(f, loadPrimaryObservationInformation)
     safeLoadInformation(f, loadSecondaryObservationInformation)
+    safeLoadInformation(f, loadPrimaryObservationInformation)
   }
 
   private def loadDatasetInformation(indicators: List[Indicator]) {
@@ -166,7 +166,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
 
   //Obtain an indicator given it's name
-  def obtainIndicator(indicatorName: String): Indicator = {
+  def obtainIndicator(indicatorName: String): Option[Indicator] = {
     val indicator = indicatorReconciliator.searchIndicator(indicatorName)
     if (indicator == null)
       logger.info(s"Not exist indicator with name ${indicatorName}")
@@ -174,13 +174,11 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
 
   //Obtain an indicator given it's id
-  def obtainIndicatorById(id: String): Indicator = {
+  def obtainIndicatorById(id: String): Option[Indicator] = {
     val combined: ListBuffer[Indicator] = new ListBuffer
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.id.equals(id))
-      .getOrElse(throw new IllegalArgumentException("Not exist indicator with " +
-        s"id ${id}"))
   }
 
   def obtainIndicatorByDescription(indicatorDescription: String): Indicator = {

@@ -114,9 +114,9 @@ class SecondaryObservationDAOImpl(
       val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
-        country.get.iso3Code + " " + year + " " + indicator.id + " " + value)
+        country.get.iso3Code + " " + year + " " + indicator.get.id + " " + value)
       createObservation(dataset, "", country.get, null,
-        indicator, year.toDouble, value, status, XslxFile)
+        indicator.get, year.toDouble, value, status, XslxFile)
     }
   }
 
@@ -130,12 +130,12 @@ class SecondaryObservationDAOImpl(
    * @param initialCell The initial cell of the observations
    * @return An indicator
    */
-  def obtainIndicator(sheet: Sheet, cell: String, evaluator: FormulaEvaluator): Indicator = {
+  /*def obtainIndicator(sheet: Sheet, cell: String, evaluator: FormulaEvaluator): Indicator = {
     val cellReference = new CellRef(cell)
     val indicatorName = POIUtils.extractCellValue(
       sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()), evaluator)
     sFetcher.obtainIndicator(indicatorName)
-  }
+  }*/
 
   //
   //  /**

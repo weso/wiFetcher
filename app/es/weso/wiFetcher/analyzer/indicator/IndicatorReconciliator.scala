@@ -83,7 +83,7 @@ class IndicatorReconciliator(implicit val sFetcher: SpreadsheetsFetcher) {
    * @param indicator The indicator name
    * @return The indicator searched
    */
-  def searchIndicator(indicator: String): Indicator = {
+  def searchIndicator(indicator: String): Option[Indicator] = {
     val reader = DirectoryReader.open(iRamDir)
     //Create the index searcher
     val indexSearcher: IndexSearcher = new IndexSearcher(reader)
@@ -95,7 +95,7 @@ class IndicatorReconciliator(implicit val sFetcher: SpreadsheetsFetcher) {
     //Process the result
     val scoreDocs: Array[ScoreDoc] = collector.topDocs().scoreDocs
     if (scoreDocs.isEmpty) {
-      null
+      None
     } else {
       val doc: Document = indexSearcher.doc(scoreDocs.head.doc)
       val id = doc.getField(IndicatorIdField).stringValue()
