@@ -59,8 +59,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     issueManager.filteredAsSeq
   }
 
-  def storeAsTTL(baseUri: String, namespace:String, store: Boolean = false) =
-    ModelGenerator(baseUri, namespace).generateJenaModel(this, store)
+  def storeAsTTL(baseUri: String, store: Boolean = false) =
+    ModelGenerator(baseUri).generateJenaModel(this, store)
 
   /**
    * This method load all structure about Web Index information

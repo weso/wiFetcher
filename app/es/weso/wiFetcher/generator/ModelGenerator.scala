@@ -19,31 +19,20 @@ import java.io.FileOutputStream
 import java.io.File
 import es.weso.wiFetcher.utils.IssueManagerUtils
 
-case class ModelGenerator(baseUri: String, namespace: String)(implicit val sFetcher: SpreadsheetsFetcher) {
+case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
 
-  val PrefixObs = new StringBuilder(baseUri)
-    .append(namespace).append("/observation/").toString
-  val PrefixWiOnto = new StringBuilder(baseUri)
-    .append(namespace).append("/ontology/").toString
-  val PrefixWiOrg = new StringBuilder(baseUri)
-    .append(namespace).append("/organization/").toString
-  val PrefixCountry = new StringBuilder(baseUri)
-    .append(namespace).append("/country/").toString
-  val PrefixRegion = new StringBuilder(baseUri)
-    .append(namespace).append("/region/").toString
-  val PrefixIndicator = new StringBuilder(baseUri)
-    .append(namespace).append("/indicator/").toString
-  val PrefixDataset = new StringBuilder(baseUri)
-    .append(namespace).append("/dataset/").toString
-  val PrefixComponent = new StringBuilder(baseUri)
-    .append(namespace).append("/component/").toString
-  val PrefixSubindex = new StringBuilder(baseUri)
-    .append(namespace).append("/subindex/").toString
-  val PrefixWeightSchema = new StringBuilder(baseUri)
-    .append(namespace).append("/weightSchema/").toString
-  val PrefixSlice = new StringBuilder(baseUri)
-    .append(namespace).append("/slice/").toString
+  val PrefixObs = new StringBuilder(baseUri).append("/observation/").toString
+  val PrefixWiOnto = new StringBuilder(baseUri).append("/ontology/").toString
+  val PrefixWiOrg = new StringBuilder(baseUri).append("/organization/").toString
+  val PrefixCountry = new StringBuilder(baseUri).append("/country/").toString
+  val PrefixRegion = new StringBuilder(baseUri).append("/region/").toString
+  val PrefixIndicator = new StringBuilder(baseUri).append("/indicator/").toString
+  val PrefixDataset = new StringBuilder(baseUri).append("/dataset/").toString
+  val PrefixComponent = new StringBuilder(baseUri).append("/component/").toString
+  val PrefixSubindex = new StringBuilder(baseUri).append("/subindex/").toString
+  val PrefixWeightSchema = new StringBuilder(baseUri).append("/weightSchema/").toString
+  val PrefixSlice = new StringBuilder(baseUri).append("/slice/").toString
 
   val PropertyWiOntoRefarea = ResourceFactory.createProperty(PrefixWiOnto
     + "ref-area")
