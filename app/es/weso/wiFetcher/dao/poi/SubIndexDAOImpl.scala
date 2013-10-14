@@ -99,21 +99,22 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
      * @param subIndex
      * @param entities
      */
-    def inner(subIdex: SubIndex, entities: Seq[Entity]) {
-      entities match {
-        case head :: tail => head match {
-          case s: SubIndex =>
-            inner(s, tail)
-          case c: Component =>
-            subIdex.addComponent(c)
-            inner(subIdex, tail)
-          case _ =>
+    def inner(subIndex: SubIndex, entities: Seq[Entity]) {
+      if(!entities.isEmpty) {
+        val head = entities.head
+		head match {
+			case s: SubIndex =>
+            	inner(s, entities.tail)
+			case c: Component =>
+            	subIndex.addComponent(c)
+            	inner(subIndex, entities.tail)
+			case _ =>
         }
-        case _ =>
       }
     }
     entities.head match {
-      case e: SubIndex => inner(e, entities.tail)
+      case e: SubIndex =>
+        inner(e, entities.tail)
       case _ =>
         sFetcher.issueManager.addError(
           message = s"The head element is not a SubIndex",
