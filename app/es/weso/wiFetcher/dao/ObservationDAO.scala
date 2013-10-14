@@ -52,11 +52,9 @@ trait ObservationDAO  extends DAO[Observation]{
    */
   def createObservation(dataset: Dataset, label: String, area: Area,
     computation: Computation, indicator: Indicator, year: Double,
-    value: Double, status: String, XslxFile : Option[String])(implicit sFetcher : SpreadsheetsFetcher): Observation = {
+    value: Option[Double], status: String, XslxFile : Option[String])(implicit sFetcher : SpreadsheetsFetcher): Observation = {
 
-    val tmpStatus = if (value == -1)
-      ObservationStatus.Missed
-    else status match {
+    val sheet = status match {
       case "Raw" => ObservationStatus.Raw
       case "Imputed" => ObservationStatus.Imputed
       case "Normalised" => ObservationStatus.Normalised
@@ -70,6 +68,10 @@ trait ObservationDAO  extends DAO[Observation]{
           status + " is unknown", path = XslxFile)
         ObservationStatus.Wrong
     }
+    
+    val tmpStatus = if (value.isEmpty)
+      ObservationStatus.Missed
+    else sheet
 
     Observation(
       dataset,
@@ -79,7 +81,8 @@ trait ObservationDAO  extends DAO[Observation]{
       indicator,
       year.toInt,
       value,
-      tmpStatus)
+      tmpStatus,
+      sheet)
 
   }
 

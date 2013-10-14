@@ -9,6 +9,7 @@ case class Observation (
     val computation : Computation = null,
     val indicator : Indicator = null,
     val year : Int = -1,
-    val value : Double = -1, 
-    val status : ObservationStatus = null
+    val value : Option[Double] = None, 
+    val status : ObservationStatus = null,
+    val sheet : ObservationStatus = null
 )
