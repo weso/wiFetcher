@@ -51,24 +51,24 @@ object POIUtils {
    * that the content not be a number, its return "-1"
    */
   def extractNumericCellValue(cell: Cell, evaluator: FormulaEvaluator)
-  (implicit sFetcher: SpreadsheetsFetcher): Double = {
+  (implicit sFetcher: SpreadsheetsFetcher): Option[Double] = {
     try {
       val cellValue: CellValue = evaluator.evaluate(cell)
       if (cellValue != null) {
         cellValue.getCellType match {
-          case Cell.CELL_TYPE_NUMERIC => cellValue.getNumberValue
+          case Cell.CELL_TYPE_NUMERIC => Some(cellValue.getNumberValue)
           case Cell.CELL_TYPE_STRING => {
             cellValue.getStringValue match {
-              case e if e.isEmpty => -1
-              case ".." | "..." | "N/A" => -1
-              case s => if (s.forall(_.isDigit)) s.toDouble else -1
+              case e if e.isEmpty => None
+              case ".." | "..." | "N/A" => None
+              case s => if (s.forall(_.isDigit)) Some(s.toDouble) else None
             }
           }
-          case Cell.CELL_TYPE_BLANK => -1
-          case Cell.CELL_TYPE_ERROR => -1
+          case Cell.CELL_TYPE_BLANK => None
+          case Cell.CELL_TYPE_ERROR => None
         }
       } else {
-        -1
+        None
       }
     } catch {
       case e: IllegalArgumentException =>
@@ -76,13 +76,13 @@ object POIUtils {
           +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
           col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
           `cell` = Some(cell.toString))
-        -1
+        None
       case e: NotImplementedException => 
         sFetcher.issueManager.addError(message = "Some errors detected within the formula: "
           +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
           col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
           `cell` = Some(cell.toString))
-        -1
+        None
     }
   }
 

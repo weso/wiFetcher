@@ -40,7 +40,7 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     + "ref-computation")
   val PropertyWiOntoRefYear = ResourceFactory.createProperty(PrefixWiOnto
     + "ref-year")
-  val PropertyWiOntoShetType = ResourceFactory.createProperty(PrefixWiOnto
+  val PropertyWiOntoSheetType = ResourceFactory.createProperty(PrefixWiOnto
     + "sheet-type")
   val PropertyWiOntoCountryCoverage = ResourceFactory.createProperty(PrefixWiOnto + "country-coverage")
   val PropertyWiOntoProviderLink = ResourceFactory.createProperty(PrefixWiOnto + "provider-link")
@@ -56,6 +56,7 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
       observation => observation.dataset)
     val model = createModel
     createDataStructureDefinition(model)
+    createComputationFlow(model)
     spreadsheetsFetcher.primaryIndicators.toList.foreach(
       indicator => createPrimaryIndicatorTriples(indicator, model))
     spreadsheetsFetcher.secondaryIndicators.toList.foreach(
@@ -65,7 +66,8 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     spreadsheetsFetcher.subIndexes.foreach(
       subindex => createSubindexTriples(subindex, model))
     spreadsheetsFetcher.datasets.foreach(
-      dataset => createDatasetsTriples(dataset, observationsByDataset, model))
+      dataset => if(!dataset.id.contains("Missed")) 
+    	  createDatasetsTriples(dataset, observationsByDataset, model))
     spreadsheetsFetcher.countries.foreach(
       country => createCountriesTriples(country, model))
     spreadsheetsFetcher.regions.foreach(
@@ -74,6 +76,47 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     if (store) storeModel(model)
 
     saveModel(model)
+  }
+  
+  private def createComputationFlow(model : Model) = {
+    val computation = model.createResource(PrefixComputation + "Flow")
+    computation.addProperty(PropertyRdfType, 
+        ResourceFactory.createResource(PrefixCex + "ComputationFlow"))
+    val steps = model.createSeq()
+    val copyRaw = model.createResource()
+    copyRaw.addProperty(PropertyCexQuery, "copyRaw")
+    val meanBetweenMissing = model.createResource()
+    meanBetweenMissing.addProperty(PropertyCexQuery, "MeanBetweenMissing")
+    val avgGrowth2Missing = model.createResource()
+    avgGrowth2Missing.addProperty(PropertyCexQuery, "AvgGrowth2Missing")
+    val filter = model.createResource
+    filter.addProperty(PropertyCexQuery, "Filter")
+    val zscores = model.createResource
+    zscores.addProperty(PropertyCexQuery, "zScores")
+    val adjust = model.createResource
+    adjust.addProperty(PropertyCexQuery, "Adjust")
+    val weightedSimple = model.createResource
+    weightedSimple.addProperty(PropertyCexQuery, "WeightedSimple")
+    val groupClusters = model.createResource
+    groupClusters.addProperty(PropertyCexQuery, "GroupClusters")
+    val groupSubindex = model.createResource
+    groupSubindex.addProperty(PropertyCexQuery, "GroupSubindex")
+    val weigthedMean = model.createResource
+    weigthedMean.addProperty(PropertyCexQuery, "WeightedMean")
+    val ranking = model.createResource
+    ranking.addProperty(PropertyCexQuery, "Ranking")
+    steps.add(copyRaw)
+    steps.add(meanBetweenMissing)
+    steps.add(avgGrowth2Missing)
+    steps.add(filter)
+    steps.add(zscores)
+    steps.add(adjust)
+    steps.add(weightedSimple)
+    steps.add(groupClusters)
+    steps.add(groupSubindex)
+    steps.add(weigthedMean)
+    steps.add(ranking)
+    computation.addProperty(PropertyCexSteps, steps)
   }
 
   private def saveModel(model: Model): String = {
@@ -150,18 +193,19 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     obsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     obsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWiOrg + "WebFoundation"))
     obsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "Observation"))
-    obsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(obs.indicator.label + " in " + obs.area.iso3Code +
-      " during " + obs.year, "en"))
+    obsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(obs.label, "en"))
     obsResource.addProperty(PropertyWiOntoRefarea, ResourceFactory.createResource(PrefixCountry + obs.area.iso3Code))
     obsResource.addProperty(PropertyWiOntoRefcomputation, ResourceFactory.createResource(PrefixCex + obs.status))
     obsResource.addProperty(PropertyCexIndicator, ResourceFactory.createResource(PrefixIndicator + obs.indicator.id.replace(" ", "_")))
     obsResource.addProperty(PropertyWiOntoRefYear, ResourceFactory.createTypedLiteral(
       String.valueOf(obs.year), XSDDatatype.XSDinteger))
-    obsResource.addProperty(PropertyCexValue, ResourceFactory.createTypedLiteral(
-      String.valueOf(obs.value), XSDDatatype.XSDdouble))
+    val value = obs.value
+    if(!value.isEmpty)
+    	obsResource.addProperty(PropertyCexValue, ResourceFactory.createTypedLiteral(
+    			String.valueOf(obs.value.get), XSDDatatype.XSDdouble))
     obsResource.addProperty(PropertySmdxObsStatus, ResourceFactory.createResource(PrefixCex + obs.status))
     obsResource.addProperty(PropertyQbDataset, ResourceFactory.createResource(PrefixDataset + obs.dataset.id.replace(" ", "_")))
-    obsResource.addProperty(PropertyWiOntoShetType, ResourceFactory.createResource(PrefixWiOnto + obs.status))
+    obsResource.addProperty(PropertyWiOntoSheetType, ResourceFactory.createResource(PrefixWiOnto + obs.sheet))
     obsResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral(
       "MD5 checksum for observation " + id, "en"))
   }
@@ -293,7 +337,7 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
         val observationsByYear: Map[Int, ListBuffer[Observation]] = observations.groupBy(observation => observation.year)
         observationsByYear.keySet.foreach(year => {
           val sliceResource = model.createResource(PrefixSlice + "Slice-" +
-            observations.head.indicator.id.replace(" ", "_") + year.toString + "-" + observations.head.status)
+            observations.head.indicator.id.replace(" ", "_") + year.toString + "-" + observations.head.sheet)
           sliceResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "Slice"))
           sliceResource.addProperty(PropertyCexIndicator, ResourceFactory.createResource(PrefixIndicator +
             observations.head.indicator.id.replace(" ", "_")))
@@ -335,6 +379,7 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     model.setNsPrefix("time", PrefixTime)
     model.setNsPrefix("smdx-attribute", PrefixSdmxAttribute)
     model.setNsPrefix("smdx-subject", PrefixSdmxSubject)
+    model.setNsPrefix("computation", PrefixComputation)
     model
   }
 }
@@ -352,6 +397,7 @@ object ModelGenerator {
   val PrefixSkos = "http://www.w3.org/2004/02/skos/core#"
   val PrefixSdmxAttribute = "http://purl.org/linked-data/sdmx/2009/attribute#"
   val PrefixSdmxSubject = "http://purl.org/linked-data/sdmx/2009/subject#"
+  val PrefixComputation = "http://data.webfoundation.org/webindex/v2013/computation/"
 
   val PropertyDcTermsPublisher = ResourceFactory.createProperty(PrefixDcTerms
     + "publisher")
@@ -388,6 +434,8 @@ object ModelGenerator {
   val PropertyCexHighLow = ResourceFactory.createProperty(PrefixCex + "highLow")
   val PropertyCexElement = ResourceFactory.createProperty(PrefixCex + "element")
   val PropertyCexWeight = ResourceFactory.createProperty(PrefixCex + "weight")
+  val PropertyCexSteps = ResourceFactory.createProperty(PrefixCex + "steps")
+  val PropertyCexQuery = ResourceFactory.createProperty(PrefixCex + "query")
 
   val PropertySmdxObsStatus = ResourceFactory.createProperty(PrefixSdmxConcept
     + "obsStatus")

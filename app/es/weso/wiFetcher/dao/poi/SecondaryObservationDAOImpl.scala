@@ -109,14 +109,15 @@ class SecondaryObservationDAOImpl(
       col <- initialCell.getCol() to sheet.getRow(0).getLastCellNum() - 1
       year = POIUtils.extractNumericCellValue(sheet.getRow(initialCell.getRow() - 1)
         .getCell(col), evaluator)
-      if (year != -1)
+      if (!year.isEmpty)
     } yield {
       val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
         country.get.iso3Code + " " + year + " " + indicator.get.id + " " + value)
-      createObservation(dataset, "", country.get, null,
-        indicator.get, year.toDouble, value, status, XslxFile)
+      val label : String = "" + indicator.get.id + " in " + country.get.iso3Code + " during " + year.get.toInt
+      createObservation(dataset, label, country.get, null,
+        indicator.get, year.get, value, status, XslxFile)
     }
   }
 

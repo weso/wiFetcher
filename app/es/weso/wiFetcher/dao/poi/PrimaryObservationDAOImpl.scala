@@ -84,7 +84,9 @@ class PrimaryObservationDAOImpl (
        val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
        logger.info("Extracted observation of: " + dataset.id + " " +
         country.get.iso3Code + " " + year + " " + indicator.get.id + " " + value)
-       createObservation(dataset, "", country.get, null, indicator.get, year, 
+       val label : String = "" + indicator.get.id + " in " + country.get.iso3Code + " during " 
+    		  + year.toInt
+       createObservation(dataset, label, country.get, null, indicator.get, year, 
            value, status, XslxFile)
      }
    }
