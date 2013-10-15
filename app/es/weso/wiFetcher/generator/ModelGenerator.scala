@@ -19,34 +19,44 @@ import java.io.FileOutputStream
 import java.io.File
 import es.weso.wiFetcher.utils.IssueManagerUtils
 
-case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFetcher) {
+case class ModelGenerator(baseUri: String, namespace : String, year : String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
+ 
+  val PrefixObs = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/observation/").toString
+  val PrefixWfOnto = new StringBuilder(baseUri).append("/ontology/").toString
+  val PrefixWfOrg = new StringBuilder(baseUri).append("/organization/").toString
+  val PrefixCountry = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/country/").toString
+  val PrefixRegion = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/region/").toString
+  val PrefixIndicator = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/indicator/").toString
+  val PrefixDataset = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/dataset/").toString
+  val PrefixComponent = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/component/").toString
+  val PrefixSubindex = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/subindex/").toString
+  val PrefixWeightSchema = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/weightSchema/").toString
+  val PrefixSlice = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/slice/").toString
+  val PrefixWfPeople = new StringBuilder(baseUri).append("/people/").toString
 
-  val PrefixObs = new StringBuilder(baseUri).append("/observation/").toString
-  val PrefixWiOnto = new StringBuilder(baseUri).append("/ontology/").toString
-  val PrefixWiOrg = new StringBuilder(baseUri).append("/organization/").toString
-  val PrefixCountry = new StringBuilder(baseUri).append("/country/").toString
-  val PrefixRegion = new StringBuilder(baseUri).append("/region/").toString
-  val PrefixIndicator = new StringBuilder(baseUri).append("/indicator/").toString
-  val PrefixDataset = new StringBuilder(baseUri).append("/dataset/").toString
-  val PrefixComponent = new StringBuilder(baseUri).append("/component/").toString
-  val PrefixSubindex = new StringBuilder(baseUri).append("/subindex/").toString
-  val PrefixWeightSchema = new StringBuilder(baseUri).append("/weightSchema/").toString
-  val PrefixSlice = new StringBuilder(baseUri).append("/slice/").toString
-
-  val PropertyWiOntoRefarea = ResourceFactory.createProperty(PrefixWiOnto
+  val PropertyWiOntoRefarea = ResourceFactory.createProperty(PrefixWfOnto
     + "ref-area")
-  val PropertyWiOntoRefcomputation = ResourceFactory.createProperty(PrefixWiOnto
+  val PropertyWiOntoRefcomputation = ResourceFactory.createProperty(PrefixWfOnto
     + "ref-computation")
-  val PropertyWiOntoRefYear = ResourceFactory.createProperty(PrefixWiOnto
+  val PropertyWiOntoRefYear = ResourceFactory.createProperty(PrefixWfOnto
     + "ref-year")
-  val PropertyWiOntoSheetType = ResourceFactory.createProperty(PrefixWiOnto
+  val PropertyWiOntoSheetType = ResourceFactory.createProperty(PrefixWfOnto
     + "sheet-type")
-  val PropertyWiOntoCountryCoverage = ResourceFactory.createProperty(PrefixWiOnto + "country-coverage")
-  val PropertyWiOntoProviderLink = ResourceFactory.createProperty(PrefixWiOnto + "provider-link")
-  val PropertyWiOntoRefSource = ResourceFactory.createProperty(PrefixWiOnto + "ref-source")
-  val PropertyWiOntoISO2 = ResourceFactory.createProperty(PrefixWiOnto + "has-iso-alpha2-code")
-  val PropertyWiOntoISO3 = ResourceFactory.createProperty(PrefixWiOnto + "has-iso-alpha3-code")
+  val PropertyWiOntoCountryCoverage = ResourceFactory.createProperty(PrefixWfOnto + "country-coverage")
+  val PropertyWiOntoProviderLink = ResourceFactory.createProperty(PrefixWfOnto + "provider-link")
+  val PropertyWiOntoRefSource = ResourceFactory.createProperty(PrefixWfOnto + "ref-source")
+  val PropertyWiOntoISO2 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha2-code")
+  val PropertyWiOntoISO3 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha3-code")
 
   private var id: Int = 1
 
@@ -132,14 +142,14 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
   }
 
   def createDataStructureDefinition(model: Model) = {
-    val dsd = model.createResource(PrefixWiOnto + "DSD")
+    val dsd = model.createResource(PrefixWfOnto + "DSD")
     dsd.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "DataStructureDefinition"))
     var dimension = model.createResource()
-    dimension.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWiOnto + "ref-area"))
+    dimension.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWfOnto + "ref-area"))
     dimension.addProperty(PropertyQbOrder, ResourceFactory.createTypedLiteral("1", XSDDatatype.XSDinteger))
     dsd.addProperty(PropertyQbComponent, dimension)
     dimension = model.createResource()
-    dimension.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWiOnto + "ref-year"))
+    dimension.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWfOnto + "ref-year"))
     dimension.addProperty(PropertyQbOrder, ResourceFactory.createTypedLiteral("2", XSDDatatype.XSDinteger))
     dsd.addProperty(PropertyQbComponent, dimension)
     dimension = model.createResource()
@@ -154,20 +164,20 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     component.addProperty(PropertyQbComponentRequired, ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean))
     component.addProperty(PropertyQbComponentAttachment, ResourceFactory.createResource(PrefixQb + "DataSet"))
     dsd.addProperty(PropertyQbComponent, component)
-    val sliceByArea = model.createResource(PrefixWiOnto + "sliceByArea")
+    val sliceByArea = model.createResource(PrefixWfOnto + "sliceByArea")
     dsd.addProperty(PropertyQbSliceKey, sliceByArea)
     sliceByArea.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "SliceKey"))
     sliceByArea.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral("slice by area", "en"))
     sliceByArea.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral("Slice by grouping areas together fixing year", "en"))
     sliceByArea.addProperty(PropertyQbComponentProperty, ResourceFactory.createResource(PrefixCex + "indicator"))
-    sliceByArea.addProperty(PropertyQbComponentProperty, ResourceFactory.createResource(PrefixWiOnto + "ref-year"))
+    sliceByArea.addProperty(PropertyQbComponentProperty, ResourceFactory.createResource(PrefixWfOnto + "ref-year"))
   }
 
   def createRegionsTriples(region: Region, model: Model) = {
     val regionResource = model.createResource(PrefixRegion + region.name.replace("& ", "").replace(" ", "_"))
-    regionResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWiOnto + "Region"))
-    regionResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWiOnto + "WESO"))
-    regionResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWiOnto + "WebFoundation"))
+    regionResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + "Region"))
+    regionResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOnto + "WESO"))
+    regionResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOnto + "WebFoundation"))
     regionResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     regionResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral(region.name, XSDDatatype.XSDstring))
     region.getCountries.foreach(country => regionResource.addProperty(PropertyWiOntoRefarea, ResourceFactory.createResource(PrefixCountry + country.iso3Code)))
@@ -175,11 +185,11 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
 
   def createCountriesTriples(country: Country, model: Model) = {
     val countryResource = model.createResource(PrefixCountry + country.iso3Code)
-    countryResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWiOnto + "Country"))
+    countryResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + "Country"))
     countryResource.addProperty(PropertyCexMD5, ResourceFactory.createTypedLiteral("MD5 for " + country.iso3Code, XSDDatatype.XSDstring))
-    countryResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWiOnto + "WESO"))
+    countryResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOnto + "WESO"))
     countryResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
-    countryResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWiOrg + "WebFoundation"))
+    countryResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
     countryResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(country.name, "en"))
     countryResource.addProperty(PropertyWiOntoISO2, ResourceFactory.createTypedLiteral(country.iso2Code, XSDDatatype.XSDstring))
     countryResource.addProperty(PropertyWiOntoISO3, ResourceFactory.createTypedLiteral(country.iso3Code, XSDDatatype.XSDstring))
@@ -188,10 +198,10 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
   def createObservationTriples(obs: Observation, model: Model, id: Int) = {
     val obsResource = model.createResource(PrefixObs + "obs" + /*obs.indicator.id + "-" + obs.area.iso2Code + "-" + obs.year.toString + "-" + obs.status*/ id)
     obsResource.addProperty(PropertyRdfType,
-      ResourceFactory.createResource(PrefixWiOnto + "Observation"))
-    obsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWiOrg + "WESO"))
+      ResourceFactory.createResource(PrefixWfOnto + "Observation"))
+    obsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     obsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
-    obsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWiOrg + "WebFoundation"))
+    obsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
     obsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "Observation"))
     obsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(obs.label, "en"))
     obsResource.addProperty(PropertyWiOntoRefarea, ResourceFactory.createResource(PrefixCountry + obs.area.iso3Code))
@@ -205,7 +215,7 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     			String.valueOf(obs.value.get), XSDDatatype.XSDdouble))
     obsResource.addProperty(PropertySmdxObsStatus, ResourceFactory.createResource(PrefixCex + obs.status))
     obsResource.addProperty(PropertyQbDataset, ResourceFactory.createResource(PrefixDataset + obs.dataset.id.replace(" ", "_")))
-    obsResource.addProperty(PropertyWiOntoSheetType, ResourceFactory.createResource(PrefixWiOnto + obs.sheet))
+    obsResource.addProperty(PropertyWiOntoSheetType, ResourceFactory.createResource(PrefixWfOnto + obs.sheet))
     obsResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral(
       "MD5 checksum for observation " + id, "en"))
   }
@@ -219,14 +229,14 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     indicatorResource.addProperty(PropertyCexHighLow, ResourceFactory.createResource(PrefixCex + indicator.highLow))
     indicatorResource.addProperty(PropertyDcTermsSource, indicator.source)
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Indicator"))
-    indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWiOnto + indicator.indicatorType + "Indicator"))
+    indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + indicator.indicatorType + "Indicator"))
     indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
     indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2009", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2012", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyWiOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
-    indicatorResource.addProperty(PropertyWiOntoProviderLink, ResourceFactory.createResource(PrefixWiOrg + "WESO"))
-    indicatorResource.addProperty(PropertyWiOntoRefSource, ResourceFactory.createResource(PrefixWiOrg + "WESO"))
+    indicatorResource.addProperty(PropertyWiOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    indicatorResource.addProperty(PropertyWiOntoRefSource, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     createIndicatorWeightTriples(indicator, model)
   }
 
@@ -239,14 +249,14 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     indicatorResource.addProperty(PropertyCexHighLow, ResourceFactory.createResource(PrefixCex + indicator.highLow))
     indicatorResource.addProperty(PropertyDcTermsSource, indicator.source)
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Indicator"))
-    indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWiOnto + indicator.indicatorType + "Indicator"))
+    indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + indicator.indicatorType + "Indicator"))
     indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
     indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertySkosNotation, ResourceFactory.createTypedLiteral(indicator.id, XSDDatatype.XSDstring))
     indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
-    indicatorResource.addProperty(PropertyWiOntoRefSource, ResourceFactory.createResource(PrefixWiOrg + "WESO"))
+    indicatorResource.addProperty(PropertyWiOntoRefSource, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     createIndicatorWeightTriples(indicator, model)
   }
 
@@ -264,9 +274,9 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     val componentResource = model.createResource(PrefixComponent + component.id.replace(" ", "_"))
     componentResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Component"))
     componentResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral("MD5 for" + component.name, "en"))
-    componentResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWiOrg + "WESO"))
+    componentResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     componentResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
-    componentResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWiOrg + "WebFoundation"))
+    componentResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
     componentResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(component.name, "en"))
     componentResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     component.getIndicators.foreach(indicator => {
@@ -305,32 +315,32 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
     model: Model) = {
     val datasetResource = model.createResource(PrefixDataset + dataset.id.replace(" ", "_"))
     datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "DataSet"))
-    datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWiOnto + "Dataset"))
+    datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + "Dataset"))
     datasetResource.addProperty(PropertyCexMD5, ResourceFactory.createTypedLiteral("MD5...", XSDDatatype.XSDstring))
-    datasetResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWiOrg + "WESO"))
+    datasetResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     datasetResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
-    datasetResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWiOrg + "WebFoundation"))
+    datasetResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
     datasetResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createLangLiteral(dataset.id, "en"))
     datasetResource.addProperty(PropertyDcTermsSubject, ResourceFactory.createResource(PrefixSdmxSubject + "2.5"))
     datasetResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(dataset.id, "en"))
     datasetResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral("Description of dataset " + dataset.id, "en"))
     datasetResource.addProperty(PropertySMDXUnitMeasure, ResourceFactory.createResource("http://dbpedia.org/resource/Year"))
     var anonymousResource = model.createResource()
-    anonymousResource.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWiOnto + "ref-area"))
+    anonymousResource.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWfOnto + "ref-area"))
     anonymousResource.addProperty(PropertyQbOrder, ResourceFactory.createTypedLiteral("1", XSDDatatype.XSDinteger))
     datasetResource.addProperty(PropertyQbComponent, anonymousResource)
     anonymousResource = model.createResource()
-    anonymousResource.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWiOnto + "ref-area"))
+    anonymousResource.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWfOnto + "ref-area"))
     anonymousResource.addProperty(PropertyQbOrder, ResourceFactory.createTypedLiteral("2", XSDDatatype.XSDinteger))
     datasetResource.addProperty(PropertyQbComponent, anonymousResource)
     anonymousResource = model.createResource()
-    anonymousResource.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWiOnto + "ref-area"))
+    anonymousResource.addProperty(PropertyQbDimension, ResourceFactory.createResource(PrefixWfOnto + "ref-area"))
     anonymousResource.addProperty(PropertyQbOrder, ResourceFactory.createTypedLiteral("3", XSDDatatype.XSDinteger))
     datasetResource.addProperty(PropertyQbComponent, anonymousResource)
     anonymousResource = model.createResource()
     anonymousResource.addProperty(PropertyQbMeasure, ResourceFactory.createResource(PrefixCex + "indicator"))
     datasetResource.addProperty(PropertyQbComponent, anonymousResource)
-    datasetResource.addProperty(PropertyQbStructure, ResourceFactory.createResource(PrefixWiOnto + "DSD"))
+    datasetResource.addProperty(PropertyQbStructure, ResourceFactory.createResource(PrefixWfOnto + "DSD"))
 
     observationsByDataset.get(dataset) match {
       case Some(observations) =>
@@ -342,7 +352,7 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
           sliceResource.addProperty(PropertyCexIndicator, ResourceFactory.createResource(PrefixIndicator +
             observations.head.indicator.id.replace(" ", "_")))
           sliceResource.addProperty(PropertyWiOntoRefYear, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
-          sliceResource.addProperty(PropertyQbSliceStructure, /*datasetResource*/ ResourceFactory.createResource(PrefixWiOnto +
+          sliceResource.addProperty(PropertyQbSliceStructure, /*datasetResource*/ ResourceFactory.createResource(PrefixWfOnto +
             "sliceByArea"))
           observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
             createObservationTriples(obs, model, id)
@@ -358,9 +368,10 @@ case class ModelGenerator(baseUri: String)(implicit val sFetcher: SpreadsheetsFe
   private def createModel: com.hp.hpl.jena.rdf.model.Model = {
     val model = ModelFactory.createDefaultModel
     model.setNsPrefix("obs", PrefixObs)
-    model.setNsPrefix("wi-onto", PrefixWiOnto)
+    model.setNsPrefix("wf-onto", PrefixWfOnto)
     model.setNsPrefix("dcterms", PrefixDcTerms)
-    model.setNsPrefix("wi-org", PrefixWiOrg)
+    model.setNsPrefix("wf-org", PrefixWfOrg)
+    model.setNsPrefix("wf-people", PrefixWfPeople)
     model.setNsPrefix("qb", PrefixQb)
     model.setNsPrefix("country", PrefixCountry)
     model.setNsPrefix("cex", PrefixCex)
