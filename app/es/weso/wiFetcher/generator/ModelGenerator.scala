@@ -18,6 +18,7 @@ import java.util.Date
 import java.io.FileOutputStream
 import java.io.File
 import es.weso.wiFetcher.utils.IssueManagerUtils
+import es.weso.wiFetcher.persistence.VirtuosoLoader
 
 case class ModelGenerator(baseUri: String, namespace : String, year : String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
@@ -83,9 +84,13 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     spreadsheetsFetcher.regions.foreach(
       region => createRegionsTriples(region, model))
 
-    if (store) storeModel(model)
+    val timestamp = new Date().getTime  
+      
+    val path = saveModel(model, timestamp)
+      
+    if (store) storeModel(path, timestamp)
 
-    saveModel(model)
+    path
   }
   
   private def createComputationFlow(model : Model) = {
@@ -129,16 +134,14 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     computation.addProperty(PropertyCexSteps, steps)
   }
 
-  private def saveModel(model: Model): String = {
-    val timestamp = new Date().getTime()
+  private def saveModel(model: Model, timestamp : Long): String = {
     val path = s"reports/dataset-${timestamp}.ttl"
     model.write(new FileOutputStream(new File(s"public/${path}")), "TURTLE")
     path
   }
 
-  private def storeModel(model: Model): Model = {
-    JenaModelDAOImpl.store(model)
-    model
+  private def storeModel(path: String, timestamp : Long) = {
+    VirtuosoLoader.store(path, timestamp, baseUri, sFetcher)
   }
 
   def createDataStructureDefinition(model: Model) = {

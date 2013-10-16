@@ -51,3 +51,6 @@ project/plugins/project/
 
 # Git specific
 *.orig
+
+#Virtuoso properties
+*/virtuoso.properties
