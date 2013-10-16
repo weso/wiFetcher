@@ -61,7 +61,7 @@ object FileUploadController extends Controller {
                 future.map {
                   sf =>
                     Ok(views.html.results.result(sf.storeAsTTL(baseUri, 
-                        fileInput.namespace, year), sf.issues))
+                        fileInput.namespace, year, store), sf.issues))
                 }
               }
               case _ => concurrentFuture("Onservations file cannot be parsed! Upload it again")

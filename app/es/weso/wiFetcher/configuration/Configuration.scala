@@ -179,6 +179,14 @@ object Configuration {
   def getPrimaryIndicatorLastCol() : Int = {
     Config.getInt("primary_indicator_last_col")
   }
+  
+  def getVirtuosoLoadDir() : String = {
+    Config.getString("load_dir")
+  }
+  
+  def getVirtuosoSourceDir() : String = {
+    Config.getString("source_dir")
+  }
 
   def loadConfigure() = {
     val config = new CompositeConfiguration
