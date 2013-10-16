@@ -21,13 +21,14 @@ object VirtuosoLoader {
         (e:String) => errors += e)
     upload ! processLogger  
     errors.foreach(error => {
-      sf.issueManager.addError(message = error, path = Some("public/temp/script.sh"))
+      if(!error.isEmpty())
+    	  sf.issueManager.addError(message = error, path = Some("public/temp/script.sh"))
     })
   }
   
   private def generateCode(timestamp : Long, path : String, baseUri : String) = {
     val variables : StringBuilder = new StringBuilder
-    val graph : String = "" + baseUri + "/" + timestamp.toString
+    val graph : String = baseUri + "/"
     val dir = Configuration.getVirtuosoLoadDir
     val virtServer = Configuration.getVirtuosoServer
     val virtUser = Configuration.getVirtuosoUser

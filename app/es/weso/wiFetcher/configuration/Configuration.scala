@@ -183,10 +183,6 @@ object Configuration {
   def getVirtuosoLoadDir() : String = {
     Config.getString("load_dir")
   }
-  
-  def getVirtuosoSourceDir() : String = {
-    Config.getString("source_dir")
-  }
 
   def loadConfigure() = {
     val config = new CompositeConfiguration

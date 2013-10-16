@@ -140,7 +140,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   }
 
   private def storeModel(path: String, timestamp : Long) = {
-    VirtuosoLoader.store(path, timestamp, baseUri, sFetcher)
+    val builder = new StringBuilder(baseUri)
+    builder.append("/").append(namespace).append("/").append(year)
+    VirtuosoLoader.store(path, timestamp, builder.toString, sFetcher)
   }
 
   def createDataStructureDefinition(model: Model) = {
