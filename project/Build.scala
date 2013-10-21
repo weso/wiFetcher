@@ -25,6 +25,7 @@ object ApplicationBuild extends Build {
   val ScalatestV = "2.0.RC1"
   val LuceneV = "4.0.0"
   val TypeConfigV = "1.0.1"
+  val OpenCsvV = "2.3"
 
   val appDependencies = Seq(
 
@@ -54,7 +55,8 @@ object ApplicationBuild extends Build {
     "org.apache.jena" % "jena-arq" % JenaV,
     "org.apache.jena" % "jena-core" % JenaV,
     "org.apache.lucene" % "lucene-core" % LuceneV,
-    "org.apache.solr" % "solr-core" % LuceneV)
+    "org.apache.solr" % "solr-core" % LuceneV,
+    "net.sf.opencsv" % "opencsv" % OpenCsvV)
 
   val main = play.Project(AppName, AppVersion, appDependencies).settings(
 

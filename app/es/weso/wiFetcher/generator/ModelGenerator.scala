@@ -60,7 +60,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 
   private var id: Int = 1
 
-  def generateJenaModel(spreadsheetsFetcher: SpreadsheetsFetcher, store: Boolean, imp: Option[String] = None): String = {
+  def generateJenaModel(spreadsheetsFetcher: SpreadsheetsFetcher, store: Boolean, timestamp : Long, imp: Option[String] = None): String = {
     //val observations : List[Observation] = SpreadsheetsFetcher.observations.toList
     val observationsByDataset = spreadsheetsFetcher.observations.groupBy(
       observation => observation.dataset)
@@ -82,8 +82,6 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
       country => createCountriesTriples(country, model))
     spreadsheetsFetcher.regions.foreach(
       region => createRegionsTriples(region, model))
-
-    val timestamp = new Date().getTime  
       
     val path = saveModel(model, timestamp)
       

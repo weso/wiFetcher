@@ -1,7 +1,6 @@
 package controllers
 
 import java.io.File
-
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import play.api.data.Form
 import play.api.data.Forms.mapping
@@ -17,6 +16,8 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
+import java.util.Date
+import es.weso.wiFetcher.entities.issues._
 
 object FileUploadController extends Controller {
 
@@ -60,8 +61,10 @@ object FileUploadController extends Controller {
                 }
                 future.map {
                   sf =>
+                    val timestamp = new Date().getTime 
+                    val results : (Seq[Issue], String) = sf.saveReport(timestamp)
                     Ok(views.html.results.result(sf.storeAsTTL(baseUri, 
-                        fileInput.namespace, year, store), sf.issues))
+                        fileInput.namespace, year, store, timestamp), results._1, results._2))
                 }
               }
               case _ => concurrentFuture("Onservations file cannot be parsed! Upload it again")

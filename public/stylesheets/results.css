@@ -491,3 +491,12 @@ pre.outline {
     line-height: 160%;
     padding-left: 1.5em;
 }
+
+a.return-main {
+	float:left;
+}
+
+a.download-link {
+	float:right;
+	margin-left: 2em;
+}
