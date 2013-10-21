@@ -57,6 +57,7 @@ class SecondaryObservationDAOImpl(
 
       logger.info("Begin observations extraction")
       val workbook: Workbook = WorkbookFactory.create(is)
+      checkSheets(workbook)
       val obs = for {
         dataset <- datasets
         sheet = workbook.getSheet(dataset.id)
@@ -72,6 +73,24 @@ class SecondaryObservationDAOImpl(
       }
       observations ++= obs.foldLeft(ListBuffer[Observation]())((a, b) => a ++= b)
       logger.info("Finish observations extraction")
+    }
+  }
+  
+  protected def checkSheets(workbook : Workbook) = {
+    val sheets = workbook.getNumberOfSheets()
+    for{
+        index <- 0 until sheets        
+        sheet = workbook.getSheetAt(index)
+        name = sheet.getSheetName
+        if(name.contains("-Ordered") || name.contains("-Imputed") || 
+          name.contains("-Normalised"))
+        indicatorId = name.substring(0, name.indexOf("-"))
+        if(!sFetcher.obtainIndicatorById(indicatorId).isDefined)
+    } { 
+      sFetcher.issueManager.addError(
+            message = s"There are observations for indicator ${indicatorId} " +
+              "but it's no present in structure file",
+            path = XslxFile)
     }
   }
 
