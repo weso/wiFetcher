@@ -316,6 +316,11 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     observationsByDataset: Map[Dataset, ListBuffer[Observation]],
     model: Model) = {
     val datasetResource = model.createResource(PrefixDataset + dataset.id.replace(" ", "_"))
+    if(dataset.id.contains("Ordered")) {
+      val computationResource = model.createResource()
+      computationResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Raw"))
+      datasetResource.addProperty(PropertyCexComputation, computationResource)
+    }
     datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "DataSet"))
     datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + "Dataset"))
     datasetResource.addProperty(PropertyCexMD5, ResourceFactory.createTypedLiteral("MD5...", XSDDatatype.XSDstring))
@@ -449,6 +454,7 @@ object ModelGenerator {
   val PropertyCexWeight = ResourceFactory.createProperty(PrefixCex + "weight")
   val PropertyCexSteps = ResourceFactory.createProperty(PrefixCex + "steps")
   val PropertyCexQuery = ResourceFactory.createProperty(PrefixCex + "query")
+  val PropertyCexComputation = ResourceFactory.createProperty(PrefixCex + "computation")
 
   val PropertySmdxObsStatus = ResourceFactory.createProperty(PrefixSdmxConcept
     + "obsStatus")
