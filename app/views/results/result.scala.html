@@ -1,4 +1,4 @@
-@(path : String, issues : Seq[Issue])
+@(path : String, issues : Seq[Issue], reportPath : String)
 
 @printIssues(name:String, issues : Seq[Issue])={
 		@for(issue <- issues){
@@ -16,9 +16,11 @@
 
 @main("Report") {
 <div id="results_container">
+
 	<p class="instructions">
-	    <a class="download" title="TTL Dataset" href="@routes.Assets.at(path)">Download TTL Dataset</a>
-	    <a class="download" title="Return to main page" href="@routes.FileUploadController.byFileUploadGET">Return to main page</a>
+		<a class="download return-main" title="Return to main page" href="@routes.FileUploadController.byFileUploadGET">Return to main page</a>
+	    <a class="download download-link" title="Report" href="@routes.Assets.at(reportPath)">Download report</a>
+	    <a class="download download-link" title="TTL Dataset" href="@routes.Assets.at(path)">Download TTL Dataset</a>
 	</p>
 	<div id="result">
 		<table>

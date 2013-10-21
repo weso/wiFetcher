@@ -12,6 +12,7 @@ project/project
 project/target
 public/temp
 public/reports/*.ttl
+public/reports/*.csv
 
 .target
 .history

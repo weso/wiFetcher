@@ -184,7 +184,8 @@ form {
 }
 
 .instructions {
-	padding: 0.5em 4em !important;
+	padding: 0.5em 0em !important;
+	overflow: auto;
 }
 
 .instructions label,.instructions input,.instructions textarea,.instructions select
