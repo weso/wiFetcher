@@ -62,9 +62,10 @@ object FileUploadController extends Controller {
                 future.map {
                   sf =>
                     val timestamp = new Date().getTime 
+                    val path = sf.storeAsTTL(baseUri, 
+                        fileInput.namespace, year, store, timestamp)
                     val results : (Seq[Issue], String) = sf.saveReport(timestamp)
-                    Ok(views.html.results.result(sf.storeAsTTL(baseUri, 
-                        fileInput.namespace, year, store, timestamp), results._1, results._2))
+                    Ok(views.html.results.result(path, results._1, results._2))
                 }
               }
               case _ => concurrentFuture("Onservations file cannot be parsed! Upload it again")

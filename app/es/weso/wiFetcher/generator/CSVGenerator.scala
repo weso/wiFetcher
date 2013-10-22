@@ -21,7 +21,11 @@ case class CSVGenerator (csvSchema : Array[String]){
     val finalPath = path + timestamp.toString + ".csv" 
     val out = new BufferedWriter(new FileWriter("public/" + finalPath))
     val writer = new CSVWriter(out)
-    writer.writeAll(values.toList)
+    try {
+      writer.writeAll(values.toList)
+    } finally {
+      writer.close
+    }
     finalPath
   }
   
