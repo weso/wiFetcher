@@ -176,7 +176,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   }
 
   def createRegionsTriples(region: Region, model: Model) = {
-    val regionResource = model.createResource(PrefixRegion + region.name.replace("& ", "").replace(" ", "_"))
+    val regionResource = model.createResource(PrefixRegion + region.name.replace("& ", "").replace(" ", "_").replace(".", ""))
     regionResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + "Region"))
     regionResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOnto + "WESO"))
     regionResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOnto + "WebFoundation"))
