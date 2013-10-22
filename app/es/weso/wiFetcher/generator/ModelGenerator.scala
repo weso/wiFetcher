@@ -49,17 +49,18 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 
   val PropertyWiOntoRefarea = ResourceFactory.createProperty(PrefixWfOnto
     + "ref-area")
-  val PropertyWiOntoRefcomputation = ResourceFactory.createProperty(PrefixWfOnto
+  val PropertyWfOntoHasCountry = ResourceFactory.createProperty(PrefixWfOnto + "has-country")
+  val PropertyWfOntoRefcomputation = ResourceFactory.createProperty(PrefixWfOnto
     + "ref-computation")
-  val PropertyWiOntoRefYear = ResourceFactory.createProperty(PrefixWfOnto
+  val PropertyWfOntoRefYear = ResourceFactory.createProperty(PrefixWfOnto
     + "ref-year")
-  val PropertyWiOntoSheetType = ResourceFactory.createProperty(PrefixWfOnto
+  val PropertyWfOntoSheetType = ResourceFactory.createProperty(PrefixWfOnto
     + "sheet-type")
-  val PropertyWiOntoCountryCoverage = ResourceFactory.createProperty(PrefixWfOnto + "country-coverage")
-  val PropertyWiOntoProviderLink = ResourceFactory.createProperty(PrefixWfOnto + "provider-link")
-  val PropertyWiOntoRefSource = ResourceFactory.createProperty(PrefixWfOnto + "ref-source")
-  val PropertyWiOntoISO2 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha2-code")
-  val PropertyWiOntoISO3 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha3-code")
+  val PropertyWfOntoCountryCoverage = ResourceFactory.createProperty(PrefixWfOnto + "country-coverage")
+  val PropertyWfOntoProviderLink = ResourceFactory.createProperty(PrefixWfOnto + "provider-link")
+  val PropertyWfOntoRefSource = ResourceFactory.createProperty(PrefixWfOnto + "ref-source")
+  val PropertyWfOntoISO2 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha2-code")
+  val PropertyWfOntoISO3 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha3-code")
 
   private var id: Int = 1
 
@@ -101,7 +102,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     datasetResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral("Dataset of all raw information about Web Index 2013", "en"))
     datasetResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     datasetResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
-    val format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss")
+    val format = new SimpleDateFormat("yyyy-MM-dd")
     datasetResource.addProperty(PropertyDcTermsCreated, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
     datasetResource.addProperty(PropertyDcTermsLicense, ResourceFactory.createResource("http://opendatacommons.org/licenses/by/1.0/"))
     datasetResource.addProperty(ResourceFactory.createProperty(PrefixFoaf + "homepage"), ResourceFactory.createResource("http://data.webfoundation.org"))
@@ -199,7 +200,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     regionResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOnto + "WebFoundation"))
     regionResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     regionResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral(region.name, XSDDatatype.XSDstring))
-    region.getCountries.foreach(country => regionResource.addProperty(PropertyWiOntoRefarea, ResourceFactory.createResource(PrefixCountry + country.iso3Code)))
+    region.getCountries.foreach(country => regionResource.addProperty(PropertyWfOntoHasCountry, ResourceFactory.createResource(PrefixCountry + country.iso3Code)))
   }
 
   def createCountriesTriples(country: Country, model: Model) = {
@@ -210,8 +211,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     countryResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     countryResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
     countryResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(country.name, "en"))
-    countryResource.addProperty(PropertyWiOntoISO2, ResourceFactory.createTypedLiteral(country.iso2Code, XSDDatatype.XSDstring))
-    countryResource.addProperty(PropertyWiOntoISO3, ResourceFactory.createTypedLiteral(country.iso3Code, XSDDatatype.XSDstring))
+    countryResource.addProperty(PropertyWfOntoISO2, ResourceFactory.createTypedLiteral(country.iso2Code, XSDDatatype.XSDstring))
+    countryResource.addProperty(PropertyWfOntoISO3, ResourceFactory.createTypedLiteral(country.iso3Code, XSDDatatype.XSDstring))
   }
 
   def createObservationTriples(obs: Observation, model: Model, id: Int) = {
@@ -224,9 +225,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     obsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "Observation"))
     obsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(obs.label, "en"))
     obsResource.addProperty(PropertyWiOntoRefarea, ResourceFactory.createResource(PrefixCountry + obs.area.iso3Code))
-    obsResource.addProperty(PropertyWiOntoRefcomputation, ResourceFactory.createResource(PrefixCex + obs.status))
+    obsResource.addProperty(PropertyWfOntoRefcomputation, ResourceFactory.createResource(PrefixCex + obs.status))
     obsResource.addProperty(PropertyCexIndicator, ResourceFactory.createResource(PrefixIndicator + obs.indicator.id.replace(" ", "_")))
-    obsResource.addProperty(PropertyWiOntoRefYear, ResourceFactory.createTypedLiteral(
+    obsResource.addProperty(PropertyWfOntoRefYear, ResourceFactory.createTypedLiteral(
       String.valueOf(obs.year), XSDDatatype.XSDinteger))
     val value = obs.value
     if(!value.isEmpty)
@@ -234,7 +235,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     			String.valueOf(obs.value.get), XSDDatatype.XSDdouble))
     obsResource.addProperty(PropertySmdxObsStatus, ResourceFactory.createResource(PrefixCex + obs.status))
     obsResource.addProperty(PropertyQbDataset, ResourceFactory.createResource(PrefixDataset + obs.dataset.id.replace(" ", "_")))
-    obsResource.addProperty(PropertyWiOntoSheetType, ResourceFactory.createResource(PrefixWfOnto + obs.sheet))
+    obsResource.addProperty(PropertyWfOntoSheetType, ResourceFactory.createResource(PrefixWfOnto + obs.sheet))
     obsResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral(
       "MD5 checksum for observation " + id, "en"))
   }
@@ -253,9 +254,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2009", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2012", XSDDatatype.XSDinteger))
-    indicatorResource.addProperty(PropertyWiOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
-    indicatorResource.addProperty(PropertyWiOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
-    indicatorResource.addProperty(PropertyWiOntoRefSource, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    indicatorResource.addProperty(PropertyWfOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
+    indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     createIndicatorWeightTriples(indicator, model)
   }
 
@@ -275,7 +276,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
-    indicatorResource.addProperty(PropertyWiOntoRefSource, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     createIndicatorWeightTriples(indicator, model)
   }
 
@@ -375,7 +376,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
           sliceResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "Slice"))
           sliceResource.addProperty(PropertyCexIndicator, ResourceFactory.createResource(PrefixIndicator +
             observations.head.indicator.id.replace(" ", "_")))
-          sliceResource.addProperty(PropertyWiOntoRefYear, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
+          sliceResource.addProperty(PropertyWfOntoRefYear, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
           sliceResource.addProperty(PropertyQbSliceStructure, /*datasetResource*/ ResourceFactory.createResource(PrefixWfOnto +
             "sliceByArea"))
           observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
