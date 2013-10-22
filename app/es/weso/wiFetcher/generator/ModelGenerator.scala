@@ -18,10 +18,13 @@ import java.io.FileOutputStream
 import java.io.File
 import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.persistence.VirtuosoLoader
+import java.text.SimpleDateFormat
 
 case class ModelGenerator(baseUri: String, namespace : String, year : String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
  
+  val PrefixBase = new StringBuilder(baseUri).append("/")
+  	.append(namespace).append("/").append(year).append("/").toString
   val PrefixObs = new StringBuilder(baseUri).append("/")
   	.append(namespace).append("/").append(year).append("/observation/").toString
   val PrefixWfOnto = new StringBuilder(baseUri).append("/ontology/").toString
@@ -65,6 +68,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     val observationsByDataset = spreadsheetsFetcher.observations.groupBy(
       observation => observation.dataset)
     val model = createModel
+    createDatasetMetadata(model, timestamp)
     createDataStructureDefinition(model)
     createComputationFlow(model)
     spreadsheetsFetcher.primaryIndicators.toList.foreach(
@@ -88,6 +92,19 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     if (store) storeModel(path, timestamp)
 
     path
+  }
+  
+  private def createDatasetMetadata(model : Model, timestamp : Long) = {
+    val datasetResource = model.createResource(PrefixBase + "ds")
+    datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixVoid + "Dataset"))
+    datasetResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral("Web Foundation | Web Index", "en"))
+    datasetResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral("Dataset of all raw information about Web Index 2013", "en"))
+    datasetResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    datasetResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    val format = new SimpleDateFormat("yyyy-MM-dd")
+    datasetResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    datasetResource.addProperty(PropertyDcTermsLicense, ResourceFactory.createResource("http://opendatacommons.org/licenses/by/1.0/"))
+    datasetResource.addProperty(ResourceFactory.createProperty(PrefixFoaf + "homepage"), ResourceFactory.createResource("http://data.webfoundation.org"))
   }
   
   private def createComputationFlow(model : Model) = {
@@ -398,6 +415,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     model.setNsPrefix("smdx-attribute", PrefixSdmxAttribute)
     model.setNsPrefix("smdx-subject", PrefixSdmxSubject)
     model.setNsPrefix("computation", PrefixComputation)
+    model.setNsPrefix("void", PrefixVoid)
+    model.setNsPrefix("base", PrefixBase)
+    model.setNsPrefix("foaf", PrefixFoaf)
     model
   }
 }
@@ -416,6 +436,8 @@ object ModelGenerator {
   val PrefixSdmxAttribute = "http://purl.org/linked-data/sdmx/2009/attribute#"
   val PrefixSdmxSubject = "http://purl.org/linked-data/sdmx/2009/subject#"
   val PrefixComputation = "http://data.webfoundation.org/webindex/v2013/computation/"
+  val PrefixVoid = "http://rdfs.org/ns/void#"
+  val PrefixFoaf = "http://xmlns.com/foaf/0.1/"
 
   val PropertyDcTermsPublisher = ResourceFactory.createProperty(PrefixDcTerms
     + "publisher")
@@ -426,6 +448,7 @@ object ModelGenerator {
   //val PropertyDcTermsCreated = ResourceFactory.createProperty(PREFIX_DCTERMS + "created")
   val PropertyDcTermsTitle = ResourceFactory.createProperty(PrefixDcTerms + "title")
   val PropertyDcTermsSubject = ResourceFactory.createProperty(PrefixDcTerms + "subject")
+  val PropertyDcTermsLicense = ResourceFactory.createProperty(PrefixDcTerms + "license")
 
   val PropertyQbDataset = ResourceFactory.createProperty(PrefixQb
     + "dataSet")
