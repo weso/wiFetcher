@@ -19,6 +19,7 @@ import java.io.File
 import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.persistence.VirtuosoLoader
 import java.text.SimpleDateFormat
+import com.hp.hpl.jena.rdf.model.Resource
 
 case class ModelGenerator(baseUri: String, namespace : String, year : String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
@@ -41,6 +42,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   	.append(namespace).append("/").append(year).append("/component/").toString
   val PrefixSubindex = new StringBuilder(baseUri).append("/")
   	.append(namespace).append("/").append(year).append("/subindex/").toString
+  val PrefixIndex = new StringBuilder(baseUri).append("/").append(namespace)
+  	.append("/").append(year).append("/index/").toString
   val PrefixWeightSchema = new StringBuilder(baseUri).append("/")
   	.append(namespace).append("/").append(year).append("/weightSchema/").toString
   val PrefixSlice = new StringBuilder(baseUri).append("/")
@@ -72,6 +75,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     createDatasetMetadata(model, timestamp)
     createDataStructureDefinition(model)
     createComputationFlow(model)
+    val indexResource = model.createResource(PrefixIndex + "index")
+    indexResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Index"))
+    indexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral("The Index", "en"))
     spreadsheetsFetcher.primaryIndicators.toList.foreach(
       indicator => createPrimaryIndicatorTriples(indicator, model))
     spreadsheetsFetcher.secondaryIndicators.toList.foreach(
@@ -79,7 +85,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     spreadsheetsFetcher.components.foreach(
       comp => createComponentsTriples(comp, model))
     spreadsheetsFetcher.subIndexes.foreach(
-      subindex => createSubindexTriples(subindex, model))
+      subindex => createSubindexTriples(subindex, indexResource, model))
     spreadsheetsFetcher.datasets.foreach(
       dataset => if(!dataset.id.contains("Missed")) 
     	  createDatasetsTriples(dataset, observationsByDataset, model))
@@ -312,7 +318,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     weightComponent.addProperty(PropertyCexWeight, anonymousResource)
   }
 
-  def createSubindexTriples(subindex: SubIndex, model: Model) {
+  def createSubindexTriples(subindex: SubIndex, indexResource : Resource, model: Model) {
     val subindexResource = model.createResource(PrefixSubindex + subindex.id.replace(" ", "_"))
     subindexResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "SubIndex"))
     subindexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(subindex.name, "en"))
@@ -320,6 +326,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     subindex.getComponents.foreach(component => {
       subindexResource.addProperty(PropertyCexElement, ResourceFactory.createResource(PrefixComponent + component.id.replace(" ", "_")))
     })
+    indexResource.addProperty(PropertyCexElement, subindexResource)
 
     val weightSubindex = model.createResource(PrefixWeightSchema + "subindexWeights")
     weightSubindex.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex))
@@ -408,6 +415,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     model.setNsPrefix("rdfs", PrefixRdfs)
     model.setNsPrefix("component", PrefixComponent)
     model.setNsPrefix("subindex", PrefixSubindex)
+    model.setNsPrefix("index", PrefixIndex)
     model.setNsPrefix("weightSchema", PrefixWeightSchema)
     model.setNsPrefix("slice", PrefixSlice)
     model.setNsPrefix("region", PrefixRegion)
