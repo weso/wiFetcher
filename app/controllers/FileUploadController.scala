@@ -54,10 +54,19 @@ object FileUploadController extends Controller {
             .append(fileInput.namespace).append("/v").append(fileInput.year).toString*/
           val year = "v" + fileInput.year.toString
           structure match {
-            case Some(s) => observations match {
+            case Some(s) => load(observations, structure, baseUri, fileInput, year, store)
+            case None => load(observations, observations, baseUri, fileInput, year, store)
+            case _ => concurrentFuture("Structure file cannot be parsed! Upload it again")
+          }
+        })
+  }
+  
+  private def load(observations : Option[File], structure : Option[File], 
+      baseUri : String, fileInput : FileForm, year : String, store : Boolean) = {
+    observations match {
               case Some(o) => {
                 val future = scala.concurrent.Future {
-                  SpreadsheetsFetcher(s, o)
+                  SpreadsheetsFetcher(structure.get, o)
                 }
                 future.map {
                   sf =>
@@ -68,11 +77,8 @@ object FileUploadController extends Controller {
                     Ok(views.html.results.result(path, results._1, results._2))
                 }
               }
-              case _ => concurrentFuture("Onservations file cannot be parsed! Upload it again")
+              case _ => concurrentFuture("Observations file cannot be parsed! Upload it again")
             }
-            case _ => concurrentFuture("Structure file cannot be parsed! Upload it again")
-          }
-        })
   }
 
   private def loadFile(name: String)(implicit request: Request[MultipartFormData[TemporaryFile]]) = {

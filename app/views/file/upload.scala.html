@@ -8,7 +8,14 @@
 			'enctype -> "multipart/form-data", 
 			'oninput->"uri.value = base_uri.value + '/' + namespace_uri.value +'/v' + year_uri.value") {
 			<div class="">
-		      	<p class="instructions">
+				<p class="instructions">
+					<label title="Upload structure as a separate file" for="structureSelector">Upload structure as a separate file: </label>
+					<input class="instructions" id="structureSelector" name="structureSelector" type="checkbox" checked="checked" />
+				</p>
+			</div>
+			 
+			<div class="">
+		      	<p class="instructions" id="structureInput">
 		      		<label title="Choose a Local File to Upload and load Web Index structure" for="structure_file">Structure file:</label>
 		      		<input type="file" id="structure_file" name="structure_file"/>
 		      	</p>
@@ -69,6 +76,6 @@
 				<input type="submit" title="Submit for validation" value="Check" class="button"/>
 			</p>
 		}
-	</div>
+	</div>	
 </div>
 }

@@ -31,13 +31,19 @@ object POIUtils {
         } else EmptyString
       } catch {
         case e: IllegalArgumentException =>
-          sFetcher.issueManager.addError(message = "Some errors detected within the formula"
+          sFetcher.issueManager.addError(message = "Some errors detected within the formula: "
             +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
             col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
             `cell` = Some(cell.toString))
           EmptyString
         case e: NotImplementedException =>
-          sFetcher.issueManager.addError(message = "Some errors detected within the formula"
+          sFetcher.issueManager.addError(message = "Some errors detected within the formula: "
+            +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
+            col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
+            `cell` = Some(cell.toString))
+          EmptyString
+        case e: RuntimeException =>
+          sFetcher.issueManager.addError(message = "Some errors detected within the formula: "
             +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
             col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
             `cell` = Some(cell.toString))
@@ -79,6 +85,12 @@ object POIUtils {
         None
       case e: NotImplementedException => 
         sFetcher.issueManager.addError(message = "Some errors detected within the formula: "
+          +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
+          col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
+          `cell` = Some(cell.toString))
+        None
+      case e: RuntimeException =>
+          sFetcher.issueManager.addError(message = "Some errors detected within the formula: "
           +e.getMessage, sheetName = Some(cell.getSheet.getSheetName),
           col = Some(cell.getColumnIndex), row = Some(cell.getRowIndex),
           `cell` = Some(cell.toString))
