@@ -20,6 +20,8 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.persistence.VirtuosoLoader
 import java.text.SimpleDateFormat
 import com.hp.hpl.jena.rdf.model.Resource
+import es.weso.wiFetcher.entities.Provider
+import com.hp.hpl.jena.rdf.model.ResourceFactory
 
 case class ModelGenerator(baseUri: String, namespace : String, year : String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
@@ -64,7 +66,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   val PropertyWfOntoRefSource = ResourceFactory.createProperty(PrefixWfOnto + "ref-source")
   val PropertyWfOntoISO2 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha2-code")
   val PropertyWfOntoISO3 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha3-code")
-
+  val PropertyWfOntoRefSourceData = ResourceFactory.createProperty(PrefixWfOnto + "ref-source-data")
+  
   private var id: Int = 1
 
   def generateJenaModel(spreadsheetsFetcher: SpreadsheetsFetcher, store: Boolean, timestamp : Long, imp: Option[String] = None): String = {
@@ -93,6 +96,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
       country => createCountriesTriples(country, model))
     spreadsheetsFetcher.regions.foreach(
       region => createRegionsTriples(region, model))
+    spreadsheetsFetcher.providers.foreach(
+		provider => createProviderTriples(provider, model)
+    )
       
     val path = saveModel(model, timestamp)
       
@@ -253,7 +259,6 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyCexComponent,
       ResourceFactory.createResource(PrefixComponent + indicator.component.id.replace(" ", "_")))
     indicatorResource.addProperty(PropertyCexHighLow, ResourceFactory.createResource(PrefixCex + indicator.highLow))
-    indicatorResource.addProperty(PropertyDcTermsSource, indicator.source)
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Indicator"))
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + indicator.indicatorType + "Indicator"))
     indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
@@ -261,8 +266,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2009", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2012", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyWfOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
-    indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
-    indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + indicator.provider.id))
+        indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
     createIndicatorWeightTriples(indicator, model)
   }
 
@@ -273,7 +278,6 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyCexComponent,
       ResourceFactory.createResource(PrefixComponent + indicator.component.id.replace(" ", "_")))
     indicatorResource.addProperty(PropertyCexHighLow, ResourceFactory.createResource(PrefixCex + indicator.highLow))
-    indicatorResource.addProperty(PropertyDcTermsSource, indicator.source)
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Indicator"))
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + indicator.indicatorType + "Indicator"))
     indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
@@ -282,7 +286,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
-    indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + indicator.provider.id))
+    indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
     createIndicatorWeightTriples(indicator, model)
   }
 
@@ -396,6 +401,15 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
       case None => sFetcher.issueManager.addError(message = s"No observations for the dataset ${dataset.id}", path = Some("RAW File"))
     }
   }
+  
+  private def createProviderTriples(provider : Provider, model : Model) = {
+    val providerResource = model.createResource(PrefixWfOrg + provider.id)
+    providerResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixOrg + "Organization"))
+    providerResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(provider.name, "en"))
+    providerResource.addProperty(PropertyOrgIdentifier, ResourceFactory.createTypedLiteral(provider.id, XSDDatatype.XSDstring))
+    providerResource.addProperty(PropertyFoafHomepage, ResourceFactory.createResource(provider.web))
+    providerResource.addProperty(PropertyWfOntoRefSourceData, ResourceFactory.createResource(provider.source))    
+  }
 
   private def createModel: com.hp.hpl.jena.rdf.model.Model = {
     val model = ModelFactory.createDefaultModel
@@ -427,6 +441,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     model.setNsPrefix("void", PrefixVoid)
     model.setNsPrefix("base", PrefixBase)
     model.setNsPrefix("foaf", PrefixFoaf)
+    model.setNsPrefix("org", PrefixOrg)
     model
   }
 }
@@ -447,6 +462,7 @@ object ModelGenerator {
   val PrefixComputation = "http://data.webfoundation.org/webindex/v2013/computation/"
   val PrefixVoid = "http://rdfs.org/ns/void#"
   val PrefixFoaf = "http://xmlns.com/foaf/0.1/"
+  val PrefixOrg = "http://www.w3.org/ns/org#"
 
   val PropertyDcTermsPublisher = ResourceFactory.createProperty(PrefixDcTerms
     + "publisher")
@@ -504,5 +520,9 @@ object ModelGenerator {
   val PropertySkosHasComponent = ResourceFactory.createProperty(PrefixSkos + "has-component")
 
   val PropertySMDXUnitMeasure = ResourceFactory.createProperty(PrefixSdmxAttribute + "unitMeasure")
+  
+  val PropertyFoafHomepage = ResourceFactory.createProperty(PrefixFoaf + "homepage")
+  
+  val PropertyOrgIdentifier = ResourceFactory.createProperty(PrefixOrg + "identifier")
 
 }

@@ -70,12 +70,12 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
    * This method load all structure about Web Index information
    */
   private def loadStructure(f: File) {
+    safeLoadInformation(f, loadProviderInformation)
     safeLoadInformation(f, loadSubIndexInformation)
     safeLoadInformation(f, loadIndicatorInformation)
     loadDatasetInformation(secondaryIndicators.toList)
     loadCountryInformation(Configuration.getCountryFile, true)
     safeLoadInformation(f, loadRegionInformation)
-    safeLoadInformation(f, loadProviderInformation)
   }
   
   def saveReport(timestamp : Long) : (Seq[Issue], String) = {
@@ -208,9 +208,32 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
 
   //Obtain a component given it's id
-  def obtainComponent(componentId: String): Component = {
-    components.find(component => component.id.equals(componentId))
-      .getOrElse(throw new IllegalArgumentException("Not exist component " + componentId))
+  def obtainComponent(componentId: String): Option[Component] = {
+    if(componentId.isEmpty()) {
+      issueManager.addError("Component of a indicator cannot be empty", 
+          Some("Structure file"), Some("Indicators"))
+      None
+    } else {      
+	    val result = components.find(component => component.id.equals(componentId))
+	    if(!result.isDefined)
+	     issueManager.addError("Not exist component " + componentId, 
+	          Some("Structure file"), Some("Indicators"))
+	    result
+	    }
+  }
+  
+  def obtainProvider(providerId : String) : Option[Provider] = {
+    if(providerId.isEmpty()) {
+      issueManager.addError("Provider of a indicator cannot be empty", 
+          Some("Structure file"), Some("Indicators"))
+      None
+    } else {
+      val result = providers.find(provider => provider.id.equals(providerId))
+	  if(!result.isDefined)
+		  issueManager.addError("Not exist provider " + providerId, 
+			  Some("Structure file"), Some("Indicators"))
+	  result
+    }
   }
 
   def getDatasets(): List[Dataset] = {
@@ -223,12 +246,6 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 
   def getObservationsByStatus(status: ObservationStatus): List[Observation] = {
     observations.filter(_.status == status).toList
-  }
-
-  def getComponentById(componentId: String): Component = {
-    components.find(component => component.id.equals(componentId)).getOrElse(
-      throw new IllegalArgumentException("There is no component with id " +
-        componentId))
   }
 }
 
