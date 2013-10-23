@@ -37,6 +37,22 @@
 				document.write(unescape("%3Cscript src='@routes.Assets.at("javascripts/jquery-1.10.2.min.js")' type='text/javascript'%3E%3C/script%3E"));
 			}
 		</script>
+		<script type="text/javascript">
+			(function structureSelector() {
+				var structureSelectorCheckbox = document.getElementById("structureSelector");
+	
+				if (structureSelectorCheckbox)
+					structureSelectorCheckbox.onclick = function() {
+						var checked = this.checked;
+						var uploadInput = document.getElementById("structureInput");
+			
+				if (checked)
+					uploadInput.style.display = "block";
+				else
+					uploadInput.style.display = "none";
+				};
+			})();
+		</script>
         <script>
 		// Safari reports success of list attribute, so doing ghetto detection instead
 		yepnope({
