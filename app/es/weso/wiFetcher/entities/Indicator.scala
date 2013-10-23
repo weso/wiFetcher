@@ -17,7 +17,7 @@ case class Indicator(
   val highLow: IndicatorHighLow = null,
   val source: String = "",
   val component: Component = null,
-  val provider:String = "") {
+  val provider:Provider = null) {
 
   override def equals(o: Any) = o match {
     case that: Indicator => that.id.equalsIgnoreCase(this.id)

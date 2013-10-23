@@ -18,6 +18,8 @@ import es.weso.wiFetcher.entities.IndicatorType
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.POIUtils
 import es.weso.wiFetcher.utils.IssueManagerUtils
+import es.weso.wiFetcher.entities.Provider
+import es.weso.wiFetcher.entities.traits.Component
 
 /**
  * This class contains the implementation that allows to load all information
@@ -110,18 +112,21 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
         Configuration.getIndicatorDescriptionColumn), evaluator)
       source = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorSourceColumn), evaluator)
-      provider = POIUtils.extractCellValue(actualRow.getCell(
+      providerId = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorProviderColumn), evaluator)
       weight = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorWeightColumn), evaluator)
       hl = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorHLColumn), evaluator)
-      component = POIUtils.extractCellValue(actualRow.getCell(
+      componentId = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorComponentColumn), evaluator)
-      if(!id.isEmpty() && !component.isEmpty())
+      if(!id.isEmpty())
+      component = sFetcher.obtainComponent(componentId) 
+      provider = sFetcher.obtainProvider(providerId)
+      if(component.isDefined && provider.isDefined)
     } yield {
       createIndicator(id, iType, name, description, weight, hl, source,
-        component, provider)
+        component.get, provider.get)
     }
     logger.info("Finish indicators extraction")
     indicators
@@ -145,8 +150,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
    */
   def createIndicator(id: String, iType: String,
     name: String, description: String, weight: String, hl: String,
-    source: String, component: String, provider: String): Indicator = {
-    val componentObj = sFetcher.obtainComponent(component)
+    source: String, component: Component, provider: Provider): Indicator = {
     val indicator = Indicator(
       id, iType match {
         case "Primary" => IndicatorType.Primary
@@ -166,8 +170,8 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
             path = XslxFile, sheetName = Some(SheetName), cell = Some(hl))
           IndicatorHighLow.Wrong
       },
-      source, componentObj, provider)
-    componentObj.addIndicator(indicator)
+      source, component, provider)
+    component.addIndicator(indicator)
     indicator
   }
 
