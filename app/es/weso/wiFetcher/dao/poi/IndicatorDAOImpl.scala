@@ -123,7 +123,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
       if(!id.isEmpty)
       component = sFetcher.obtainComponent(componentId, actualRow.getRowNum, 
           Configuration.getIndicatorComponentColumn) 
-      provider = sFetcher.obtainProvider(providerId, actualRow.getRowNum,
+      provider = sFetcher.obtainProviderByName(providerId, actualRow.getRowNum,
         Configuration.getIndicatorProviderColumn)
       if(component.isDefined && provider.isDefined)
     } yield {
