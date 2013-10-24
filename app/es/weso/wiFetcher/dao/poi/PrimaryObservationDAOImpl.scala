@@ -97,7 +97,7 @@ class PrimaryObservationDAOImpl (
      for {
        col <- initialCol to row.getLastCellNum
        indicatorId = POIUtils.extractCellValue(row.getCell(col), evaluator)
-       if(!indicatorId.isEmpty())
+       if(!indicatorId.isEmpty)
        indicator = sFetcher.obtainIndicatorById(indicatorId)
        if{
          val ret = indicator.isDefined

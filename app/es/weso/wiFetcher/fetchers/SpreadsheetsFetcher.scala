@@ -192,7 +192,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 
   //Obtain an indicator given it's id
   def obtainIndicatorById(id: String): Option[Indicator] = {
-    val combined: ListBuffer[Indicator] = new ListBuffer
+    val combined: ListBuffer[Indicator] = ListBuffer.empty
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
     combined.find(indicator => indicator.id.equals(id))
@@ -208,30 +208,30 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
 
   //Obtain a component given it's id
-  def obtainComponent(componentId: String): Option[Component] = {
+  def obtainComponent(componentId: String, row : Int, col : Int): Option[Component] = {
     if(componentId.isEmpty()) {
       issueManager.addError("Component of a indicator cannot be empty", 
-          Some("Structure file"), Some("Indicators"))
+          Some("Structure file"), Some("Indicators"), Some(col), Some(row))
       None
     } else {      
 	    val result = components.find(component => component.id.equals(componentId))
 	    if(!result.isDefined)
 	     issueManager.addError("Not exist component " + componentId, 
-	          Some("Structure file"), Some("Indicators"))
+	          Some("Structure file"), Some("Indicators"), Some(col), Some(row))
 	    result
 	    }
   }
   
-  def obtainProvider(providerId : String) : Option[Provider] = {
+  def obtainProvider(providerId : String, row : Int, col : Int) : Option[Provider] = {
     if(providerId.isEmpty()) {
       issueManager.addError("Provider of a indicator cannot be empty", 
-          Some("Structure file"), Some("Indicators"))
+          Some("Structure file"), Some("Indicators"), Some(col), Some(row))
       None
     } else {
       val result = providers.find(provider => provider.id.equals(providerId))
 	  if(!result.isDefined)
 		  issueManager.addError("Not exist provider " + providerId, 
-			  Some("Structure file"), Some("Indicators"))
+			  Some("Structure file"), Some("Indicators"), Some(col), Some(row))
 	  result
     }
   }

@@ -77,7 +77,7 @@ class SecondaryObservationDAOImpl(
   }
   
   protected def checkSheets(workbook : Workbook) = {
-    val sheets = workbook.getNumberOfSheets()
+    val sheets = workbook.getNumberOfSheets
     for{
         index <- 0 until sheets        
         sheet = workbook.getSheetAt(index)
@@ -88,8 +88,8 @@ class SecondaryObservationDAOImpl(
         if(!sFetcher.obtainIndicatorById(indicatorId).isDefined)
     } { 
       sFetcher.issueManager.addError(
-            message = s"There are observations for indicator ${indicatorId} " +
-              "but it's no present in structure file",
+            message = s"There are observations for dataset ${name}, but indicator ${indicatorId} " +
+              "it's no present in structure file",
             path = XslxFile)
     }
   }
