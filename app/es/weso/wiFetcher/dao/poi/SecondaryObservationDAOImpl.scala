@@ -85,6 +85,7 @@ class SecondaryObservationDAOImpl(
         if(name.contains("-Ordered") || name.contains("-Imputed") || 
           name.contains("-Normalised"))
         indicatorId = name.substring(0, name.indexOf("-"))
+        if(!indicatorId.equals("Survey"))
         if(!sFetcher.obtainIndicatorById(indicatorId).isDefined)
     } { 
       sFetcher.issueManager.addError(

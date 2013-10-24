@@ -231,7 +231,7 @@
 	{"webIndexName" : "Tuvalu", "iso-2": "TV", "iso-3": "TUV", "names":["Tuvalu"]},
 	{"webIndexName" : "Uganda", "iso-2": "UG", "iso-3": "UGA", "names":["Uganda"]},
 	{"webIndexName" : "Ukraine", "iso-2": "UA", "iso-3": "UKR", "names":["Ukraine"]},
-	{"webIndexName" : "United Arab Emirates", "iso-2": "AE", "iso-3": "ARE", "names":["United Arab Emirates"]},
+	{"webIndexName" : "United Arab Emirates", "iso-2": "AE", "iso-3": "ARE", "names":["United Arab Emirates", "UAE"]},
 	{"webIndexName" : "Uruguay", "iso-2": "UY", "iso-3": "URY", "names":["Uruguay"]},
 	{"webIndexName" : "Uzbekistan", "iso-2": "UZ", "iso-3": "UZB", "names":["Uzbekistan"]},
 	{"webIndexName" : "Vanuatu", "iso-2": "VU", "iso-3": "VUT", "names":["Vanuatu"]},

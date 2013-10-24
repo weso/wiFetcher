@@ -29,23 +29,26 @@ class PrimaryObservationDAOImpl (
   protected def load(is: InputStream) {
     logger.info("Begin primary observations extraction")
     val workbook: Workbook = WorkbookFactory.create(is)
-    val sheet = workbook.getSheet(sheetName)
-    if (sheet == null) {
-      sFetcher.issueManager.addError(
-        message = s"The sheet ${sheetName} is not included in the file. " +
-        		"Primary observations cannot be loaded.",
-        path = XslxFile)
-    } else {
-      observations ++= parseData(workbook, sheet)
+    for(sheetName <- sheets) {
+      val sheet = workbook.getSheet(sheetName)
+      if (sheet == null) {
+        sFetcher.issueManager.addError(
+          message = s"The sheet ${sheetName} is not included in the file. " +
+        	  	"Primary observations cannot be loaded.",
+          path = XslxFile)
+      } else {
+        observations ++= parseData(workbook, sheet)
+      }
     }
-      logger.info("Finish primary observations extraction")
+    logger.info("Finish primary observations extraction")
   }
   
    protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Observation] = {
      val initialCell = new CellRef(Configuration.getInicialCellPrimaryIndicator)
      val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
      val indicatorRow = Configuration.getPrimaryIndicatorRow
-     val status = "Raw"
+     val sheetName = sheet.getSheetName
+     val status = sheetName.substring(sheetName.indexOf("-") + 1, sheetName.length)
        
      val indicators = extractIndicators(indicatorRow, initialCell.getCol, 
          sheet, evaluator)
@@ -122,7 +125,8 @@ object PrimaryObservationDAOImpl {
 
   private val logger: Logger = Logger.getLogger(this.getClass)
   
-  private val sheetName : String = "Survey-Raw"
+    private val sheets : Array[String] = Array("Survey-Raw", "Survey-Ordered", 
+      "Survey-Normalised")
 
   private val XslxFile = Some("Observations File")
 
