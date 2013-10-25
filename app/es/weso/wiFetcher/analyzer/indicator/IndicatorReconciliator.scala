@@ -53,7 +53,7 @@ class IndicatorReconciliator(implicit val sFetcher: SpreadsheetsFetcher) {
       val id = new TextField(IndicatorIdField, indicator.id,
         Field.Store.YES)
       val name = new TextField(IndicatorNameField,
-        indicator.label, Field.Store.YES)
+        indicator.labels.get("en").get, Field.Store.YES)
       doc.add(id)
       doc.add(name)
       indexWriter.addDocument(doc)

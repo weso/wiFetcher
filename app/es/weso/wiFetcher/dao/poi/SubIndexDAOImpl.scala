@@ -1,16 +1,13 @@
 package es.weso.wiFetcher.dao.poi
 
 import java.io.InputStream
-
 import scala.collection.mutable.ListBuffer
-
 import org.apache.poi.hssf.util.CellReference
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.SubIndexDAO
 import es.weso.wiFetcher.entities.Entity
@@ -19,6 +16,7 @@ import es.weso.wiFetcher.entities.traits.SubIndex
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.utils.POIUtils
+import scala.collection.mutable.HashMap
 
 /**
  * This class contains the implementation that allows to load all information
@@ -85,9 +83,29 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
       //Extract the weight
       weight = POIUtils.extractCellValue(
         actualRow.getCell(Configuration.getSubindexWeithColumn), evaluator)
+      frenchLabel = POIUtils.extractCellValue(
+        actualRow.getCell(Configuration.getSubindexFrenchLabelColumn), evaluator)
+      frenchComment = POIUtils.extractCellValue(
+          actualRow.getCell(Configuration.getSubindexFrenchCommentColumn), evaluator)
+      spanishLabel = POIUtils.extractCellValue(
+          actualRow.getCell(Configuration.getSubindexSpanishLabelColumn), evaluator)
+      spanishComment = POIUtils.extractCellValue(
+          actualRow.getCell(Configuration.getSubindexSpanishCommentColumn), evaluator)
+      arabicLabel = POIUtils.extractCellValue(
+          actualRow.getCell(Configuration.getSubindexArabicLabelColumn), evaluator)
+      arabicComment = POIUtils.extractCellValue(
+          actualRow.getCell(Configuration.getSubindexArabicCommentColumn), evaluator)
       //Create the entity (sub-index or component)
     } yield {
-      createEntity(eType, id, name, description, weight)
+      val names : HashMap[String, String] = HashMap("en" -> name,
+          "fr" -> frenchLabel,
+          "es" -> spanishLabel,
+          "ar" -> arabicLabel)
+      val comments : HashMap[String, String] = HashMap("en" -> description,
+          "fr" -> frenchComment,
+          "es" -> spanishComment,
+          "ar" -> arabicComment)
+      createEntity(eType, id, weight, names, comments)
     }
   }
 
@@ -131,12 +149,13 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    * @param The description of the entity
    */
   def createEntity(eType: String, id: String, weight: String,
-    name: String, description: String): Entity = {
+    names: HashMap[String, String], 
+    descriptions: HashMap[String, String]): Entity = {
     eType match {
       case e if (e == SubindexType) =>
-        createSubIndex(id, weight, name, description)
+        createSubIndex(id, names, descriptions, weight)
       case e if (e == ComponentType) =>
-        createComponent(id, weight, name, description)
+        createComponent(id, names, descriptions, weight)
       case _ =>
         sFetcher.issueManager.addError(message = new StringBuilder("Unknown type '")
           .append(eType).append(" in Structure Sheet").toString, path = XslxFile,
@@ -153,10 +172,10 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    * @param weight The weight that have the sub-index in order to calculate the
    * Web Index
    */
-  def createSubIndex(id: String, name: String, description: String,
-    weight: String): SubIndex = {
+  def createSubIndex(id: String, names: HashMap[String, String], 
+      descriptions: HashMap[String, String], weight: String): SubIndex = {
     logger.info("Create the component: {}" + { id })
-    val subIndex = new Entity(id, name, description, weight.toDouble) with SubIndex
+    val subIndex = new Entity(id, names, descriptions, weight.toDouble) with SubIndex
     subIndexes += subIndex
     subIndex
   }
@@ -169,15 +188,16 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    * @param Weight The weight that have the component in order to calculate
    * the Web Index
    */
-  def createComponent(id: String, name: String, description: String,
-    weight: String): Component = {
+  def createComponent(id: String, names: HashMap[String, String], 
+      descriptions: HashMap[String, String], weight: String): Component = {
     logger.info("Create the sub-index: {}", id)
-    val component = new Entity(id, name, description, weight.toDouble) with Component
+    val component = new Entity(id, names, descriptions, weight.toDouble) with Component
     components += component
     component
   }
 
-  def createWrongEntity = Entity("wrong", "wrong", "wrong", 0)
+  def createWrongEntity = Entity("wrong", HashMap("en" -> "wrong"), 
+      HashMap("en"->"wrong"), 0)
 
   /**
    * This method returns a list with all components

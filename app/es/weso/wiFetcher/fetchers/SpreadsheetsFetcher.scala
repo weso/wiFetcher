@@ -207,7 +207,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     val combined: ListBuffer[Indicator] = new ListBuffer
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
-    combined.find(indicator => indicator.comment.equalsIgnoreCase(indicatorDescription))
+    combined.find(indicator => indicator.comments
+        .get("en").get.equalsIgnoreCase(indicatorDescription))
       .getOrElse(throw new IllegalArgumentException("Not exist indicator with "
         + s"description ${indicatorDescription}"))
   }

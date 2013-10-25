@@ -261,13 +261,24 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyCexHighLow, ResourceFactory.createResource(PrefixCex + indicator.highLow))
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Indicator"))
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + indicator.indicatorType + "Indicator"))
-    indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
-    indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(indicator.comment, "en"))
+//    indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
+//    indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2009", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2012", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyWfOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + indicator.provider.id))
         indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
+    indicator.labels.keySet.foreach(lang => {
+      val label = indicator.labels.get(lang).get
+//      if(!label.isEmpty)
+    	  indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
+    })
+    indicator.comments.keySet.foreach(lang => {
+      val comment = indicator.comments.get(lang).get
+//      if(!comment.isEmpty)
+        indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))
+        indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(comment, lang))
+    })
     createIndicatorWeightTriples(indicator, model)
   }
 
@@ -280,14 +291,25 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyCexHighLow, ResourceFactory.createResource(PrefixCex + indicator.highLow))
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Indicator"))
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + indicator.indicatorType + "Indicator"))
-    indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
-    indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(indicator.comment, "en"))
+//    indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
+//    indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertySkosNotation, ResourceFactory.createTypedLiteral(indicator.id, XSDDatatype.XSDstring))
-    indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(indicator.comment, "en"))
+//    indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
     indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + indicator.provider.id))
     indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
+    indicator.labels.keySet.foreach(lang => {
+      val label = indicator.labels.get(lang).get
+//      if(!label.isEmpty)
+    	  indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
+    })
+    indicator.comments.keySet.foreach(lang => {
+      val comment = indicator.comments.get(lang).get
+//      if(!comment.isEmpty)
+        indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))
+        indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(comment, lang))
+    })
     createIndicatorWeightTriples(indicator, model)
   }
 
@@ -304,11 +326,21 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   def createComponentsTriples(component: Component, model: Model) = {
     val componentResource = model.createResource(PrefixComponent + component.id.replace(" ", "_"))
     componentResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Component"))
-    componentResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral("MD5 for" + component.name, "en"))
+    componentResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral("MD5 for" + component.names.get("en").get, "en"))
     componentResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     componentResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     componentResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
-    componentResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(component.name, "en"))
+//    componentResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(component.name, "en"))
+    component.names.keySet.foreach(lang => {
+      val label = component.names.get(lang).get
+//      if(!label.isEmpty)
+    	  componentResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
+    })
+    component.descriptions.keySet.foreach(lang => {
+      val comment = component.descriptions.get(lang).get
+//      if(!label.isEmpty)
+    	  componentResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))      
+    })
     componentResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     component.getIndicators.foreach(indicator => {
       componentResource.addProperty(PropertyCexElement, ResourceFactory.createResource(PrefixIndicator + indicator.id.replace(" ", "_")))
@@ -326,8 +358,19 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   def createSubindexTriples(subindex: SubIndex, indexResource : Resource, model: Model) {
     val subindexResource = model.createResource(PrefixSubindex + subindex.id.replace(" ", "_"))
     subindexResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "SubIndex"))
-    subindexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(subindex.name, "en"))
-    subindexResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(subindex.description, "en"))
+//    subindexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(subindex.name, "en"))
+//    subindexResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(subindex.description, "en"))
+    subindex.names.keySet.foreach(lang => {
+      val label = subindex.names.get(lang).get
+//      if(!label.isEmpty)
+    	  subindexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
+    })
+    subindex.descriptions.keySet.foreach(lang => {
+      val comment = subindex.descriptions.get(lang).get
+//      if(!label.isEmpty)
+    	  subindexResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))      
+    })
+    
     subindex.getComponents.foreach(component => {
       subindexResource.addProperty(PropertyCexElement, ResourceFactory.createResource(PrefixComponent + component.id.replace(" ", "_")))
     })
