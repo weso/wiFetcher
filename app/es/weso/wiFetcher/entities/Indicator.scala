@@ -4,12 +4,13 @@ import es.weso.wiFetcher.entities.IndicatorType._
 import es.weso.wiFetcher.entities.IndicatorHighLow._
 import java.util.Date
 import es.weso.wiFetcher.entities.traits.Component
+import scala.collection.mutable.HashMap
 
 case class Indicator(
   val id: String = null,
   val indicatorType: IndicatorType = null,
-  val label: String = "",
-  val comment: String = "",
+  val labels: HashMap[String, String] = new HashMap[String, String](),
+  val comments: HashMap[String, String] = new HashMap[String, String](),
   val intervalStarts: Date = null,
   val interfalFinishes: Date = null,
   val countriesCoverage: Int = 0,
