@@ -19,11 +19,11 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   var subIndexDao : SubIndexDAO = null
   var emptyDao : SubIndexDAO = null
   val fetcher : SpreadsheetsFetcher = SpreadsheetsFetcher(
-      new File(FileUtils.getFilePath("files/structure.xlsx", true)),
+      new File(FileUtils.getFilePath("files/Structure.xlsx", true)),
       new File(FileUtils.getFilePath("files/example.xlsx", true)))
   
   before {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     subIndexDao = new SubIndexDAOImpl(is)(fetcher)
     val is2 = new FileInputStream(FileUtils.getFilePath("files/empty.xlsx", 
@@ -46,7 +46,7 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Load all subindex data from correct excel file") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", true))
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", true))
     subIndexDao = new SubIndexDAOImpl(is)(fetcher)
     subIndexDao should not be (null)
     subIndexDao.getSubIndexes.size should not be (0)
