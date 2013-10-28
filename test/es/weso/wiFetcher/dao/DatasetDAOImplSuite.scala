@@ -12,6 +12,7 @@ import scala.collection.mutable.ListBuffer
 import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.entities.IndicatorType
 import es.weso.wiFetcher.entities.IndicatorHighLow
+import es.weso.wiFetcher.entities.Provider
 
 @RunWith(classOf[JUnitRunner])
 class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter 
@@ -30,7 +31,7 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        "")
+        Provider("", "", "", ""))
     list += Indicator("B", 
         IndicatorType.Primary, 
         "test indicator 2",
@@ -42,7 +43,7 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        "")
+        Provider("", "", "", ""))
     list += Indicator("C", 
         IndicatorType.Primary, 
         "test indicator 3",
@@ -54,7 +55,7 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        "")
+        Provider("", "", "", ""))
     list
   }
   

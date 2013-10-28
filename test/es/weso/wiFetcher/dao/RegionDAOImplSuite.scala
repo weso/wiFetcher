@@ -18,7 +18,7 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
 	with Matchers with BeforeAndAfterAll{
   
   val fetcher : SpreadsheetsFetcher = SpreadsheetsFetcher(
-      new File(FileUtils.getFilePath("files/structure.xlsx", true)),
+      new File(FileUtils.getFilePath("files/Structure.xlsx", true)),
       new File(FileUtils.getFilePath("files/example.xlsx", true)))
 
   test("Try to load data from a non-existing file") {
@@ -36,7 +36,7 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Load data correctly") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val regionDao = new RegionDAOImpl(is)(fetcher)
     regionDao should not be null
@@ -44,12 +44,12 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Obtain all regions") {
-     val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val regionDao = new RegionDAOImpl(is)(fetcher)
     val regions = regionDao.getRegions
     regions should not be null
-    regions.size should be (1)
+    regions.size should be (5)
   }
   
   test("Obtain all regions from empty file") {
@@ -61,17 +61,20 @@ class RegionDAOImplSuite extends FunSuite with BeforeAndAfter
     regions.size should be (0)
   }
   
-  /*test("Validate countries for regions") {
+  test("Validate countries for regions") {
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
+        true))
+    val regionDao = new RegionDAOImpl(is)(fetcher)
     val regions = regionDao.getRegions
     regions.foreach(region => {
       region.name match {
-        case "Africa" => region.getCountries.size should be (18)
-        case "Americas" => region.getCountries.size should be (9)
-        case "Asia pacific" => region.getCountries.size should be (14)
-        case "Europe" => region.getCountries.size should be (15)
-        case "Middle east & Central asia" => region.getCountries.size should be (5)
+        case "Africa" => region.getCountries.size should be (22)
+        case "Americas" => region.getCountries.size should be (13)
+        case "Asia Pacific" => region.getCountries.size should be (15)
+        case "Europe" => region.getCountries.size should be (23)
+        case "Middle East & C. Asia" => region.getCountries.size should be (8)
       } 
     })
-  }*/
+  }
   
 }
