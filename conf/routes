@@ -5,6 +5,10 @@
 # Home page
 GET     /                           controllers.Application.index
 
+GET     /result						controllers.Application.uploadData(path : String, reportPath : String, graph : String)
+
+GET     /instructions				controllers.Application.instructions
+
 GET		/file						controllers.FileUploadController.byFileUploadGET
 POST	/file						controllers.FileUploadController.byFileUploadPOST
 

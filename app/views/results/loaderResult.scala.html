@@ -1,0 +1,26 @@
+@* loaderResult Template File *@
+@(errors: List[String], path : String, reportPath : String, graph : String)
+
+@printErrors() = {
+
+	@for(error <- errors) {
+		@error <br />
+	}
+}
+
+@main("Loader result") {
+	
+	<p class="instructions">
+		<a class="download return-main" title="Return to main page" href="@routes.FileUploadController.byFileUploadGET">Return to main page</a>
+	    <a class="download download-link" title="Report" href="@routes.Assets.at(reportPath)">Download report</a>
+	    <a class="download download-link" title="TTL Dataset" href="@routes.Assets.at(path)">Download TTL Dataset</a>
+	</p>
+	
+	<div><p class="center">
+	@if(errors.isEmpty) {
+		:) All data is stored successfully into the triple-store in the named graph @graph! 
+	} else {
+		@printErrors()
+	}
+	</p></div>
+}

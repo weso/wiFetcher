@@ -63,10 +63,10 @@
 					</datalist>
 				</p>
 				}
-	      	<p class="instructions">
+	      	<!--  <p class="instructions">
 	      		<label title="Load generated ttl file into the triple-store" for="load_file">Upload dataset.ttl to the Triple Store:</label>
 	      		<input type="checkbox" value="1" id="load_file" name="load_file"/>
-	      	</p>
+	      	</p>-->
 	      	<div class="@if(fileForm.hasErrors) {error}">
 	      		@for(error <- fileForm.globalErrors){
 	      			<span class="errors">@error.message</span>

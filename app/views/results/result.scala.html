@@ -1,4 +1,4 @@
-@(path : String, issues : Seq[Issue], reportPath : String)
+@(path : String, issues : Seq[Issue], reportPath : String, graph : String)
 
 @printIssues(name:String, issues : Seq[Issue])={
 		@for(issue <- issues){
@@ -16,6 +16,11 @@
 
 @main("Report") {
 <div id="results_container">
+
+	<p class="submit_button">
+		<a title="Upload data into the triple-store" href="@routes.Application.uploadData(path, reportPath, graph)"><button class="button">Upload</button></a>
+		<a title="Instructions to upload data" href="@routes.Application.instructions()"><button class="button">Instructions</button></a>
+	</p>
 
 	<p class="instructions">
 		<a class="download return-main" title="Return to main page" href="@routes.FileUploadController.byFileUploadGET">Return to main page</a>
