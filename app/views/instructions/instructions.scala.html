@@ -1,0 +1,20 @@
+@* instructions Template File *@
+@(param: Any)
+
+@main("Instructions") {
+	<p class="instructions">
+		<a class="download return-main" title="Return to main page" href="@routes.FileUploadController.byFileUploadGET">Return to main page</a>
+	</p>
+	<p class="instructions">
+		In order to upload data into the triple-store, you only have to access 
+		to the server and execute the upload script. This script is located in 
+		the folder <em>"public/temp"</em>, inside root folder of this 
+		application. 
+	</p>
+	<p class="instructions">
+		If all parameters of the script are correct, the last ttl file generated
+		by wiFether will be uploaded into triple-store. On the other hand, if an
+		error occurs during the execution, the data will not be uploaded, so you
+		must review parameters of the script.
+	</p>
+}

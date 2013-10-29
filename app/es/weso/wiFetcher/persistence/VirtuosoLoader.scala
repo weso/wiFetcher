@@ -13,20 +13,16 @@ object VirtuosoLoader {
   
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
 
-  def store(path : String, timestamp : Long, baseUri : String, sf : SpreadsheetsFetcher) = {  
-    generateCode(timestamp, path, baseUri)
+  def store() : List[String] = {  
     val errors : ListBuffer[String] = ListBuffer.empty
     val upload = Process("public/temp/script.sh")
     val processLogger = ProcessLogger((o: String) => logger.info(o),
         (e:String) => errors += e)
-    upload ! processLogger  
-    errors.foreach(error => {
-      if(!error.isEmpty())
-    	  sf.issueManager.addError(message = error, path = Some("public/temp/script.sh"))
-    })
+    upload ! processLogger
+    errors.toList
   }
   
-  private def generateCode(timestamp : Long, path : String, baseUri : String) = {
+  def generateCode(timestamp : Long, path : String, baseUri : String) = {
     val variables : StringBuilder = new StringBuilder
     val graph : String = baseUri + "/"
     val dir = Configuration.getVirtuosoLoadDir

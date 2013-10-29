@@ -70,7 +70,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   
   private var id: Int = 1
 
-  def generateJenaModel(spreadsheetsFetcher: SpreadsheetsFetcher, store: Boolean, timestamp : Long, imp: Option[String] = None): String = {
+  def generateJenaModel(spreadsheetsFetcher: SpreadsheetsFetcher/*, store: Boolean*/, timestamp : Long, imp: Option[String] = None): String = {
     //val observations : List[Observation] = SpreadsheetsFetcher.observations.toList
     val observationsByDataset = spreadsheetsFetcher.observations.groupBy(
       observation => observation.dataset)
@@ -102,7 +102,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
       
     val path = saveModel(model, timestamp)
       
-    if (store) storeModel(path, timestamp)
+    generateUploadScript(path, timestamp)
 
     path
   }
@@ -167,10 +167,10 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     path
   }
 
-  private def storeModel(path: String, timestamp : Long) = {
+  private def generateUploadScript(path: String, timestamp : Long) = {
     val builder = new StringBuilder(baseUri)
     builder.append("/").append(namespace).append("/").append(year)
-    VirtuosoLoader.store(path, timestamp, builder.toString, sFetcher)
+    VirtuosoLoader.generateCode(timestamp, path, builder.toString)
   }
 
   def createDataStructureDefinition(model: Model) = {
