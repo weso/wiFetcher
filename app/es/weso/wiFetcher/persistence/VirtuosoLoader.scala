@@ -30,11 +30,15 @@ object VirtuosoLoader {
     val virtUser = Configuration.getVirtuosoUser
     val virtPass = Configuration.getVirtuosoPass
     val scriptBuilder = new StringBuilder
+    
+    scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
+    scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
     scriptBuilder.append("install ./public/").append(path).append(" ").append(dir).append("\n")
     scriptBuilder.append("isql-vt ").append(virtServer).append(" ").append(virtUser).append(" ").append(virtPass).append(" <<EOF\n")
     scriptBuilder.append("sparql clear graph '").append(graph).append("';\n")
     scriptBuilder.append("delete from DB.DBA.load_list;\n")
     scriptBuilder.append("ld_dir ('").append(dir).append("', 'dataset-").append(timestamp).append(".ttl', '").append(graph).append("');\n")
+    scriptBuilder.append("ld_dir ('").append(dir).append("', 'wf.ttl', '").append(graph).append("');\n")
     scriptBuilder.append("rdf_loader_run();\n")
     scriptBuilder.append("EXIT;\n")
     scriptBuilder.append("EOF\n")
