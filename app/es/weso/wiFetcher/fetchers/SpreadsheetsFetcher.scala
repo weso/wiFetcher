@@ -255,17 +255,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
   
   def obtainProviderByName(providerName : String, row : Int, col : Int) : Option[Provider] = {
-    if(providerName.isEmpty()) {
-      issueManager.addError("Provider of a indicator cannot be empty", 
-          Some("Structure file"), Some("Indicators"), Some(col), Some(row))
-      None
-    } else {
       val result = providers.find(provider => provider.name.equalsIgnoreCase(providerName.trim))
-	  if(!result.isDefined)
-		  issueManager.addError("Not exist provider " + providerName, 
-			  Some("Structure file"), Some("Indicators"), Some(col), Some(row))
 	  result
-    }
   }
 
   def getDatasets(): List[Dataset] = {
