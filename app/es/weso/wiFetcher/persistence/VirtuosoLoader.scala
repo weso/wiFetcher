@@ -44,7 +44,7 @@ object VirtuosoLoader {
     scriptBuilder.append("cd .. \n")
     scriptBuilder.append("fi \n")
     
-    scriptBuilder.append("install ./computex/ontology/wf.tll ").append(dir).append("\n")
+    scriptBuilder.append("install ./computex/ontology/wf.ttl ").append(dir).append("\n")
     scriptBuilder.append("install ./public/").append(path).append(" ").append(dir).append("\n")
     scriptBuilder.append("isql-vt ").append(virtServer).append(" ").append(virtUser).append(" ").append(virtPass).append(" <<EOF\n")
     scriptBuilder.append("sparql clear graph '").append(graph).append("';\n")
