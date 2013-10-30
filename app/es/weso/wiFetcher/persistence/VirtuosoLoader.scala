@@ -32,18 +32,13 @@ object VirtuosoLoader {
     val scriptBuilder = new StringBuilder
     
     //Create function that update a local repository of computex
-    scriptBuilder.append("function update_repo {\n")
-    scriptBuilder.append("if [[ -d \"$1\" && ! -L \"$1\" ]] ; then \n")
-    scriptBuilder.append("(cd $1; git checkout $3)\n")
-    scriptBuilder.append("(cd $1; git pull origin $3)\n")
+    scriptBuilder.append("if [[ -d \"computex\" && ! -L \"computex\" ]] ; then \n")
+    scriptBuilder.append("(cd computex; git checkout master)\n")
+    scriptBuilder.append("(cd computex; git pull origin master)\n")
     scriptBuilder.append("else\n")
-    scriptBuilder.append("git clone $2 \n")
-    scriptBuilder.append("(cd $1; git checkout $3)\n")
+    scriptBuilder.append("git clone https://github.com/weso/wiFetcher.git \n")
+    scriptBuilder.append("(cd computex; git checkout master)\n")
     scriptBuilder.append("fi \n")
-    scriptBuilder.append("}\n\n")
-    
-    //Update the repository and copy wf.ttl file into /tmp folder
-    scriptBuilder.append("update_repo \"computex\" \"https://github.com/weso/computex.git\" \"master\" \n")
     
     scriptBuilder.append("install ./computex/ontology/wf.tll ").append(dir).append("\n")
     scriptBuilder.append("install ./public/").append(path).append(" ").append(dir).append("\n")
