@@ -30,11 +30,28 @@ object VirtuosoLoader {
     val virtUser = Configuration.getVirtuosoUser
     val virtPass = Configuration.getVirtuosoPass
     val scriptBuilder = new StringBuilder
+    
+    //Create function that update a local repository of computex
+    scriptBuilder.append("function update_repo {\n")
+    scriptBuilder.append("if [[ -d \"$1\" && ! -L \"$1\" ]] ; then \n")
+    scriptBuilder.append("(cd $1; git checkout $3)\n")
+    scriptBuilder.append("(cd $1; git pull origin $3)\n")
+    scriptBuilder.append("else\n")
+    scriptBuilder.append("git clone $2 \n")
+    scriptBuilder.append("(cd $1; git checkout $3)\n")
+    scriptBuilder.append("fi \n")
+    scriptBuilder.append("}\n\n")
+    
+    //Update the repository and copy wf.ttl file into /tmp folder
+    scriptBuilder.append("update_repo \"computex\" \"https://github.com/weso/computex.git\" \"master\" \n")
+    
+    scriptBuilder.append("install ./computex/ontology/wf.tll ").append(dir).append("\n")
     scriptBuilder.append("install ./public/").append(path).append(" ").append(dir).append("\n")
     scriptBuilder.append("isql-vt ").append(virtServer).append(" ").append(virtUser).append(" ").append(virtPass).append(" <<EOF\n")
     scriptBuilder.append("sparql clear graph '").append(graph).append("';\n")
     scriptBuilder.append("delete from DB.DBA.load_list;\n")
     scriptBuilder.append("ld_dir ('").append(dir).append("', 'dataset-").append(timestamp).append(".ttl', '").append(graph).append("');\n")
+    scriptBuilder.append("ld_dir ('").append(dir).append("', 'wf.ttl', '").append(graph).append("');\n")
     scriptBuilder.append("rdf_loader_run();\n")
     scriptBuilder.append("EXIT;\n")
     scriptBuilder.append("EOF\n")
