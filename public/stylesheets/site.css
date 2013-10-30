@@ -235,7 +235,7 @@ button.button {
 	background: #7AB800;
 }
 
-button.button:hover, button.button:visited, button.button:active, button.button:link{
+button.button:hover, button.button:visited, button.button:active, button.button:link, button.button:focus{
 	background: #7AB800;
 }
 

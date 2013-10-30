@@ -32,7 +32,7 @@ object VirtuosoLoader {
     val scriptBuilder = new StringBuilder
     
     //Create function that update a local repository of computex
-    scriptBuilder.append("if [[ -d \"computex\" && ! -L \"computex\" ]] ; then \n")
+    /*scriptBuilder.append("if [[ -d \"computex\" && ! -L \"computex\" ]] ; then \n")
     scriptBuilder.append("cd computex \n")
     scriptBuilder.append("git checkout master\n")
     scriptBuilder.append("git pull origin master\n")
@@ -42,9 +42,10 @@ object VirtuosoLoader {
     scriptBuilder.append("cd computex \n")
     scriptBuilder.append("git checkout master \n")
     scriptBuilder.append("cd .. \n")
-    scriptBuilder.append("fi \n")
+    scriptBuilder.append("fi \n")*/
     
-    scriptBuilder.append("install ./computex/ontology/wf.ttl ").append(dir).append("\n")
+    scriptBuilder.append("wget -N https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
+    scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
     scriptBuilder.append("install ./public/").append(path).append(" ").append(dir).append("\n")
     scriptBuilder.append("isql-vt ").append(virtServer).append(" ").append(virtUser).append(" ").append(virtPass).append(" <<EOF\n")
     scriptBuilder.append("sparql clear graph '").append(graph).append("';\n")
