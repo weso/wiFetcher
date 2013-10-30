@@ -136,9 +136,9 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
       if(!id.isEmpty)
       component = sFetcher.obtainComponent(componentId, actualRow.getRowNum, 
           Configuration.getIndicatorComponentColumn) 
-      provider = sFetcher.obtainProviderByName(providerId, actualRow.getRowNum,
+      providers = sFetcher.obtainProvider(providerId, actualRow.getRowNum,
         Configuration.getIndicatorProviderColumn)
-      if(component.isDefined && provider.isDefined)
+      if(component.isDefined && !providers.isEmpty)
     } yield {
       val names : HashMap[String, String] = HashMap("en" -> name,
           "fr" -> frenchLabel,
@@ -149,7 +149,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
           "es" -> spanishComment,
           "ar" -> arabicLabel)
       createIndicator(id, iType, names, descriptions, weight, hl, source,
-        component.get, provider.get)
+        component.get, providers)
     }
     logger.info("Finish indicators extraction")
     indicators
@@ -174,7 +174,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
   def createIndicator(id: String, iType: String,
     names: HashMap[String, String], descriptions: HashMap[String, String], 
     weight: String, hl: String, source: String, component: Component, 
-    provider: Provider): Indicator = {
+    provider: ListBuffer[Provider]): Indicator = {
     val indicator = Indicator(
       id, iType match {
         case "Primary" => IndicatorType.Primary

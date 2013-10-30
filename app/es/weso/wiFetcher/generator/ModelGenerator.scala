@@ -266,8 +266,10 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2009", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2012", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyWfOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
-    indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + indicator.provider.id))
-        indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
+    indicator.providers.foreach(provider => {
+      indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + provider.id))
+    })
+    indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
     indicator.labels.keySet.foreach(lang => {
       val label = indicator.labels.get(lang).get
 //      if(!label.isEmpty)
@@ -297,7 +299,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 //    indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2011", XSDDatatype.XSDint))
-    indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + indicator.provider.id))
+    indicator.providers.foreach(provider => {
+      indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + provider.id))
+    })
     indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
     indicator.labels.keySet.foreach(lang => {
       val label = indicator.labels.get(lang).get

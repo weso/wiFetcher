@@ -5,6 +5,7 @@ import es.weso.wiFetcher.entities.IndicatorHighLow._
 import java.util.Date
 import es.weso.wiFetcher.entities.traits.Component
 import scala.collection.mutable.HashMap
+import scala.collection.mutable.ListBuffer
 
 case class Indicator(
   val id: String = null,
@@ -18,7 +19,7 @@ case class Indicator(
   val highLow: IndicatorHighLow = null,
   val source: String = "",
   val component: Component = null,
-  val provider:Provider = null) {
+  val providers:ListBuffer[Provider] = ListBuffer.empty) {
 
   override def equals(o: Any) = o match {
     case that: Indicator => that.id.equalsIgnoreCase(this.id)
