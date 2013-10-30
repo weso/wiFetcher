@@ -33,11 +33,15 @@ object VirtuosoLoader {
     
     //Create function that update a local repository of computex
     scriptBuilder.append("if [[ -d \"computex\" && ! -L \"computex\" ]] ; then \n")
-    scriptBuilder.append("(cd computex; git checkout master)\n")
-    scriptBuilder.append("(cd computex; git pull origin master)\n")
+    scriptBuilder.append("cd computex \n")
+    scriptBuilder.append("git checkout master\n")
+    scriptBuilder.append("git pull origin master\n")
+    scriptBuilder.append("cd .. \n")
     scriptBuilder.append("else\n")
     scriptBuilder.append("git clone https://github.com/weso/wiFetcher.git \n")
-    scriptBuilder.append("(cd computex; git checkout master)\n")
+    scriptBuilder.append("cd computex \n")
+    scriptBuilder.append("git checkout master \n")
+    scriptBuilder.append("cd .. \n")
     scriptBuilder.append("fi \n")
     
     scriptBuilder.append("install ./computex/ontology/wf.tll ").append(dir).append("\n")
