@@ -31,19 +31,6 @@ object VirtuosoLoader {
     val virtPass = Configuration.getVirtuosoPass
     val scriptBuilder = new StringBuilder
     
-    //Create function that update a local repository of computex
-    /*scriptBuilder.append("if [[ -d \"computex\" && ! -L \"computex\" ]] ; then \n")
-    scriptBuilder.append("cd computex \n")
-    scriptBuilder.append("git checkout master\n")
-    scriptBuilder.append("git pull origin master\n")
-    scriptBuilder.append("cd .. \n")
-    scriptBuilder.append("else\n")
-    scriptBuilder.append("git clone https://github.com/weso/computex.git \n")
-    scriptBuilder.append("cd computex \n")
-    scriptBuilder.append("git checkout master \n")
-    scriptBuilder.append("cd .. \n")
-    scriptBuilder.append("fi \n")*/
-    
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
     scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
     scriptBuilder.append("install ./public/").append(path).append(" ").append(dir).append("\n")
