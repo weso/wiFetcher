@@ -228,18 +228,29 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 	    }
   }
   
-  def obtainProvider(providerId : String, row : Int, col : Int) : Option[Provider] = {
+  def obtainProvider(providerId : String, row : Int, col : Int) : ListBuffer[Provider] = {
+    val providers : ListBuffer[Provider] = ListBuffer.empty    
     if(providerId.isEmpty()) {
       issueManager.addError("Provider of a indicator cannot be empty", 
           Some("Structure file"), Some("Indicators"), Some(col), Some(row))
-      None
     } else {
-      val result = providers.find(provider => provider.id.equals(providerId))
-	  if(!result.isDefined)
-		  issueManager.addError("Not exist provider " + providerId, 
-			  Some("Structure file"), Some("Indicators"), Some(col), Some(row))
-	  result
+      val parts = providerId.split("/")
+      parts.foreach(provider =>{
+        val result = providers.find(provider => provider.id.equals(providerId))
+		if(!result.isDefined) {
+		  val prov = obtainProviderByName(providerId, row, col)
+		  if(prov.isDefined) 
+		    providers += prov.get
+		  else
+		    issueManager.addError("Not exist provider " + providerId, 
+			  Some("Structure file"), Some("Indicators"), Some(col), Some(row))  
+		} else {
+		  providers += result.get
+		}
+		
+      })
     }
+    providers
   }
   
   def obtainProviderByName(providerName : String, row : Int, col : Int) : Option[Provider] = {
