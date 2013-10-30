@@ -229,28 +229,29 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
   
   def obtainProvider(providerId : String, row : Int, col : Int) : ListBuffer[Provider] = {
-    val providers : ListBuffer[Provider] = ListBuffer.empty    
+    val providersLocal : ListBuffer[Provider] = ListBuffer.empty    
     if(providerId.isEmpty()) {
       issueManager.addError("Provider of a indicator cannot be empty", 
           Some("Structure file"), Some("Indicators"), Some(col), Some(row))
     } else {
+      
       val parts = providerId.split("/")
-      parts.foreach(provider =>{
-        val result = providers.find(provider => provider.id.equals(providerId))
+      parts.foreach(pvr =>{
+        val result = providers.find(provider => provider.id.equals(pvr))
 		if(!result.isDefined) {
-		  val prov = obtainProviderByName(providerId, row, col)
+		  val prov = obtainProviderByName(pvr, row, col)
 		  if(prov.isDefined) 
-		    providers += prov.get
+		    providersLocal += prov.get
 		  else
-		    issueManager.addError("Not exist provider " + providerId, 
+		    issueManager.addError("Not exist provider " + pvr, 
 			  Some("Structure file"), Some("Indicators"), Some(col), Some(row))  
 		} else {
-		  providers += result.get
+		  providersLocal += result.get
 		}
 		
       })
     }
-    providers
+    providersLocal
   }
   
   def obtainProviderByName(providerName : String, row : Int, col : Int) : Option[Provider] = {
