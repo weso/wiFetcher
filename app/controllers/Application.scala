@@ -12,7 +12,7 @@ object Application extends Controller {
   def uploadData(ttlPath : String, reportPath : String, graph : String) = Action  {
     implicit request => 
       val errors = VirtuosoLoader.store
-      Ok(views.html.results.loaderResult(errors, ttlPath, reportPath, graph))
+      Ok(views.html.results.loaderResult(errors, ttlPath, reportPath, graph + "/"))
   }
   
   def instructions() = Action {
