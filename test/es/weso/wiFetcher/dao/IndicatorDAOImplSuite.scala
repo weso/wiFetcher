@@ -14,13 +14,17 @@ import es.weso.wiFetcher.dao.poi.IndicatorDAOImpl
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import java.io.File
 import es.weso.wiFetcher.utils.IssueManagerUtils
+import es.weso.wiFetcher.entities.traits.Component
+import es.weso.wiFetcher.entities.Entity
+import es.weso.wiFetcher.dao.poi.PoiDAO
+import es.weso.wiFetcher.entities.Provider
 
 @RunWith(classOf[JUnitRunner])
 class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter 
-	with Matchers{
+	with Matchers {
   
   implicit val fetcher : SpreadsheetsFetcher = SpreadsheetsFetcher(
-      new File(FileUtils.getFilePath("files/structure.xlsx", true)),
+      new File(FileUtils.getFilePath("files/Structure.xlsx", true)),
       new File(FileUtils.getFilePath("files/example.xlsx", true)))
   
   test("Try to load indicators information given a null path") {
@@ -38,14 +42,14 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
   }  
   
   test("Load indicators information from a correct excel file") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", true))
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", true))
     val indicatorDAO = new IndicatorDAOImpl(is)
     val totalSize = indicatorDAO.getPrimaryIndicators.size + indicatorDAO.getSecondaryIndicators.size
     totalSize should be (6)
   }
   
   test("Obtain primary indicators") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
     val indicators = indicatorDAO.getPrimaryIndicators
@@ -54,7 +58,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Obtain secondary indicators") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
     val indicators = indicatorDAO.getSecondaryIndicators
@@ -81,49 +85,53 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
   }
   
   test("Create a secondary indicator") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
+    val component = new Entity("Q2", "Q2", "Q2 Description", 0.0) with Component
     val indicator = indicatorDAO.createIndicator("test", "Secondary", 
         "Test indicator", "Test description", "0.5", "High", "Source", 
-        "Q2", "provider")
+        component, Provider("", "", "", ""))
     indicator.id should be ("test")
     indicator.component.id should be ("Q2")
     indicator.indicatorType should be (IndicatorType.Secondary)
   }
   
   test("Create a primary indicator") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
+    val component = new Entity("Q2", "Q2", "Q2 Description", 0.0) with Component
     val indicator = indicatorDAO.createIndicator("test", "Primary", 
         "Test indicator", "Test description", "0.5", "High", "Source", 
-        "Q2", "provider")
+        component, Provider("", "", "", ""))
     indicator.id should be ("test")
     indicator.component.id should be ("Q2")
     indicator.indicatorType should be (IndicatorType.Primary)
   }
   
   test("Create an indicator given an incorrect type") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
+    val component = new Entity("Q2", "Q2", "Q2 Description", 0.0) with Component
     val before = fetcher.issueManager.asSeq.size
     indicatorDAO.createIndicator("test", "AAAA", "Test indicator", 
       "Test description", "0.5", "High", "Source", 
-      "Q2", "provider")
+      component, Provider("", "", "", ""))
     val after = fetcher.issueManager.asSeq.size
     after should be (before + 1)
   }
   
   test("Create an indicator given an incorrect HighLow property") {
-    val is = new FileInputStream(FileUtils.getFilePath("files/structure.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
+    val component = new Entity("Q2", "Q2", "Q2 Description", 0.0) with Component
     val before = fetcher.issueManager.asSeq.size
     indicatorDAO.createIndicator("test", "Primary", "Test indicator", 
 	  "Test description", "0.5", "BBBB", "Source", 
-      "Q2", "provider")
+      component, Provider("", "", "", ""))
     val after = fetcher.issueManager.asSeq.size
     after should be (before + 1)
   }  

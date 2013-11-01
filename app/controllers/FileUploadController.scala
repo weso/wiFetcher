@@ -21,14 +21,14 @@ import es.weso.wiFetcher.entities.issues._
 
 object FileUploadController extends Controller {
 
-  case class FileForm(val baseUri: String, val year: Int, val namespace: String, val store: Option[Int])
+  case class FileForm(val baseUri: String, val year: Int, val namespace: String/*, val store: Option[Int]*/)
 
   val fileInputForm: Form[FileForm] = Form(
     mapping(
       "base_uri" -> text.verifying(nonEmpty),
       "year_uri" -> number.verifying(min(2001), max(2013)),
-      "namespace_uri" -> text.verifying(nonEmpty),
-      "load_file" -> optional(number))(FileForm.apply)(FileForm.unapply))
+      "namespace_uri" -> text.verifying(nonEmpty)/*,
+      "load_file" -> optional(number)*/)(FileForm.apply)(FileForm.unapply))
 
   def byFileUploadGET() = Action {
     implicit request =>
@@ -42,7 +42,7 @@ object FileUploadController extends Controller {
           Ok(views.html.file.upload(formWithErrors))
         },
         fileInput => {
-          val store = fileInput.store.getOrElse(0) != 0
+          //val store = fileInput.store.getOrElse(0) != 0
           val structure = loadFile("structure_file")
           val observations = loadFile("observations_file")
 
@@ -54,15 +54,15 @@ object FileUploadController extends Controller {
             .append(fileInput.namespace).append("/v").append(fileInput.year).toString*/
           val year = "v" + fileInput.year.toString
           structure match {
-            case Some(s) => load(observations, structure, baseUri, fileInput, year, store)
-            case None => load(observations, observations, baseUri, fileInput, year, store)
+            case Some(s) => load(observations, structure, baseUri, fileInput, year/*, store*/)
+            case None => load(observations, observations, baseUri, fileInput, year/*, store*/)
             case _ => concurrentFuture("Structure file cannot be parsed! Upload it again")
           }
         })
   }
   
   private def load(observations : Option[File], structure : Option[File], 
-      baseUri : String, fileInput : FileForm, year : String, store : Boolean) = {
+      baseUri : String, fileInput : FileForm, year : String/*, store : Boolean*/) = {
     observations match {
               case Some(o) => {
                 val future = scala.concurrent.Future {
@@ -72,9 +72,12 @@ object FileUploadController extends Controller {
                   sf =>
                     val timestamp = new Date().getTime 
                     val path = sf.storeAsTTL(baseUri, 
-                        fileInput.namespace, year, store, timestamp)
+                        fileInput.namespace, year/*, store*/, timestamp)
                     val results : (Seq[Issue], String) = sf.saveReport(timestamp)
-                    Ok(views.html.results.result(path, results._1, results._2))
+                    val graph = new StringBuilder(baseUri).append("/")
+                    	.append(fileInput.namespace).append("/v")
+                    	.append(fileInput.year).toString
+                    Ok(views.html.results.result(path, results._1, results._2, graph))
                 }
               }
               case _ => concurrentFuture("Observations file cannot be parsed! Upload it again")

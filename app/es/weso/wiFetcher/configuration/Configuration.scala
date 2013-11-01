@@ -183,6 +183,54 @@ object Configuration {
   def getVirtuosoLoadDir() : String = {
     Config.getString("load_dir")
   }
+  
+  def getIndicatorFrenchLabelColumn() : Int = {
+    Config.getInt("french_label_column")
+  }
+  
+  def getIndicatorFrenchCommentColumn() : Int = {
+    Config.getInt("french_comment_column")
+  }
+  
+  def getIndicatorSpanishLabelColumn() : Int = {
+    Config.getInt("spanish_label_column")
+  }
+  
+  def getIndicatorSpanishCommentColumn() : Int = {
+    Config.getInt("spanish_comment_column")
+  }
+  
+  def getIndicatorArabicLabelColumn() : Int = {
+    Config.getInt("arabic_label_column")
+  }
+  
+  def getIndicatorArabicCommentColumn() : Int = {
+    Config.getInt("arabic_comment_column")
+  }
+  
+  def getSubindexFrenchLabelColumn() : Int = {
+    Config.getInt("sb_french_label_column")
+  }
+  
+  def getSubindexFrenchCommentColumn() : Int = {
+    Config.getInt("sb_french_comment_column")
+  }
+  
+  def getSubindexSpanishLabelColumn() : Int = {
+    Config.getInt("sb_spanish_label_column")
+  }
+  
+  def getSubindexSpanishCommentColumn() : Int = {
+    Config.getInt("sb_spanish_comment_column")
+  }
+  
+  def getSubindexArabicLabelColumn() : Int = {
+    Config.getInt("sb_arabic_label_column")
+  }
+  
+  def getSubindexArabicCommentColumn() : Int = {
+    Config.getInt("sb_arabic_comment_column")
+  }
 
   def loadConfigure() = {
     val config = new CompositeConfiguration

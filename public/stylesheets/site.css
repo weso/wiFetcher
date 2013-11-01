@@ -217,7 +217,7 @@ p.submit_button {
 	border-radius: 0 0 5px 5px;
 }
 
-.submit_button input {
+.submit_button input, .submit_button button {
 	width: 100px;
 	height: 100px;
 	border-radius: 50px;
@@ -231,11 +231,23 @@ p.submit_button {
 	padding: 0px;
 }
 
+button.button {
+	background: #7AB800;
+}
+
+button.button:hover, button.button:visited, button.button:active, button.button:link, button.button:focus{
+	background: #7AB800;
+}
+
 div#results_container {
 	padding-top: 0;
 }
 
 div#results_container .instructions {
+	text-align: center;
+}
+
+p.center{
 	text-align: center;
 }
 

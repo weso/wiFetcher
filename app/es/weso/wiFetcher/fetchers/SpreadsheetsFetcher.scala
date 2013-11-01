@@ -68,8 +68,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     issueManager.filteredAsSeq
   }
 
-  def storeAsTTL(baseUri: String, namespace: String, year : String, store: Boolean = false, timestamp : Long) =
-    ModelGenerator(baseUri, namespace, year).generateJenaModel(this, store, timestamp)
+  def storeAsTTL(baseUri: String, namespace: String, year : String/*, store: Boolean = false*/, timestamp : Long) =
+    ModelGenerator(baseUri, namespace, year).generateJenaModel(this/*, store*/, timestamp)
 
   /**
    * This method load all structure about Web Index information
@@ -207,7 +207,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     val combined: ListBuffer[Indicator] = new ListBuffer
     combined.insertAll(0, primaryIndicators)
     combined.insertAll(0, secondaryIndicators)
-    combined.find(indicator => indicator.comment.equalsIgnoreCase(indicatorDescription))
+    combined.find(indicator => indicator.comments
+        .get("en").get.equalsIgnoreCase(indicatorDescription))
       .getOrElse(throw new IllegalArgumentException("Not exist indicator with "
         + s"description ${indicatorDescription}"))
   }
@@ -227,32 +228,35 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 	    }
   }
   
-  def obtainProvider(providerId : String, row : Int, col : Int) : Option[Provider] = {
+  def obtainProvider(providerId : String, row : Int, col : Int) : ListBuffer[Provider] = {
+    val providersLocal : ListBuffer[Provider] = ListBuffer.empty    
     if(providerId.isEmpty()) {
       issueManager.addError("Provider of a indicator cannot be empty", 
           Some("Structure file"), Some("Indicators"), Some(col), Some(row))
-      None
     } else {
-      val result = providers.find(provider => provider.id.equals(providerId))
-	  if(!result.isDefined)
-		  issueManager.addError("Not exist provider " + providerId, 
-			  Some("Structure file"), Some("Indicators"), Some(col), Some(row))
-	  result
+      
+      val parts = providerId.split("/")
+      parts.foreach(pvr =>{
+        val result = providers.find(provider => provider.id.equals(pvr))
+		if(!result.isDefined) {
+		  val prov = obtainProviderByName(pvr, row, col)
+		  if(prov.isDefined) 
+		    providersLocal += prov.get
+		  else
+		    issueManager.addError("Not exist provider " + pvr, 
+			  Some("Structure file"), Some("Indicators"), Some(col), Some(row))  
+		} else {
+		  providersLocal += result.get
+		}
+		
+      })
     }
+    providersLocal
   }
   
   def obtainProviderByName(providerName : String, row : Int, col : Int) : Option[Provider] = {
-    if(providerName.isEmpty()) {
-      issueManager.addError("Provider of a indicator cannot be empty", 
-          Some("Structure file"), Some("Indicators"), Some(col), Some(row))
-      None
-    } else {
       val result = providers.find(provider => provider.name.equalsIgnoreCase(providerName.trim))
-	  if(!result.isDefined)
-		  issueManager.addError("Not exist provider " + providerName, 
-			  Some("Structure file"), Some("Indicators"), Some(col), Some(row))
 	  result
-    }
   }
 
   def getDatasets(): List[Dataset] = {
