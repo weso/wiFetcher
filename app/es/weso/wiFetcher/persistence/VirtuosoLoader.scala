@@ -8,6 +8,7 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.mutable.ListBuffer
+import es.weso.wiExtract._
 
 object VirtuosoLoader {
   
@@ -31,7 +32,14 @@ object VirtuosoLoader {
     val virtPass = Configuration.getVirtuosoPass
     val scriptBuilder = new StringBuilder
     
+    val file = "-f ./public/reports/wf.ttl" /*+ path*/
+    val out = "-o ./public/temp/observations.json" 
+    
+    Main.main(Array(file, out))
+    
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
+//    scriptBuilder.append("wget -q https://oss.sonatype.org/content/repositories/snapshots/es/weso/wiextract_2.10/1.0-SNAPSHOT/wiextract_2.10-1.0-SNAPSHOT.jar -O ./public/temp/wiExtract.jar \n")
+//    scriptBuilder.append("java -jar ./public/temp/wiExtract.jar --file=./public/").append(path).append(" --out=./public/temp/").append(timestamp).append(".json \n")
     scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
     scriptBuilder.append("install ./public/").append(path).append(" ").append(dir).append("\n")
     scriptBuilder.append("isql-vt ").append(virtServer).append(" ").append(virtUser).append(" ").append(virtPass).append(" <<EOF\n")
