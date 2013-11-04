@@ -1,4 +1,6 @@
-This is your new Play 2.1 application
+wiFetcher
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+Web: [![Build Status](https://api.travis-ci.org/weso/wiFetcher.png?branch=web)](https://travis-ci.org/weso/wiFetcher)
+
+MSExcel & Indaba Extractor for the World Wide Web Foundation's Web Index & ODB
