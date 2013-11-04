@@ -96,7 +96,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
       arabicComment = POIUtils.extractCellValue(
           actualRow.getCell(Configuration.getSubindexArabicCommentColumn), evaluator)
       //Create the entity (sub-index or component)
-      if(!weight.isDefined)
+      if(weight.isDefined)
     } yield {
       val names : HashMap[String, String] = HashMap("en" -> name,
           "fr" -> frenchLabel,
