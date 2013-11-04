@@ -16,7 +16,6 @@ object ApplicationBuild extends Build {
    */
   val ConfigV = "1.9"
   val CountryV = "0.3.0-SNAPSHOT"
-  val wiExtractV = "1.0-SNAPSHOT"
   val CucumberV = "1.1.4"
   val JenaV = "2.10.1"
   val JunitV = "4.11"
@@ -46,7 +45,6 @@ object ApplicationBuild extends Build {
 
     /*Scala Dependencies*/
     "es.weso" % "countryreconciliator_2.10" % CountryV,
-    "es.weso" % "wiextract_2.10" % wiExtractV,
     "com.github.nscala-time" %% "nscala-time" % NScalaV,
 
     /*Java Dependencies*/
