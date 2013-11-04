@@ -81,7 +81,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
       description = POIUtils.extractCellValue(
         actualRow.getCell(Configuration.getSubindexDescriptionColumn), evaluator)
       //Extract the weight
-      weight = POIUtils.extractCellValue(
+      weight = POIUtils.extractNumericCellValue(
         actualRow.getCell(Configuration.getSubindexWeithColumn), evaluator)
       frenchLabel = POIUtils.extractCellValue(
         actualRow.getCell(Configuration.getSubindexFrenchLabelColumn), evaluator)
@@ -96,6 +96,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
       arabicComment = POIUtils.extractCellValue(
           actualRow.getCell(Configuration.getSubindexArabicCommentColumn), evaluator)
       //Create the entity (sub-index or component)
+      if(weight.isDefined)
     } yield {
       val names : HashMap[String, String] = HashMap("en" -> name,
           "fr" -> frenchLabel,
@@ -105,7 +106,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
           "fr" -> frenchComment,
           "es" -> spanishComment,
           "ar" -> arabicComment)
-      createEntity(eType, id, weight, names, comments)
+      createEntity(eType, id, weight.get, names, comments)
     }
   }
 
@@ -148,7 +149,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    * @param The name of the entity
    * @param The description of the entity
    */
-  def createEntity(eType: String, id: String, weight: String,
+  def createEntity(eType: String, id: String, weight: Double,
     names: HashMap[String, String], 
     descriptions: HashMap[String, String]): Entity = {
     eType match {
@@ -173,9 +174,9 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    * Web Index
    */
   def createSubIndex(id: String, names: HashMap[String, String], 
-      descriptions: HashMap[String, String], weight: String): SubIndex = {
+      descriptions: HashMap[String, String], weight: Double): SubIndex = {
     logger.info("Create the component: {}" + { id })
-    val subIndex = new Entity(id, names, descriptions, weight.toDouble) with SubIndex
+    val subIndex = new Entity(id, names, descriptions, weight) with SubIndex
     subIndexes += subIndex
     subIndex
   }
@@ -189,9 +190,9 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    * the Web Index
    */
   def createComponent(id: String, names: HashMap[String, String], 
-      descriptions: HashMap[String, String], weight: String): Component = {
+      descriptions: HashMap[String, String], weight: Double): Component = {
     logger.info("Create the sub-index: {}", id)
-    val component = new Entity(id, names, descriptions, weight.toDouble) with Component
+    val component = new Entity(id, names, descriptions, weight) with Component
     components += component
     component
   }
