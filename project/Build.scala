@@ -59,7 +59,8 @@ object ApplicationBuild extends Build {
     "net.sf.opencsv" % "opencsv" % OpenCsvV)
 
   val main = play.Project(AppName, AppVersion, appDependencies).settings(
-
+	playAssetsDirectories <+= baseDirectory / "public/reports",
+	playAssetsDirectories <+= baseDirectory / "public/temp",
     scalaVersion := ScalaV,
     /*Extern Repositories*/
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
