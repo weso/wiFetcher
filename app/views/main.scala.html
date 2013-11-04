@@ -10,17 +10,17 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=900"/>
 		<title>wiFetcher</title>
-		<link rel="stylesheet" href="@routes.Assets.at("public/javascripts", "stylesheets/foundation.css")"/>
+		<link rel="stylesheet" href="@routes.Assets.at("stylesheets/foundation.css")"/>
 		<link href="http://fonts.googleapis.com/css?family=Advent+Pro:200|Bad+Script|Raleway:400|Comfortaa" rel="stylesheet" type="text/css"/>
-        <link rel="stylesheet" href="@routes.Assets.at("public/javascripts", "stylesheets/base.css")"/>
-        <link rel="stylesheet" href="@routes.Assets.at("public/javascripts", "stylesheets/results.css")"/>
-        <link rel="stylesheet" href="@routes.Assets.at("public/javascripts", "stylesheets/site.css")" />
-        <link rel="icon" type="image/png" href="@routes.Assets.at("public/images", "images/weso.png")"/>
-        <script src="@routes.Assets.at("public/javascripts", "javascripts/modernizr.custom.62291.js")"></script>
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/base.css")"/>
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/results.css")"/>
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/site.css")" />
+        <link rel="icon" type="image/png" href="@routes.Assets.at("images/weso.png")"/>
+        <script src="@routes.Assets.at("javascripts/modernizr.custom.62291.js")"></script>
     </head>
     <body>
     	<header id="banner">
-    		<a id="weso-logo" href="/"><img alt="WESO" width="100" height="100" id="logo" src="@routes.Assets.at("public/images", "images/weso.png")"></a>
+    		<a id="weso-logo" href="/"><img alt="WESO" width="100" height="100" id="logo" src="@routes.Assets.at("images/weso.png")"></a>
     		<div>
 				<h1 id="title">
 					<a href="/"><span class="computex">wiFetcher</span> <span class="validation">Upload Service</span></a>
@@ -34,7 +34,7 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script type="text/javascript">
 			if (typeof jQuery == 'undefined') {
-				document.write(unescape("%3Cscript src='@routes.Assets.at("public/javascripts", "javascripts/jquery-1.10.2.min.js")' type='text/javascript'%3E%3C/script%3E"));
+				document.write(unescape("%3Cscript src='@routes.Assets.at("javascripts/jquery-1.10.2.min.js")' type='text/javascript'%3E%3C/script%3E"));
 			}
 		</script>
 		<script type="text/javascript">
@@ -58,8 +58,8 @@
 		yepnope({
 		  test : (!Modernizr.input.list || (parseInt($.browser.version) > 400)),
 		  yep : [
-		      '@routes.Assets.at("public/javascripts", "javascripts/jquery.relevant-dropdown.js")',
-					'@routes.Assets.at("public/javascripts", "javascripts/load-fallbacks.js")'
+		      '@routes.Assets.at("javascripts/jquery.relevant-dropdown.js")',
+					'@routes.Assets.at("javascripts/load-fallbacks.js")'
 		  ]
 		});
 		</script>  
