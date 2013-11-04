@@ -8,17 +8,26 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.mutable.ListBuffer
-import es.weso.wiExtract._
 
 object VirtuosoLoader {
   
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
+  private val omittedWarnings : Array[String] = Array(
+      "public/temp/script.sh: 1: public/temp/script.sh: [[: not found",
+      "fatal: destination path 'wiExtract' already exists and is not an empty directory.",
+      "Ya está en «master»",
+      "log4j:WARN No appenders could be found for logger (org.apache.jena.riot.stream.JenaIOEnvironment).",
+      "log4j:WARN Please initialize the log4j system properly.",
+      "log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.")
 
   def store() : List[String] = {  
     val errors : ListBuffer[String] = ListBuffer.empty
     val upload = Process("public/temp/script.sh")
     val processLogger = ProcessLogger((o: String) => logger.info(o),
-        (e:String) => errors += e)
+        (e:String) => {
+          if(!omittedWarnings.contains(e))
+        	  errors += e
+        })
     upload ! processLogger
     errors.toList
   }
@@ -47,11 +56,7 @@ object VirtuosoLoader {
     scriptBuilder.append("java -jar ./wiExtract/target/scala-2.10/WiExtract-assembly-1.0-SNAPSHOT.jar ")
     	.append(file).append(" ").append(out).append("\n")
     
-    Main.main(Array(file, out))
-    
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
-//    scriptBuilder.append("wget -q https://oss.sonatype.org/content/repositories/snapshots/es/weso/wiextract_2.10/1.0-SNAPSHOT/wiextract_2.10-1.0-SNAPSHOT.jar -O ./public/temp/wiExtract.jar \n")
-//    scriptBuilder.append("java -jar ./public/temp/wiExtract.jar --file=./public/").append(path).append(" --out=./public/temp/").append(timestamp).append(".json \n")
     scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
     scriptBuilder.append("install ./public/").append(path).append(" ").append(dir).append("\n")
     scriptBuilder.append("isql-vt ").append(virtServer).append(" ").append(virtUser).append(" ").append(virtPass).append(" <<EOF\n")
