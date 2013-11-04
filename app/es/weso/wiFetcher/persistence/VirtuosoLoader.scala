@@ -18,7 +18,8 @@ object VirtuosoLoader {
       "Ya está en «master»",
       "log4j:WARN No appenders could be found for logger (org.apache.jena.riot.stream.JenaIOEnvironment).",
       "log4j:WARN Please initialize the log4j system properly.",
-      "log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.")
+      "log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.",
+      "Already on 'master'")
 
   def store() : List[String] = {  
     val errors : ListBuffer[String] = ListBuffer.empty
