@@ -32,8 +32,8 @@ object VirtuosoLoader {
     val virtPass = Configuration.getVirtuosoPass
     val scriptBuilder = new StringBuilder
     
-    val file = "-f ./public/" + path
-    val out = "-o ./public/temp/observations.json" 
+    val file = "-f public/" + path
+    val out = "-o public/temp/observations.json" 
       
     scriptBuilder.append("if [[ -d \"wiExtract\" && ! -L \"wiExtract\" ]] ; then \n")
     scriptBuilder.append("(cd wiExtract; git checkout \"master\")\n")
@@ -45,9 +45,9 @@ object VirtuosoLoader {
     
     scriptBuilder.append("(cd wiExtract ; sbt assembly)\n")
     scriptBuilder.append("java -jar ./wiExtract/target/scala-2.10/WiExtract-assembly-1.0-SNAPSHOT.jar ")
-    	.append(file).append(" ").append(out)
+    	.append(file).append(" ").append(out).append("\n")
     
-    /*Main.main(Array(file, out))*/
+    Main.main(Array(file, out))
     
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
 //    scriptBuilder.append("wget -q https://oss.sonatype.org/content/repositories/snapshots/es/weso/wiextract_2.10/1.0-SNAPSHOT/wiextract_2.10-1.0-SNAPSHOT.jar -O ./public/temp/wiExtract.jar \n")
