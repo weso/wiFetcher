@@ -138,7 +138,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
           Configuration.getIndicatorComponentColumn) 
       providers = sFetcher.obtainProvider(providerId, actualRow.getRowNum,
         Configuration.getIndicatorProviderColumn)
-      if(component.isDefined && !providers.isEmpty)
+      if(component.isDefined /*&& !providers.isEmpty*/)
     } yield {
       val names : HashMap[String, String] = HashMap("en" -> name,
           "fr" -> frenchLabel,

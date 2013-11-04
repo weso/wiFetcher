@@ -51,12 +51,11 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   val observations: ListBuffer[Observation] = ListBuffer.empty
 
   loadStructure(structure)
-  if(issueManager.asSeq.isEmpty)
-  	loadObservations(raw)
-  else 
-    issueManager.addError("There were problems parsing structure file, so ttl " +
-    		"generated is not complete. You must fix them and try it again.", 
+  if(!issueManager.asSeq.isEmpty)
+    issueManager.addWarn("There were problems parsing structure file, so ttl " +
+    		"generated is not complete.", 
     		Some("Structure file"))
+  loadObservations(raw)
 
   def issues: Seq[Issue] = {
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("MEAN")))
