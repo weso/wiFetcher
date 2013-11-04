@@ -12,12 +12,23 @@ import scala.collection.mutable.ListBuffer
 object VirtuosoLoader {
   
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
+  private val omittedWarnings : Array[String] = Array(
+      "public/temp/script.sh: 1: public/temp/script.sh: [[: not found",
+      "fatal: destination path 'wiExtract' already exists and is not an empty directory.",
+      "Ya está en «master»",
+      "log4j:WARN No appenders could be found for logger (org.apache.jena.riot.stream.JenaIOEnvironment).",
+      "log4j:WARN Please initialize the log4j system properly.",
+      "log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.",
+      "Already on 'master'")
 
   def store() : List[String] = {  
     val errors : ListBuffer[String] = ListBuffer.empty
     val upload = Process("public/temp/script.sh")
     val processLogger = ProcessLogger((o: String) => logger.info(o),
-        (e:String) => errors += e)
+        (e:String) => {
+          if(!omittedWarnings.contains(e))
+        	  errors += e
+        })
     upload ! processLogger
     errors.toList
   }
@@ -30,6 +41,21 @@ object VirtuosoLoader {
     val virtUser = Configuration.getVirtuosoUser
     val virtPass = Configuration.getVirtuosoPass
     val scriptBuilder = new StringBuilder
+    
+    val file = "-f public/" + path
+    val out = "-o public/temp/observations.json" 
+      
+    scriptBuilder.append("if [[ -d \"wiExtract\" && ! -L \"wiExtract\" ]] ; then \n")
+    scriptBuilder.append("(cd wiExtract; git checkout \"master\")\n")
+    scriptBuilder.append("(cd wiExtract; git pull origin \"master\")\n")
+    scriptBuilder.append("else\n")
+    scriptBuilder.append("git clone https://github.com/weso/wiExtract.git\n")
+    scriptBuilder.append("(cd wiExtract ; git checkout master)\n")
+    scriptBuilder.append("fi\n\n")
+    
+    scriptBuilder.append("(cd wiExtract ; sbt assembly)\n")
+    scriptBuilder.append("java -jar ./wiExtract/target/scala-2.10/WiExtract-assembly-1.0-SNAPSHOT.jar ")
+    	.append(file).append(" ").append(out).append("\n")
     
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
     scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
