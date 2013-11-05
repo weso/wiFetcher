@@ -287,6 +287,14 @@ table {
 	border-radius: 5px;
 }
 
+tr.error{
+	color:red
+}
+
+tr.warning {
+	color:yellow	
+}
+
 table th {
 	font-size: 0.875em !important;
 }

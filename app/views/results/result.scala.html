@@ -2,7 +2,11 @@
 
 @printIssues(name:String, issues : Seq[Issue])={
 		@for(issue <- issues){
-			<tr>
+			@issue match {
+				case e : Error => {<tr class="error">}
+				case w : Warn => {<tr class="warning">}
+				case _ => {<tr>}
+			}
 				<td>@name</td>
 				<td>@issue.message</td>
 				<td>@issue.path.getOrElse("-")</td>
