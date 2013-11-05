@@ -53,7 +53,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   loadStructure(structure)
   if(!issueManager.asSeq.isEmpty)
     issueManager.addWarn("There were problems parsing structure file, so ttl " +
-    		"generated is not complete.", 
+    		"generated maybe is not complete.", 
     		Some("Structure file"))
   loadObservations(raw)
 

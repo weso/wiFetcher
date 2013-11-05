@@ -292,7 +292,7 @@ tr.error{
 }
 
 tr.warning {
-	color:yellow;
+	color:orange;
 	background: white;
 }
 
