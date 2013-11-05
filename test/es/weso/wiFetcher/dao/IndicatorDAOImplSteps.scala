@@ -33,8 +33,8 @@ class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
   When("""^I check the indicator with "([^"]*)" "([^"]*)"$""") { (property : String, value : String) =>
     result = property match {
       case "id" => indicators.find(indicator => indicator.id.equals(value)).getOrElse(throw new IllegalArgumentException("There is no indicator with id " + value))
-      case "name" => indicators.find(indicator => indicator.label.equals(value)).getOrElse(throw new IllegalArgumentException("There is no indicator with name " + value))
-      case "description" => indicators.find(indicator => indicator.comment.equals(value)).getOrElse(throw new IllegalArgumentException("There is no indicator with description " + value))
+      case "name" => indicators.find(indicator => indicator.labels.get("en").get.equals(value)).getOrElse(throw new IllegalArgumentException("There is no indicator with name " + value))
+      case "description" => indicators.find(indicator => indicator.comments.get("en").get.equals(value)).getOrElse(throw new IllegalArgumentException("There is no indicator with description " + value))
       case _ => throw new IllegalArgumentException("")
     }
   }
@@ -42,8 +42,8 @@ class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
   Then("""^the indicator "([^"]*)" should be "([^"]*)"$""") { (property : String, value : String) =>
     property match {
       case "id" => result.id should be (value)
-      case "name" => result.label should be (value)
-      case "description" => result.comment should be (value)
+      case "name" => result.labels.get("en").get should be (value)
+      case "description" => result.comments.get("en").get should be (value)
       case "type" => result.indicatorType.toString() should be(value)
       case "weight" => result.weight should be (value.toDouble +- 0.0000001f)
       case "source" => result.source should be (value)
@@ -55,8 +55,8 @@ class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
   Then("""^the indicator "([^"]*)" should not be "([^"]*)"$""") {(property : String, value : String) =>
     property match {
       case "id" => result.id should not be (value)
-      case "name" => result.label should not be (value)
-      case "description" => result.comment should not be (value)
+      case "name" => result.labels.get("en").get should not be (value)
+      case "description" => result.comments.get("en").get should not be (value)
       case "type" => result.indicatorType should not be(value)
       case "weight" => result.weight should not be (value.toDouble +- 0.0000001f)
       case "source" => result.source should not be (value)

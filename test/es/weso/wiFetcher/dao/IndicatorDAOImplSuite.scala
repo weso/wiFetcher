@@ -18,6 +18,8 @@ import es.weso.wiFetcher.entities.traits.Component
 import es.weso.wiFetcher.entities.Entity
 import es.weso.wiFetcher.dao.poi.PoiDAO
 import es.weso.wiFetcher.entities.Provider
+import scala.collection.mutable.HashMap
+import scala.collection.mutable.ListBuffer
 
 @RunWith(classOf[JUnitRunner])
 class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter 
@@ -88,10 +90,12 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
-    val component = new Entity("Q2", "Q2", "Q2 Description", 0.0) with Component
+    val component = new Entity("Q2", HashMap("en" -> "Q2"),
+        HashMap("en" -> "Q2 Description"), 0.0) with Component
     val indicator = indicatorDAO.createIndicator("test", "Secondary", 
-        "Test indicator", "Test description", "0.5", "High", "Source", 
-        component, Provider("", "", "", ""))
+        HashMap("en" -> "Test indicator"), HashMap("en" -> "Test description"), 
+        0.5, "High", "Source", 
+        component, ListBuffer(Provider("", "", "", "")))
     indicator.id should be ("test")
     indicator.component.id should be ("Q2")
     indicator.indicatorType should be (IndicatorType.Secondary)
@@ -101,10 +105,12 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
-    val component = new Entity("Q2", "Q2", "Q2 Description", 0.0) with Component
+    val component = new Entity("Q2", HashMap("en" ->"Q2"), 
+        HashMap("en" -> "Q2 Description"), 0.0) with Component
     val indicator = indicatorDAO.createIndicator("test", "Primary", 
-        "Test indicator", "Test description", "0.5", "High", "Source", 
-        component, Provider("", "", "", ""))
+        HashMap("en" -> "Test indicator"), HashMap("en" -> "Test description"), 
+        0.5, "High", "Source", 
+        component, ListBuffer(Provider("", "", "", "")))
     indicator.id should be ("test")
     indicator.component.id should be ("Q2")
     indicator.indicatorType should be (IndicatorType.Primary)
@@ -114,11 +120,13 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
-    val component = new Entity("Q2", "Q2", "Q2 Description", 0.0) with Component
+    val component = new Entity("Q2", HashMap("en" -> "Q2"), 
+        HashMap("en" -> "Q2 Description"), 0.0) with Component
     val before = fetcher.issueManager.asSeq.size
-    indicatorDAO.createIndicator("test", "AAAA", "Test indicator", 
-      "Test description", "0.5", "High", "Source", 
-      component, Provider("", "", "", ""))
+    indicatorDAO.createIndicator("test", "AAAA", 
+        HashMap("en" -> "Test indicator"), 
+      HashMap("en" -> "Test description"), 0.5, "High", "Source", 
+      component, ListBuffer(Provider("", "", "", "")))
     val after = fetcher.issueManager.asSeq.size
     after should be (before + 1)
   }
@@ -127,11 +135,13 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
-    val component = new Entity("Q2", "Q2", "Q2 Description", 0.0) with Component
+    val component = new Entity("Q2", HashMap("en" -> "Q2"), 
+        HashMap("en" -> "Q2 Description"), 0.0) with Component
     val before = fetcher.issueManager.asSeq.size
-    indicatorDAO.createIndicator("test", "Primary", "Test indicator", 
-	  "Test description", "0.5", "BBBB", "Source", 
-      component, Provider("", "", "", ""))
+    indicatorDAO.createIndicator("test", "Primary", 
+        HashMap("en" -> "Test indicator"), 
+	  HashMap("en" -> "Test description"), 0.5, "BBBB", "Source", 
+      component, ListBuffer(Provider("", "", "", "")))
     val after = fetcher.issueManager.asSeq.size
     after should be (before + 1)
   }  
