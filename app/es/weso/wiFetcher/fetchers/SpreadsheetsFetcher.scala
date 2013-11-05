@@ -85,8 +85,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   def saveReport(timestamp : Long) : (Seq[Issue], String) = {
     val csvSchema = Array("Type", "Message", "Path", "sheetName", "Column", "Row", "Cell")
     val csvGenerator = CSVGenerator(csvSchema)
-    val issues = issueManager.asSeq
-    issues.foreach(issue  => {
+    val finalIssues = issues
+    finalIssues.foreach(issue  => {
       val typ = issue match {
         case e: Error => "Error"
         case e: Warn => "Warning"
@@ -95,7 +95,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
       csvGenerator.addValue(value)
     })
     val path = csvGenerator.save(timestamp)
-    (issues, path)
+    (finalIssues, path)
   }
 
   /**
