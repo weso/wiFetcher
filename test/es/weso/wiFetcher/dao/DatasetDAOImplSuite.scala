@@ -13,6 +13,7 @@ import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.entities.IndicatorType
 import es.weso.wiFetcher.entities.IndicatorHighLow
 import es.weso.wiFetcher.entities.Provider
+import scala.collection.mutable.HashMap
 
 @RunWith(classOf[JUnitRunner])
 class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter 
@@ -22,8 +23,8 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
     val list :ListBuffer[Indicator] = ListBuffer.empty
     list += Indicator("A", 
         IndicatorType.Primary, 
-        "test indicator",
-        "test indicator description",
+        HashMap("en" -> "test indicator"),
+        HashMap("en" -> "test indicator description"),
         null,
         null,
         0,
@@ -31,11 +32,11 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        Provider("", "", "", ""))
+        ListBuffer(Provider("", "", "", "")))
     list += Indicator("B", 
         IndicatorType.Primary, 
-        "test indicator 2",
-        "test indicator description 2",
+        HashMap("en" -> "test indicator 2"),
+        HashMap("en" -> "test indicator description 2"),
         null,
         null,
         0,
@@ -43,11 +44,11 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        Provider("", "", "", ""))
+        ListBuffer(Provider("", "", "", "")))
     list += Indicator("C", 
         IndicatorType.Primary, 
-        "test indicator 3",
-        "test indicator description 3",
+        HashMap("en" -> "test indicator 3"),
+        HashMap("en" -> "test indicator description 3"),
         null,
         null,
         0,
@@ -55,7 +56,7 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        Provider("", "", "", ""))
+        ListBuffer(Provider("", "", "", "")))
     list
   }
   
