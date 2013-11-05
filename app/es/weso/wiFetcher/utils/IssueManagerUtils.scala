@@ -68,8 +68,7 @@ class IssueManagerUtils() {
     row: Option[Int] = None, cell: Option[String] = None): Unit = {
 
     logger.info(message)
-    Warn(message, path, sheetName, col, row, cell)
-
+    issues += Warn(message, path, sheetName, col, row, cell)
   }
 
   def filteredAsSeq: List[Issue] = {

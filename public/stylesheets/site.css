@@ -288,11 +288,12 @@ table {
 }
 
 tr.error{
-	color:red
+	color:red;
 }
 
 tr.warning {
-	color:yellow	
+	color:yellow;
+	background: white;
 }
 
 table th {
