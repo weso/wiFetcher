@@ -33,8 +33,8 @@ class PrimaryObservationDAOImpl (
       val sheet = workbook.getSheet(sheetName)
       if (sheet == null) {
         sFetcher.issueManager.addError(
-          message = s"The sheet ${sheetName} is not included in the file. " +
-        	  	"Primary observations cannot be loaded.",
+          message = s"The sheet ${sheetName} is not included in the file, so" +
+        	  	"it is not possible to load corresponding observations.",
           path = XslxFile)
       } else {
         observations ++= parseData(workbook, sheet)
