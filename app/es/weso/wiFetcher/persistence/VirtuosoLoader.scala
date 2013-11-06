@@ -45,7 +45,7 @@ object VirtuosoLoader {
     val file = "-f public/" + path
     val out = "-o public/temp/observations.json" 
       
-    scriptBuilder.append("if [[ -d \"wiExtract\" && ! -L \"wiExtract\" ]] ; then \n")
+    /*scriptBuilder.append("if [[ -d \"wiExtract\" && ! -L \"wiExtract\" ]] ; then \n")
     scriptBuilder.append("(cd wiExtract; git checkout \"master\")\n")
     scriptBuilder.append("(cd wiExtract; git pull origin \"master\")\n")
     scriptBuilder.append("else\n")
@@ -53,8 +53,8 @@ object VirtuosoLoader {
     scriptBuilder.append("(cd wiExtract ; git checkout master)\n")
     scriptBuilder.append("fi\n\n")
     
-    scriptBuilder.append("(cd wiExtract ; sbt assembly)\n")
-    scriptBuilder.append("java -jar ./wiExtract/target/scala-2.10/WiExtract-assembly-1.0-SNAPSHOT.jar ")
+    scriptBuilder.append("(cd wiExtract ; sbt assembly)\n")*/
+    scriptBuilder.append("java -jar ./public/temp/WiExtract-assembly-1.0-SNAPSHOT.jar ")
     	.append(file).append(" ").append(out).append("\n")
     
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
