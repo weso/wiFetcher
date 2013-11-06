@@ -29,7 +29,7 @@ class SecondaryObservationDAOImplSuite extends FunSuite with BeforeAndAfter
   
   test("Load a correct and an existing spreadsheet") {
     val fetcher = SpreadsheetsFetcher(
-        new File(FileUtils.getFilePath("files/Structure.xlsx", true)),
+        new File(FileUtils.getFilePath("files/structureSimple0.2.xlsx", true)),
         new File(FileUtils.getFilePath("files/example.xlsx", true)))
     val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/example.xlsx", true)))

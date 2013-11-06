@@ -47,7 +47,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", true))
     val indicatorDAO = new IndicatorDAOImpl(is)
     val totalSize = indicatorDAO.getPrimaryIndicators.size + indicatorDAO.getSecondaryIndicators.size
-    totalSize should be (6)
+    totalSize should be (91)
   }
   
   test("Obtain primary indicators") {
@@ -56,7 +56,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val indicatorDAO = new IndicatorDAOImpl(is)
     val indicators = indicatorDAO.getPrimaryIndicators
     indicators should not be (null)
-    indicators.size should be (2)
+    indicators.size should be (53)
   }
   
   test("Obtain secondary indicators") {
@@ -65,7 +65,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val indicatorDAO = new IndicatorDAOImpl(is)
     val indicators = indicatorDAO.getSecondaryIndicators
     indicators should not be (null)
-    indicators.size should be (4)
+    indicators.size should be (38)
   }
   
   test("Obtain primary indicator from empty excel") {
