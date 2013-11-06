@@ -3,6 +3,8 @@ package controllers
 import play.api._
 import play.api.mvc._
 import es.weso.wiFetcher.persistence.VirtuosoLoader
+import scala.io.Source
+import java.io.File
 
 object Application extends Controller {
   
@@ -18,6 +20,15 @@ object Application extends Controller {
   def instructions() = Action {
     implicit request =>
       Ok(views.html.instructions.instructions())
+  }
+  
+  def files(path : String) = Action {
+    implicit request => 
+      println("PATH: ./public/" + path)
+      val src = Source.fromFile(new File("./public/" + path))
+      val result = src.mkString
+      src.close
+      Ok(result)
   }
   
 }
