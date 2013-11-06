@@ -1,16 +1,15 @@
 package es.weso.wiFetcher.dao
 
-import es.weso.wiFetcher.entities.Observation
-import es.weso.wiFetcher.entities.Dataset
-import es.weso.wiFetcher.entities.ObservationStatus._
 import es.weso.reconciliator.CountryReconciliator
 import es.weso.wiFetcher.configuration.Configuration
-import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
-import es.weso.wiFetcher.entities.Country
-import es.weso.wiFetcher.entities.ObservationStatus
-import es.weso.wiFetcher.entities.Computation
-import es.weso.wiFetcher.entities.Indicator
 import es.weso.wiFetcher.entities.Area
+import es.weso.wiFetcher.entities.Computation
+import es.weso.wiFetcher.entities.Country
+import es.weso.wiFetcher.entities.Dataset
+import es.weso.wiFetcher.entities.Indicator
+import es.weso.wiFetcher.entities.Observation
+import es.weso.wiFetcher.entities.ObservationStatus
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 
 trait ObservationDAO  extends DAO[Observation]{
 
@@ -38,6 +37,8 @@ trait ObservationDAO  extends DAO[Observation]{
     }
     country
   }
+  
+  def getObservations() : List[Observation]
   
   /**
    * This method has to create an observation

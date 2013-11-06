@@ -16,14 +16,14 @@ import java.io.File
 class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
 
   val fetcher : SpreadsheetsFetcher = SpreadsheetsFetcher(
-      new File(FileUtils.getFilePath("files/Structure0.4.xlsx", true)), 
-      new File(FileUtils.getFilePath("files/Raw0.3.xlsx", true)))
+      new File(FileUtils.getFilePath("files/Structure.xlsx", true)), 
+      new File(FileUtils.getFilePath("files/Raw.xlsx", true)))
   var indicatorDao : IndicatorDAO = null
   val indicators : ListBuffer[Indicator] = ListBuffer.empty
   var result : Indicator = null
   
   Given("""^I want to load all information about indicators in the WebIndex$""") { () =>
-    val is = new FileInputStream(FileUtils.getFilePath("files/Structure0.4.xlsx", 
+    val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
     indicatorDao = new IndicatorDAOImpl(is)(fetcher)
     indicators ++= indicatorDao.getPrimaryIndicators
@@ -64,4 +64,14 @@ class IndicatorDAOImplSteps extends ScalaDsl with EN with Matchers{
       case _ => throw new IllegalArgumentException("")
     }
   }
+  
+  Then("""^the number of primary indicators should be "([^"]*)"$""") {(indicators : Int) =>
+    indicatorDao.getPrimaryIndicators.size should be (indicators)
+  }
+  
+  Then("""^the number of secondary indicators should be "([^"]*)"$""") {(indicators : Int) =>
+    indicatorDao.getSecondaryIndicators.size should be (indicators)
+  }
+  
+  
 }

@@ -12,40 +12,32 @@ import es.weso.wiFetcher.utils.FileUtils
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.poi.SecondaryObservationDAOImpl
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import es.weso.wiFetcher.utils.StepsUtils
 
 class SecondaryObservationDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   var observationDAO : ObservationDAO = null
   var observations : List[Observation] = null
   var result : Observation = null
+  var dataset : Dataset = null
   
-  Given("""^I want to load the observations of dataset "([^"]*)" in the year "([^"]*)"$"""){ (datast:String, year:Int) =>
-	val dataset : Dataset = Dataset(datast)
+  Given("""^I want to load the observations of dataset "([^"]*)"$"""){ (datast:String) =>
+    StepsUtils.vars.clear
+	val fetcher = SpreadsheetsFetcher(
+        new File(FileUtils.getFilePath("files/Structure.xlsx", true)),
+        new File(FileUtils.getFilePath("files/example.xlsx", true)))
+    dataset = Dataset(datast)
 	val is = new FileInputStream(new File(
-	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
-	observationDAO = new SecondaryObservationDAOImpl(is)(null)
+	    FileUtils.getFilePath("files/Raw.xlsx", true)))
+	observationDAO = new SecondaryObservationDAOImpl(is)(fetcher)
+	observations = observationDAO.getObservations
   } 
   
-  Given("""^I want to load the observations of non-existing dataset "([^"]*)" in the year "([^"]*)"$""") {(datast : String, year:Int) => {
-    val dataset : Dataset = Dataset(datast)
-	val is = new FileInputStream(new File(
-	    FileUtils.getFilePath("files/TASTemplate.xlsx", true)))
-    intercept[IllegalArgumentException] {
-	    observationDAO = new SecondaryObservationDAOImpl(is)(null)
-    }
-  }}
-  
-  When("""^I check the value for the country "([^"]*)" and indicator "([^"]*)"$""") {(regionName : String, indicator : String) =>
-    result = observations.find(obs => (obs.area.name.equals(regionName) && obs.indicator != null && obs.indicator.id.equals(indicator))).getOrElse(null)
+  When("""^I check the value for the country "([^"]*)" and year "([^"]*)"$""") {(regionName : String, year : Int) =>
+    result = observations.find(obs => (obs.area.name.equals(regionName) && obs.year.equals(year) && obs.dataset.equals(dataset))).getOrElse(null)
+    StepsUtils.vars.put(StepsUtils.VALUE, result.value.get.toString)
     result should not be null
-  }
-  
-  Then("""the value should be "([^"]*)"$""") { (value : Double) =>
-    value should be(value +- 0.0000001f)
-  }
-  
-  Then("""it should raise an Exception$""") { () =>
-    throw new NotImplementedException
   }
 
 }

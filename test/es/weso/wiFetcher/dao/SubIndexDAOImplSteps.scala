@@ -11,6 +11,7 @@ import java.io.FileInputStream
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.poi.SubIndexDAOImpl
+import java.io.File
 
 class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   
@@ -19,11 +20,14 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   var components : List[Component] = null
   var subIndex : SubIndex = null
   var component : Component = null
+  var indicators : Int = 0
   
   Given("""^I want to load all information about subindexes in the WebIndex$""") {() => 
-    
+    val fetcher = SpreadsheetsFetcher(
+        new File(FileUtils.getFilePath("files/Structure.xlsx", true)),
+        new File(FileUtils.getFilePath("files/example.xlsx", true)))
     subIndexDAO = new SubIndexDAOImpl(new FileInputStream(
-        FileUtils.getFilePath("files/structure.xlsx", true)))(null)
+        FileUtils.getFilePath("files/Structure.xlsx", true)))(fetcher)
     subIndexDAO should not be (null)
   }
   
@@ -45,21 +49,12 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   When("""^I check the numbers of components of subindex "([^"]*)"$""") {(subindex : String) =>
     subIndex = subIndexDAO.getSubIndexes.find(sub => sub.id.equals(subindex)).getOrElse(throw new IllegalArgumentException)
   }
-  
-  When("""^I check the number of indicators of component "([^"]*)"$""") {(component : String) =>
-    this.component = null
-  }
-  
   When("""^I check the component with "([^"]*)" "([^"]*)"$""") { (property : String, value : String) =>
     component = property match {
       case "name" => components.find(comp => comp.names.get("en").get.equals(value)).getOrElse(throw new IllegalArgumentException("There is no subindex with name " + value))
       case "id" => components.find(comp => comp.id.equals(value)).getOrElse(throw new IllegalArgumentException("There is no subindex with id " + value))
       case _ => throw new IllegalArgumentException
     }
-  }
-  
-  Then("""^the number of indicators should be "([^"]*)"$""") {(indicators : Int) =>
-    component.getIndicators.size should be (indicators)
   }
   
   Then("""^the component "([^"]*)" should be "([^"]*)"$""") { (property : String, value : String) =>
