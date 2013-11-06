@@ -10,8 +10,8 @@ Feature: Cucumber
   	Then the number of regions should be "5"
   	
   	Given I want to load all information about regions
-  	When I check the region with the name "Asia pacific"
-    Then the region should have "14" countries
+  	When I check the region with the name "Asia Pacific"
+    Then the region should have "15" countries
     
     Given I want to load all information about regions
     When I check the region with the name "Africa"

@@ -6,33 +6,31 @@ Feature: Cucumber
   Scenario: Validate the data loading from indicators excel File
     
   	Given I want to load all information about indicators in the WebIndex
-  	When I check the indicator with "id" "FH A"
+  	When I check the indicator with "id" "ITU K"
     Then the indicator "type" should be "Secondary"
+    Then the number of primary indicators should be "53"
+    Then the number of secondary indicators should be "38"
     
     Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "name" "Information on jobs"
-    Then the indicator "id" should be "Q8c" 
+    When I check the indicator with "name" "Civil Liberties"
+    Then the indicator "id" should be "FH B" 
     
     Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "name" "Information on jobs"  
-    Then the indicator "id" should not be "FH A" 
+    When I check the indicator with "name" "Enforcement of web accessibility by people with disability"  
+    Then the indicator "id" should not be "Q19" 
     
     Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "description" "Survey Question: How free is the press in your country? [1 = totally restricted; 7 = completely free]"
-    Then the indicator "id" should be "WEF C"  
+    When I check the indicator with "description" "Technicians in R&D (per million population)"
+    Then the indicator "id" should be "WB D"  
     
     Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "id" "WIKI A"
-    Then the indicator "type" should be "Secondary"
-    
-    Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "id" "Q8a"
-    Then the indicator "weight" should be "1"
+    When I check the indicator with "id" "Q11"
+    Then the indicator "type" should be "Primary"
     
     Given I want to load all information about indicators in the WebIndex
     When I check the indicator with "id" "RSF A"
-    Then the indicator "source" should be "RSF"
+    Then the indicator "weight" should be "0.5"
     
     Given I want to load all information about indicators in the WebIndex
-    When I check the indicator with "id" "ITU A"
+    When I check the indicator with "id" "ODB.I.2"
     Then the indicator "hl" should be "High"

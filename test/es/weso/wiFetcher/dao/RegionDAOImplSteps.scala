@@ -9,6 +9,8 @@ import es.weso.wiFetcher.utils.FileUtils
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import es.weso.wiFetcher.dao.poi.RegionDAOImpl
+import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
+import java.io.File
 
 class RegionDAOImplSteps extends ScalaDsl with EN with Matchers{
 
@@ -17,9 +19,12 @@ class RegionDAOImplSteps extends ScalaDsl with EN with Matchers{
   var region : Region = null
   
   Given("""I want to load all information about regions$""") {() =>
+    val fetcher = SpreadsheetsFetcher(
+        new File(FileUtils.getFilePath("files/Structure.xlsx", true)),
+        new File(FileUtils.getFilePath("files/example.xlsx", true)))
     val is = new FileInputStream(FileUtils.getFilePath("files/Structure.xlsx", 
         true))
-    val regionsDao : RegionDAO = new RegionDAOImpl(is)(null)
+    val regionsDao : RegionDAO = new RegionDAOImpl(is)(fetcher)
     regions = regionsDao.getRegions
   }
   
