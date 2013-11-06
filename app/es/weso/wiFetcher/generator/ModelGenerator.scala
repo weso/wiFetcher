@@ -436,7 +436,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
           sliceResource.addProperty(PropertyCexIndicator, ResourceFactory.createResource(PrefixIndicator +
             observations.head.indicator.id.replace(" ", "_")))
           sliceResource.addProperty(PropertyWfOntoRefYear, ResourceFactory.createTypedLiteral(year.toString, XSDDatatype.XSDinteger))
-          sliceResource.addProperty(PropertyQbSliceStructure, /*datasetResource*/ ResourceFactory.createResource(PrefixWfOnto +
+          sliceResource.addProperty(PropertyQbSliceStructure, ResourceFactory.createResource(PrefixWfOnto +
             "sliceByArea"))
           observationsByYear.get(year).getOrElse(throw new IllegalArgumentException).foreach(obs => {
             createObservationTriples(obs, model, id)
