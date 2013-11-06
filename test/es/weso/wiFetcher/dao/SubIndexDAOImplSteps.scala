@@ -36,7 +36,7 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   When("""^I check the subindex with "([^"]*)" "([^"]*)"$""") { (property : String, value : String) =>
     subIndex = property match {
-      case "name" => subIndexes.find(subindex => subindex.name.equals(value)).getOrElse(throw new IllegalArgumentException("There is no subindex with name " + value))
+      case "name" => subIndexes.find(subindex => subindex.names.get("en").get.equals(value)).getOrElse(throw new IllegalArgumentException("There is no subindex with name " + value))
       case "id" => subIndexes.find(subindex => subindex.id.equals(value)).getOrElse(throw new IllegalArgumentException("There is no subindex with id " + value))
       case _ => throw new IllegalArgumentException
     }
@@ -52,7 +52,7 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   When("""^I check the component with "([^"]*)" "([^"]*)"$""") { (property : String, value : String) =>
     component = property match {
-      case "name" => components.find(comp => comp.name.equals(value)).getOrElse(throw new IllegalArgumentException("There is no subindex with name " + value))
+      case "name" => components.find(comp => comp.names.get("en").get.equals(value)).getOrElse(throw new IllegalArgumentException("There is no subindex with name " + value))
       case "id" => components.find(comp => comp.id.equals(value)).getOrElse(throw new IllegalArgumentException("There is no subindex with id " + value))
       case _ => throw new IllegalArgumentException
     }
@@ -64,9 +64,9 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   Then("""^the component "([^"]*)" should be "([^"]*)"$""") { (property : String, value : String) =>
     property match {
-      case "name" => component.name should be (value)
+      case "name" => component.names.get("en").get should be (value)
       case "id" => component.id should be (value)
-      case "description" => component.description should be (value)
+      case "description" => component.descriptions.get("en").get should be (value)
       case "weight" => component.weight should be (value.toDouble +- 0.0000001f)
     }
   }
@@ -82,9 +82,9 @@ class SubIndexDAOImplSteps extends ScalaDsl with EN with Matchers{
   
   Then("""^the subindex "([^"]*)" should be "([^"]*)"$""") {(property : String, value : String) =>
     property match {
-      case "name" => subIndex.name should be (value)
+      case "name" => subIndex.names.get("es").get should be (value)
       case "id" => subIndex.id should be (value)
-      case "description" => subIndex.description should be (value)
+      case "description" => subIndex.descriptions.get("en").get should be (value)
       case "weight" => subIndex.weight should be (value.toDouble +- 0.0000001f)
     }
   }

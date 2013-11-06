@@ -33,8 +33,8 @@ class PrimaryObservationDAOImpl (
       val sheet = workbook.getSheet(sheetName)
       if (sheet == null) {
         sFetcher.issueManager.addError(
-          message = s"The sheet ${sheetName} is not included in the file. " +
-        	  	"Primary observations cannot be loaded.",
+          message = s"The sheet ${sheetName} is not included in the file, so " +
+        	  	"it is not possible to load corresponding observations.",
           path = XslxFile)
       } else {
         observations ++= parseData(workbook, sheet)
@@ -81,7 +81,7 @@ class PrimaryObservationDAOImpl (
        indicatorId = POIUtils.extractCellValue(cell, evaluator)
        if(!indicatorId.isEmpty())
        indicator = indicators.find(indicator => indicator.id.equals(indicatorId))
-       if(!indicator.isEmpty)       
+       if(indicator.isDefined)       
      }yield {
        val dataset = sFetcher.getDatasetById(indicatorId + "-" + status)
        val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
@@ -126,7 +126,7 @@ object PrimaryObservationDAOImpl {
   private val logger: Logger = Logger.getLogger(this.getClass)
   
     private val sheets : Array[String] = Array("Survey-Raw", "Survey-Ordered", 
-      "Survey-Normalised")
+      "Survey-Normalised", "ODB-Raw", "ODB-Ordered", "ODB-Normalised")
 
   private val XslxFile = Some("Observations File")
 

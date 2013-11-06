@@ -65,7 +65,8 @@ class SecondaryObservationDAOImpl(
         println(dataset.id)
         if (sheet == null) {
           sFetcher.issueManager.addError(
-            message = s"The dataset ${dataset.id} are invalid or empty. It is mandatory to have data " +
+            message = s"The dataset ${dataset.id} are invalid or empty. It is " + 
+        	  "mandatory to have data " +
               "within the datasets in order to process the Observations",
             path = XslxFile)
           List.empty
@@ -88,7 +89,7 @@ class SecondaryObservationDAOImpl(
         if(!indicatorId.equals("Survey"))
         if(!sFetcher.obtainIndicatorById(indicatorId).isDefined)
     } { 
-      sFetcher.issueManager.addError(
+      sFetcher.issueManager.addWarn(
             message = s"There are observations for dataset ${name}, but indicator ${indicatorId} " +
               "it's no present in structure file",
             path = XslxFile)

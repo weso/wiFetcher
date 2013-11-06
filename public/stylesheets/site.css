@@ -287,6 +287,15 @@ table {
 	border-radius: 5px;
 }
 
+tr.error{
+	color:red;
+}
+
+tr.warning {
+	color:orange;
+	background: white;
+}
+
 table th {
 	font-size: 0.875em !important;
 }
