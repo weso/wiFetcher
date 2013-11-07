@@ -45,15 +45,6 @@ object VirtuosoLoader {
     val file = "-f public/" + path
     val out = "-o public/temp/observations.json" 
       
-    /*scriptBuilder.append("if [[ -d \"wiExtract\" && ! -L \"wiExtract\" ]] ; then \n")
-    scriptBuilder.append("(cd wiExtract; git checkout \"master\")\n")
-    scriptBuilder.append("(cd wiExtract; git pull origin \"master\")\n")
-    scriptBuilder.append("else\n")
-    scriptBuilder.append("git clone https://github.com/weso/wiExtract.git\n")
-    scriptBuilder.append("(cd wiExtract ; git checkout master)\n")
-    scriptBuilder.append("fi\n\n")
-    
-    scriptBuilder.append("(cd wiExtract ; sbt assembly)\n")*/
     scriptBuilder.append("java -jar ./public/temp/WiExtract-assembly-1.0-SNAPSHOT.jar ")
     	.append(file).append(" ").append(out).append("\n")
     
