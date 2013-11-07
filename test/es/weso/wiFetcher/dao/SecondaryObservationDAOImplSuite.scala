@@ -34,7 +34,7 @@ class SecondaryObservationDAOImplSuite extends FunSuite with BeforeAndAfter
     val is = new FileInputStream(new File(
 	    FileUtils.getFilePath("files/example.xlsx", true)))
     val observationDAO = new SecondaryObservationDAOImpl(is)(fetcher)
-    observationDAO.getObservations.size should be (120)
+    observationDAO.getObservations.size should be (84)
   }
   
 }
