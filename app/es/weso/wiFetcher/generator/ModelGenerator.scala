@@ -250,8 +250,6 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     obsResource.addProperty(PropertySmdxObsStatus, ResourceFactory.createResource(PrefixCex + obs.status))
     obsResource.addProperty(PropertyQbDataset, ResourceFactory.createResource(PrefixDataset + obs.dataset.id.replace(" ", "_")))
     obsResource.addProperty(PropertyWfOntoSheetType, ResourceFactory.createResource(PrefixWfOnto + obs.sheet))
-    /*obsResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral(
-      "MD5 checksum for observation " + id, "en"))*/
     val builder = new StringBuilder
     builder.append(obs.indicator.id).append("#").append(obs.status).append("#")
     	.append(obs.area.iso3Code).append("#").append(obs.year).append("#")

@@ -30,7 +30,6 @@ object Application extends Controller {
   protected def extractMimeType(path : String) : String = {
     val ext = path.substring(path.lastIndexOf('.'), path.length)
     		.replace(".", "")
-	println("EXTENSION: " + ext)
 	ext match {
       case "csv" => "text/csv"
       case "ttl" => "text/turtle"
