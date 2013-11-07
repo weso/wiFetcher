@@ -29,6 +29,14 @@ class PrimaryObservationDAOImpl (
   protected def load(is: InputStream) {
     logger.info("Begin primary observations extraction")
     val workbook: Workbook = WorkbookFactory.create(is)
+    val sheets : ListBuffer[String] = ListBuffer.empty
+    
+    for(index <- 0 until workbook.getNumberOfSheets()) {
+      val sheetName = workbook.getSheetAt(index).getSheetName()
+      if(pattern.findFirstMatchIn(sheetName).isDefined) 
+        sheets += sheetName
+    }
+    
     for(sheetName <- sheets) {
       val sheet = workbook.getSheet(sheetName)
       if (sheet == null) {
@@ -125,8 +133,7 @@ object PrimaryObservationDAOImpl {
 
   private val logger: Logger = Logger.getLogger(this.getClass)
   
-    private val sheets : Array[String] = Array("Survey-Raw", "Survey-Ordered", 
-      "Survey-Normalised", "ODB-Raw", "ODB-Ordered", "ODB-Normalised")
+    val pattern = """(?i)(odb|gi|survey)-(?i)(raw|ordered)""".r
 
   private val XslxFile = Some("Observations File")
 
