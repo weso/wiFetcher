@@ -60,20 +60,30 @@ class SecondaryObservationDAOImpl(
       checkSheets(workbook)
       val obs = for {
         dataset <- datasets
-        sheet = workbook.getSheet(dataset.id)
+        sheet = obtainSheet(workbook, dataset.id)
       } yield {
         println(dataset.id)
-        if (sheet == null) {
+        if (!sheet.isDefined) {
           sFetcher.issueManager.addError(
             message = s"The dataset ${dataset.id} are invalid or empty. It is " + 
         	  "mandatory to have data " +
               "within the datasets in order to process the Observations",
             path = XslxFile)
           List.empty
-        } else parseData(workbook, sheet)
+        } else parseData(workbook, sheet.get)
       }
       observations ++= obs.foldLeft(ListBuffer[Observation]())((a, b) => a ++= b)
       logger.info("Finish observations extraction")
+    }
+  }
+  
+  protected def obtainSheet(workbook : Workbook, datasetId : String) : Option[Sheet] = {
+    val auxSheet = workbook.getSheet(datasetId)
+    if(auxSheet == null) {
+      val sheet = workbook.getSheet(datasetId + " (1)")
+      if(sheet == null) None else Some(sheet)
+    } else {
+      Some(auxSheet)
     }
   }
   
@@ -83,8 +93,7 @@ class SecondaryObservationDAOImpl(
         index <- 0 until sheets        
         sheet = workbook.getSheetAt(index)
         name = sheet.getSheetName
-        if(name.contains("-Ordered") || name.contains("-Imputed") || 
-          name.contains("-Normalised"))
+        if(name.contains("-Ordered") || name.contains("-Imputed"))
         indicatorId = name.substring(0, name.indexOf("-"))
         if(!indicatorId.equals("Survey"))
         if(!sFetcher.obtainIndicatorById(indicatorId).isDefined)
@@ -102,7 +111,12 @@ class SecondaryObservationDAOImpl(
     //Obtain the initial cell of observation from properties file
     val initialCell = new CellRef(Configuration.getInitialCellSecondaryObservation)
     val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
-    val dataset = sFetcher.getDatasetById(sheet.getSheetName())
+    val datasetId = if(!sheet.getSheetName.contains("(")){
+      sheet.getSheetName 
+    } else {
+      sheet.getSheetName().substring(0, sheet.getSheetName.indexOf("("))
+    }
+    val dataset = sFetcher.getDatasetById(datasetId.trim)
     val indicator = sFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-'))) /*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
     val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
 
@@ -141,39 +155,6 @@ class SecondaryObservationDAOImpl(
         indicator.get, year.get, value, status, XslxFile)
     }
   }
-
-  /**
-   * This method has to obtain the indicator corresponds to an observation
-   * @param sheet The sheet that contains all observation of a dataset
-   * @param dataset A dataset corresponds to the excel sheet from we have to
-   * extract the indicator
-   * @param column The column corresponds to an observation
-   * @param row The row corresponds to an observation
-   * @param initialCell The initial cell of the observations
-   * @return An indicator
-   */
-  /*def obtainIndicator(sheet: Sheet, cell: String, evaluator: FormulaEvaluator): Indicator = {
-    val cellReference = new CellRef(cell)
-    val indicatorName = POIUtils.extractCellValue(
-      sheet.getRow(cellReference.getRow()).getCell(cellReference.getCol()), evaluator)
-    sFetcher.obtainIndicator(indicatorName)
-  }*/
-
-  //
-  //  /**
-  //   * This method has to extract the status of the observations
-  //   * @param cell The cell where is the status
-  //   * @param sheet The sheet that contains all observations of a dataset
-  //   * @return The values extracted of the status cell
-  //   */
-  //  def obtainStatus(cell: String, sheet: Sheet, evaluator: FormulaEvaluator): String = {
-  //    val cellReference = new CellRef(cell)
-  //    val stat = sheet.getRow(cellReference.getRow()).getCell(
-  //      cellReference.getCol())
-  //    if (stat == null)
-  //      throw new IllegalArgumentException("Status cell is empty")
-  //    POIUtils.extractCellValue(stat, evaluator)
-  //  }
 
   def getObservations(): List[Observation] = observations.toList
 
