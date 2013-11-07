@@ -79,11 +79,11 @@ class IssueManagerUtils() {
     } yield {
       issue
     }
-    val finalIssues = for (issue <- issues) yield {
-      if (filteredIssues.contains(issue)) {
-        Warn(issue.message, issue.path, issue.sheetName,
-          issue.col, issue.row, issue.cell)
-      } else issue
+    val finalIssues = for {
+    	issue <- issues
+    	if(!filteredIssues.contains(issue))
+      } yield {
+       issue
     }
 
     finalIssues.toList
