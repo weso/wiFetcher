@@ -26,6 +26,8 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory
 case class ModelGenerator(baseUri: String, namespace : String, year : String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
  
+  val md5 = java.security.MessageDigest.getInstance("MD5")
+  
   val PrefixBase = new StringBuilder(baseUri).append("/")
   	.append(namespace).append("/").append(year).append("/").toString
   val PrefixObs = new StringBuilder(baseUri).append("/")
@@ -248,8 +250,15 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     obsResource.addProperty(PropertySmdxObsStatus, ResourceFactory.createResource(PrefixCex + obs.status))
     obsResource.addProperty(PropertyQbDataset, ResourceFactory.createResource(PrefixDataset + obs.dataset.id.replace(" ", "_")))
     obsResource.addProperty(PropertyWfOntoSheetType, ResourceFactory.createResource(PrefixWfOnto + obs.sheet))
-    obsResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral(
-      "MD5 checksum for observation " + id, "en"))
+    /*obsResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral(
+      "MD5 checksum for observation " + id, "en"))*/
+    val builder = new StringBuilder
+    builder.append(obs.indicator.id).append("#").append(obs.status).append("#")
+    	.append(obs.area.iso3Code).append("#").append(obs.year).append("#")
+    	.append(obs.value).append("#WESO")
+    val md5Value : String = md5.digest(builder.toString.getBytes).map(0xFF & _).map { "%02x".format(_) }.foldLeft(""){_ + _}
+    obsResource.addProperty(PropertyCexMD5, 
+        ResourceFactory.createPlainLiteral(md5Value))
   }
 
   def createSecondaryIndicatorTriples(indicator: Indicator, model: Model) = {
