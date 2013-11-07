@@ -13,8 +13,7 @@ class DatasetDAOImpl(indicators : List[Indicator]) extends DatasetDAO
   private def loadDatasets(indicators : List[Indicator]) : ListBuffer[Dataset] = {
     val result = for(indicator <- indicators) yield {
       Seq(Dataset(indicator.id + "-Ordered"), 
-          Dataset(indicator.id + "-Imputed"), 
-          Dataset(indicator.id + "-Normalised"))
+          Dataset(indicator.id + "-Imputed"))
     }
     result.foldLeft(ListBuffer.empty[Dataset])((a, b) => a ++= b)
   }

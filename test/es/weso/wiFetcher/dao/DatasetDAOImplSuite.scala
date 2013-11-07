@@ -64,11 +64,10 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
   test("Load correct all datasets and verify that all data is loaded") {
     val datasetDao : DatasetDAOImpl = new DatasetDAOImpl(indicators.toList)
     val datasets : List[Dataset] = datasetDao.getDatasets
-    datasets.size should be (9)
+    datasets.size should be (6)
     indicators.foreach(indicator => {
       datasets.contains(Dataset(indicator.id + "-Ordered")) should be (true)
       datasets.contains(Dataset(indicator.id + "-Imputed")) should be (true)
-      datasets.contains(Dataset(indicator.id + "-Normalised")) should be (true)
     })
   }
 
