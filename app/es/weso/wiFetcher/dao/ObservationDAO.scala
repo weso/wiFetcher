@@ -54,16 +54,16 @@ trait ObservationDAO  extends DAO[Observation]{
   def createObservation(dataset: Dataset, label: String, area: Area,
     computation: Computation, indicator: Indicator, year: Double,
     value: Option[Double], status: String, XslxFile : Option[String])(implicit sFetcher : SpreadsheetsFetcher): Observation = {
-
+	  
     val sheet = status match {
-      case "Raw" => ObservationStatus.Raw
-      case "Imputed" => ObservationStatus.Imputed
-      case "Normalised" => ObservationStatus.Normalised
-      case "Missed" => ObservationStatus.Missed
-      case "Sorted" => ObservationStatus.Sorted
-      case "Adjusted" => ObservationStatus.Adjusted
-      case "Weighted" => ObservationStatus.Weighted
-      case "Ordered" => ObservationStatus.Ordered
+      case "Raw" | "raw" => ObservationStatus.Raw
+      case "Imputed" | "imputed" => ObservationStatus.Imputed
+      case "Normalised" | "normalised" | "Normalized" | "normalized" => ObservationStatus.Normalised
+      case "Missed" | "missed" => ObservationStatus.Missed
+      case "Sorted" | "sorted" => ObservationStatus.Sorted
+      case "Adjusted" | "adjusted" => ObservationStatus.Adjusted
+      case "Weighted" | "weighted" => ObservationStatus.Weighted
+      case "Ordered" | "ordered" => ObservationStatus.Ordered
       case _ =>
         sFetcher.issueManager.addError(message = "Observation status " +
           status + " is unknown", path = XslxFile)
