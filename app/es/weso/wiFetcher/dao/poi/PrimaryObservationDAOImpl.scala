@@ -145,7 +145,7 @@ object PrimaryObservationDAOImpl {
 
   private val logger: Logger = Logger.getLogger(this.getClass)
   
-    val pattern = """(?i)(odb|gi|survey)-(?i)(raw|ordered)""".r
+    val pattern = """(?i)(odb|gi|survey)-(?i)(ordered)""".r
 
   private val XslxFile = Some("Observations File")
 
