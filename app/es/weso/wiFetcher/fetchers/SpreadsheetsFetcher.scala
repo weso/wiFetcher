@@ -68,7 +68,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     issueManager.addFilter(FilterIssue(cell=Some("Country Column")))
     issueManager.addFilter(FilterIssue(cell=Some("Datasets_Average")))
     issueManager.addFilter(FilterIssue(cell=Some("Questions")))
-    issueManager.addFilter(FilterIssue(cell=Some("Country Column is not defined")))
+    issueManager.addFilter(FilterIssue(cell=Some("Column")))
     issueManager.filteredAsSeq
   }
 
