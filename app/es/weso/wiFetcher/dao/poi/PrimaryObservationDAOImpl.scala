@@ -15,6 +15,7 @@ import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.POIUtils
 import org.apache.poi.ss.usermodel.FormulaEvaluator
+import org.apache.poi.ss.usermodel.Cell
 
 class PrimaryObservationDAOImpl (
   is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
@@ -51,8 +52,19 @@ class PrimaryObservationDAOImpl (
     logger.info("Finish primary observations extraction")
   }
   
+  protected def obtainInitialCell(cell : CellRef, sheet : Sheet) : CellRef = {
+    if(cell != null) {
+      cell
+    } else {
+      val nextRowCell : Cell = sheet.getRow(cell.getRow + 1).getCell(cell.getCol())
+      obtainInitialCell(new CellRef(nextRowCell.getRowIndex, 
+          nextRowCell.getColumnIndex()), sheet)
+    }
+  }
+  
    protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Observation] = {
-     val initialCell = new CellRef(Configuration.getInicialCellPrimaryIndicator)
+     val initialCell = obtainInitialCell(
+         new CellRef(Configuration.getInicialCellPrimaryIndicator), sheet)
      val evaluator = workbook.getCreationHelper().createFormulaEvaluator()
      val indicatorRow = Configuration.getPrimaryIndicatorRow
      val sheetName = sheet.getSheetName
