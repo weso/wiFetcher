@@ -64,11 +64,16 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("s.d.")))
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("OBSERVATIONS")))
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("MEAN OF COUNTRIES WITH 5 YEARS DATA")))
+    issueManager.addFilter(FilterIssue(cell=Some("STDEV")))
+    issueManager.addFilter(FilterIssue(cell=Some("Country Column")))
+    issueManager.addFilter(FilterIssue(cell=Some("Datasets_Average")))
+    issueManager.addFilter(FilterIssue(cell=Some("Questions")))
+    issueManager.addFilter(FilterIssue(cell=Some("Column")))
     issueManager.filteredAsSeq
   }
 
-  def storeAsTTL(baseUri: String, namespace: String, year : String/*, store: Boolean = false*/, timestamp : Long) =
-    ModelGenerator(baseUri, namespace, year).generateJenaModel(this/*, store*/, timestamp)
+  def storeAsTTL(baseUri: String, namespace: String, year : String, timestamp : Long) =
+    ModelGenerator(baseUri, namespace, year).generateJenaModel(this, timestamp)
 
   /**
    * This method load all structure about Web Index information
