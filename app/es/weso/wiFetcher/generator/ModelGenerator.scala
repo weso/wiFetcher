@@ -92,8 +92,10 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     spreadsheetsFetcher.subIndexes.foreach(
       subindex => createSubindexTriples(subindex, indexResource, model))
     spreadsheetsFetcher.datasets.foreach(
-      dataset => if(!dataset.id.contains("Missed")) 
-    	  createDatasetsTriples(dataset, observationsByDataset, model))
+      dataset => {
+        if(!dataset.id.contains("Missed")) 
+        	createDatasetsTriples(dataset, observationsByDataset, model)
+      })  
     spreadsheetsFetcher.countries.foreach(
       country => createCountriesTriples(country, model))
     spreadsheetsFetcher.regions.foreach(
@@ -220,7 +222,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   def createCountriesTriples(country: Country, model: Model) = {
     val countryResource = model.createResource(PrefixCountry + country.iso3Code)
     countryResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + "Country"))
-    countryResource.addProperty(PropertyCexMD5, ResourceFactory.createTypedLiteral("MD5 for " + country.iso3Code, XSDDatatype.XSDstring))
+    //countryResource.addProperty(PropertyCexMD5, ResourceFactory.createTypedLiteral("MD5 for " + country.iso3Code, XSDDatatype.XSDstring))
     countryResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOnto + "WESO"))
     countryResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     countryResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
@@ -261,8 +263,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 
   def createSecondaryIndicatorTriples(indicator: Indicator, model: Model) = {
     val indicatorResource = model.createResource(PrefixIndicator + indicator.id.replace(" ", "_"))
-    indicatorResource.addProperty(PropertyCexMD5,
-      ResourceFactory.createLangLiteral("MD5 checksum for indicator " + indicator.id, "en"))
+    /*indicatorResource.addProperty(PropertyCexMD5,
+      ResourceFactory.createLangLiteral("MD5 checksum for indicator " + indicator.id, "en"))*/
     indicatorResource.addProperty(PropertyCexComponent,
       ResourceFactory.createResource(PrefixComponent + indicator.component.id.replace(" ", "_")))
     indicatorResource.addProperty(PropertyCexHighLow, ResourceFactory.createResource(PrefixCex + indicator.highLow))
@@ -293,8 +295,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 
   def createPrimaryIndicatorTriples(indicator: Indicator, model: Model) = {
     val indicatorResource = model.createResource(PrefixIndicator + indicator.id.replace(" ", "_"))
-    indicatorResource.addProperty(PropertyCexMD5,
-      ResourceFactory.createLangLiteral("MD5 checksum for indicator " + indicator.id, "en"))
+    /*indicatorResource.addProperty(PropertyCexMD5,
+      ResourceFactory.createLangLiteral("MD5 checksum for indicator " + indicator.id, "en"))*/
     indicatorResource.addProperty(PropertyCexComponent,
       ResourceFactory.createResource(PrefixComponent + indicator.component.id.replace(" ", "_")))
     indicatorResource.addProperty(PropertyCexHighLow, ResourceFactory.createResource(PrefixCex + indicator.highLow))
@@ -337,7 +339,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   def createComponentsTriples(component: Component, model: Model) = {
     val componentResource = model.createResource(PrefixComponent + component.id.replace(" ", "_"))
     componentResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Component"))
-    componentResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral("MD5 for" + component.names.get("en").get, "en"))
+    /*componentResource.addProperty(PropertyCexMD5, ResourceFactory.createLangLiteral("MD5 for" + component.names.get("en").get, "en"))*/
     componentResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     componentResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     componentResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
@@ -407,7 +409,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     }
     datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "DataSet"))
     datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + "Dataset"))
-    datasetResource.addProperty(PropertyCexMD5, ResourceFactory.createTypedLiteral("MD5...", XSDDatatype.XSDstring))
+    /*datasetResource.addProperty(PropertyCexMD5, ResourceFactory.createTypedLiteral("MD5...", XSDDatatype.XSDstring))*/
     datasetResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
     datasetResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     datasetResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
