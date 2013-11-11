@@ -406,6 +406,10 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
       val computationResource = model.createResource()
       computationResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Raw"))
       datasetResource.addProperty(PropertyCexComputation, computationResource)
+    } else if(dataset.id.contains("Imputed")) {
+      val computationResource = model.createResource()
+      computationResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Imputed"))
+      datasetResource.addProperty(PropertyCexComputation, computationResource)
     }
     datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixQb + "DataSet"))
     datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + "Dataset"))
