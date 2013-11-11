@@ -16,6 +16,7 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.POIUtils
 import org.apache.poi.ss.usermodel.FormulaEvaluator
 import org.apache.poi.ss.usermodel.Cell
+import es.weso.wiFetcher.entities.IndicatorType
 
 class PrimaryObservationDAOImpl (
   is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
@@ -74,6 +75,7 @@ class PrimaryObservationDAOImpl (
          sheet, evaluator)
          
      indicators.foreach(indicator => {
+       if(indicator.indicatorType.equals(IndicatorType.Primary)) 
     	 sFetcher.datasets += Dataset(indicator.id + "-" + status)
      })
      
