@@ -22,6 +22,22 @@ import java.text.SimpleDateFormat
 import com.hp.hpl.jena.rdf.model.Resource
 import es.weso.wiFetcher.entities.Provider
 import com.hp.hpl.jena.rdf.model.ResourceFactory
+import play.api.libs.ws.WS
+import scala.concurrent.Future
+import play.api.libs.ws.Response
+import play.api.libs.json.Reads
+import play.api.libs.json.Json
+import play.api.libs.json.Writes
+import play.api.libs.functional.syntax.functionalCanBuildApplicative
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.functional.syntax.unlift
+import play.api.libs.json.__
+import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
+import play.api.libs.functional.syntax._
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 case class ModelGenerator(baseUri: String, namespace : String, year : String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
@@ -473,36 +489,24 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 
   private def createModel: com.hp.hpl.jena.rdf.model.Model = {
     val model = ModelFactory.createDefaultModel
-    model.setNsPrefix("obs", PrefixObs)
-    model.setNsPrefix("wf-onto", PrefixWfOnto)
-    model.setNsPrefix("dcterms", PrefixDcTerms)
-    model.setNsPrefix("wf-org", PrefixWfOrg)
-    model.setNsPrefix("wf-people", PrefixWfPeople)
-    model.setNsPrefix("qb", PrefixQb)
-    model.setNsPrefix("country", PrefixCountry)
-    model.setNsPrefix("cex", PrefixCex)
-    model.setNsPrefix("indicator", PrefixIndicator)
-    model.setNsPrefix("sdmx-concept", PrefixSdmxConcept)
-    model.setNsPrefix("sdmx-code", PrefixSdmxCode)
-    model.setNsPrefix("dataset", PrefixDataset)
-    model.setNsPrefix("rdf", PrefixRdf)
-    model.setNsPrefix("rdfs", PrefixRdfs)
-    model.setNsPrefix("component", PrefixComponent)
-    model.setNsPrefix("subindex", PrefixSubindex)
-    model.setNsPrefix("index", PrefixIndex)
-    model.setNsPrefix("weightSchema", PrefixWeightSchema)
-    model.setNsPrefix("slice", PrefixSlice)
-    model.setNsPrefix("region", PrefixRegion)
-    model.setNsPrefix("skos", PrefixSkos)
-    model.setNsPrefix("time", PrefixTime)
-    model.setNsPrefix("smdx-attribute", PrefixSdmxAttribute)
-    model.setNsPrefix("smdx-subject", PrefixSdmxSubject)
-    model.setNsPrefix("computation", PrefixComputation)
-    model.setNsPrefix("void", PrefixVoid)
-    model.setNsPrefix("base", PrefixBase)
-    model.setNsPrefix("foaf", PrefixFoaf)
-    model.setNsPrefix("org", PrefixOrg)
+    addPrefixes(model)
     model
+  }
+  
+  
+  
+  private def addPrefixes(model : Model) = {
+    val response : Future[Response] = WS.url("http://156.35.82.103:9003/prefixes/json").get
+    implicit val context = scala.concurrent.ExecutionContext.Implicits.global
+    val future = response.map{
+      response =>
+        println(response.body)
+        val prefixes = response.json.as[Map[String, String]]
+        prefixes.keySet.foreach(prefix => {
+          model.setNsPrefix(prefix, prefixes.get(prefix).get)
+        })
+    }
+    Await.result(future, 5 minutes)
   }
 }
 
