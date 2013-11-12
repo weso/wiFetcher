@@ -31,6 +31,12 @@
       	<div id="main">
         @content
         </div>
+        <footer id="footer">
+			<p>"wiFetcher Upload Service" is a web service developed by <a href="http://www.weso.es" title="WESO RG">WESO RG</a></p>
+			<p>( <a href="mailto:ignacio.fuertes@@weso.es" title="Mail to Ignacio Fuertes Bernardo">Ignacio Fuertes Bernardo</a>, <a href="mailto:cesar.luis@@weso.es" title="Mail to César Luis Alvargonzález">César Luis Alvargonzález</a>, <a href="mailto:labra@@uniovi.es" title="Mail to Jose Emilio Labra Gayo">Jose Emilio Labra Gayo</a> and <a href="mailto:jmalvarez@@seerc.org" title="Mail to Jose Maria Alvarez Rodriguez">Jose Maria Alvarez Rodriguez</a> )<p>
+			<p>2013 WESO RG (<a href="http://www.apache.org/licenses/LICENSE-2.0.html" title="Apache License, Version 2.0">Apache License</a>), <a href="http://github.com/weso/computex" title="Computex Github Repository">Github</a></p>
+			<p>Version: @io.Source.fromFile("conf/app_version.txt").mkString </p>
+		</footer>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script type="text/javascript">
 			if (typeof jQuery == 'undefined') {

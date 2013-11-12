@@ -8,6 +8,7 @@ wiExtract/
 *.~lock.*
 
 bin/
+conf/app_version.txt
 
 project/project
 project/target
