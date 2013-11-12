@@ -297,12 +297,12 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
     indicator.labels.keySet.foreach(lang => {
       val label = indicator.labels.get(lang).get
-//      if(!label.isEmpty)
+      if(!label.isEmpty)
     	  indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
     })
     indicator.comments.keySet.foreach(lang => {
       val comment = indicator.comments.get(lang).get
-//      if(!comment.isEmpty)
+      if(!comment.isEmpty)
         indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))
         indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(comment, lang))
     })
@@ -330,12 +330,12 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
     indicator.labels.keySet.foreach(lang => {
       val label = indicator.labels.get(lang).get
-//      if(!label.isEmpty)
+      if(!label.isEmpty)
     	  indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
     })
     indicator.comments.keySet.foreach(lang => {
       val comment = indicator.comments.get(lang).get
-//      if(!comment.isEmpty)
+      if(!comment.isEmpty)
         indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))
         indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(comment, lang))
     })
@@ -362,12 +362,12 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 //    componentResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(component.name, "en"))
     component.names.keySet.foreach(lang => {
       val label = component.names.get(lang).get
-//      if(!label.isEmpty)
+      if(!label.isEmpty)
     	  componentResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
     })
     component.descriptions.keySet.foreach(lang => {
       val comment = component.descriptions.get(lang).get
-//      if(!label.isEmpty)
+      if(!comment.isEmpty)
     	  componentResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))      
     })
     componentResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
@@ -391,12 +391,12 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 //    subindexResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(subindex.description, "en"))
     subindex.names.keySet.foreach(lang => {
       val label = subindex.names.get(lang).get
-//      if(!label.isEmpty)
+      if(!label.isEmpty)
     	  subindexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
     })
     subindex.descriptions.keySet.foreach(lang => {
       val comment = subindex.descriptions.get(lang).get
-//      if(!label.isEmpty)
+      if(!comment.isEmpty)
     	  subindexResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))      
     })
     
@@ -474,7 +474,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
           })
           datasetResource.addProperty(PropertyQbSlice, sliceResource)
         })
-      case None => sFetcher.issueManager.addError(message = s"No observations for the dataset ${dataset.id}", path = Some("RAW File"))
+      case None => sFetcher.issueManager.addWarn(message = s"No observations for the dataset ${dataset.id}", path = Some("RAW File"))
     }
   }
   
@@ -500,7 +500,6 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     implicit val context = scala.concurrent.ExecutionContext.Implicits.global
     val future = response.map{
       response =>
-        println(response.body)
         val prefixes = response.json.as[Map[String, String]]
         prefixes.keySet.foreach(prefix => {
           model.setNsPrefix(prefix, prefixes.get(prefix).get)

@@ -63,14 +63,9 @@ class SecondaryObservationDAOImpl(
         sheet = obtainSheet(workbook, dataset.id)
       } yield {
         println(dataset.id)
-        if (!sheet.isDefined) {
-          sFetcher.issueManager.addError(
-            message = s"The dataset ${dataset.id} are invalid or empty. It is " + 
-        	  "mandatory to have data " +
-              "within the datasets in order to process the Observations",
-            path = XslxFile)
+        if (!sheet.isDefined) 
           List.empty
-        } else parseData(workbook, sheet.get)
+        else parseData(workbook, sheet.get)
       }
       observations ++= obs.foldLeft(ListBuffer[Observation]())((a, b) => a ++= b)
       logger.info("Finish observations extraction")
