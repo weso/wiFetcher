@@ -2,12 +2,13 @@ import sbt._
 import Keys._
 import play.Project._
 import templemore.sbt.cucumber.CucumberPlugin
+import java.io.PrintWriter
 
 object ApplicationBuild extends Build {
 
   val AppName = "wiFetcher"
   val AppOrg = "es.weso"
-  val AppVersion = "1.1-M1-SNAPSHOT"
+  val AppVersion = "git describe --abbrev=0 --tags".!!.trim
 
   val ScalaV = "2.10.2"
 
@@ -73,4 +74,12 @@ object ApplicationBuild extends Build {
     
     templatesImport += "es.weso.wiFetcher.entities.issues._",
     templatesImport += "controllers.FileUploadController._")
+    
+    
+    def writeToFile(fileName: String, value: String) = {
+	  	val file = new PrintWriter(new File(fileName))
+  		try { file.print(value) } finally { file.close() }
+  	}
+ 
+  	writeToFile("conf/app_version.txt", AppVersion)
 }

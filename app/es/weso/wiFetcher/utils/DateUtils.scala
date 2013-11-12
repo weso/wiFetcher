@@ -1,7 +1,8 @@
 package es.weso.wiFetcher.utils
 
 import java.util.Calendar
-import java.text.SimpleDateFormat
+import java.text.SimpleDateFormat 
+
 
 object DateUtils {
   /**
@@ -19,6 +20,6 @@ object DateUtils {
     val currentDay = dayFormat.format(actual)
     new StringBuilder(currentYear).append("-").append(currentMonth)
       .append("-").append(currentDay).toString
-  }
+  } 
 
 }
