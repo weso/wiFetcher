@@ -128,16 +128,166 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   }
   
   private def createDatasetMetadata(model : Model, timestamp : Long) = {
-    val datasetResource = model.createResource(PrefixBase + "ds")
-    datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixVoid + "Dataset"))
-    datasetResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral("Web Foundation | Web Index", "en"))
-    datasetResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral("Dataset of all raw information about Web Index 2013", "en"))
-    datasetResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
-    datasetResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
     val format = new SimpleDateFormat("yyyy-MM-dd")
-    datasetResource.addProperty(PropertyDcTermsCreated, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
-    datasetResource.addProperty(PropertyDcTermsLicense, ResourceFactory.createResource("http://opendatacommons.org/licenses/by/1.0/"))
-    datasetResource.addProperty(ResourceFactory.createProperty(PrefixFoaf + "homepage"), ResourceFactory.createResource("http://data.webfoundation.org"))
+    val catalogResource = model.createResource(PrefixBase + namespace + "-catalog")
+    catalogResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Catalog"))
+    catalogResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral(namespace + " catalog", XSDDatatype.XSDstring))
+    catalogResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral(namespace + " catalog", XSDDatatype.XSDstring))
+    catalogResource.addProperty(PropertyFoafHomepage, ResourceFactory.createResource("http://data.webfoundation.org"))
+    catalogResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    catalogResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    catalogResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    val distributionResource = model.createResource(PrefixBase + "distribution")
+    distributionResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Distribution"))
+    distributionResource.addProperty(PropertyDcatAccesURL, ResourceFactory.createResource("http://data.webfoundation.org"))
+    distributionResource.addProperty(PropertyDcatMediaType, ResourceFactory.createPlainLiteral("text/turtle"))
+    createObservationDsMetadata(model, timestamp, format, distributionResource)
+    createIndicatorsDsMetadata(model, timestamp, format, distributionResource)
+    createIndexesDsMetadata(model, timestamp, format, distributionResource)
+    createComponentsDsMetadata(model, timestamp, format, distributionResource)
+    createSlicesDsMetadata(model, timestamp, format, distributionResource)
+    createDatasetsDsMetadata(model, timestamp, format, distributionResource)
+    createRegionsDsMetadata(model, timestamp, format, distributionResource)
+    createCountriesDsMetadata(model, timestamp, format, distributionResource)
+    createOrganizationsDsMetadata(model, timestamp, format, distributionResource)
+//    val datasetResource = model.createResource(PrefixBase + "ds")
+//    datasetResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixVoid + "Dataset"))
+//    datasetResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral("Web Foundation | Web Index", "en"))
+//    datasetResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral("Dataset of all raw information about Web Index 2013", "en"))
+//    datasetResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+//    datasetResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+//    val format = new SimpleDateFormat("yyyy-MM-dd")
+//    datasetResource.addProperty(PropertyDcTermsCreated, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+//    datasetResource.addProperty(PropertyDcTermsLicense, ResourceFactory.createResource("http://opendatacommons.org/licenses/by/1.0/"))
+//    datasetResource.addProperty(ResourceFactory.createProperty(PrefixFoaf + "homepage"), ResourceFactory.createResource("http://data.webfoundation.org"))
+  }
+  
+  private def createObservationDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val obsDsResource = model.createResource(PrefixBase + "observations-ds")
+    obsDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    obsDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Observations dataset", XSDDatatype.XSDstring))
+    obsDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Observations dataset", XSDDatatype.XSDstring))
+    obsDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("observations"))
+    obsDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    obsDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    obsDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    obsDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    obsDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixObs + ".+"))
+    obsDsResource.addProperty(PropertyDcatDistribution, distrResource)
+  }
+  
+  private def createIndicatorsDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val indicatorsDsResource = model.createResource(PrefixBase + "indicators-ds")
+    indicatorsDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    indicatorsDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Indicators dataset", XSDDatatype.XSDstring))
+    indicatorsDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Indicators dataset", XSDDatatype.XSDstring))
+    indicatorsDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("indicators"))
+    indicatorsDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    indicatorsDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    indicatorsDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    indicatorsDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    indicatorsDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixIndicator + ".+"))
+    indicatorsDsResource.addProperty(PropertyDcatDistribution, distrResource)
+  }
+  
+  private def createIndexesDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val indexesDsResource = model.createResource(PrefixBase + "indexes-ds")
+    indexesDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    indexesDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Index and subindexes dataset", XSDDatatype.XSDstring))
+    indexesDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Index and subindexes dataset", XSDDatatype.XSDstring))
+    indexesDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("index"))
+    indexesDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("subindexes"))
+    indexesDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    indexesDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    indexesDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    indexesDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    indexesDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixIndex + ".+"))
+    indexesDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixSubindex + ".+"))
+    indexesDsResource.addProperty(PropertyDcatDistribution, distrResource)
+  }
+  
+  private def createComponentsDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val componentsDsResource = model.createResource(PrefixBase + "components-ds")
+    componentsDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    componentsDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Components dataset", XSDDatatype.XSDstring))
+    componentsDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Components dataset", XSDDatatype.XSDstring))
+    componentsDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("components"))
+    componentsDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    componentsDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    componentsDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    componentsDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    componentsDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixComponent + ".+"))
+    componentsDsResource.addProperty(PropertyDcatDistribution, distrResource)
+  }
+  
+  private def createSlicesDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val slicesDsResource = model.createResource(PrefixBase + "slices-ds")
+    slicesDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    slicesDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Slices dataset", XSDDatatype.XSDstring))
+    slicesDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Slices dataset", XSDDatatype.XSDstring))
+    slicesDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("Slices"))
+    slicesDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    slicesDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    slicesDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    slicesDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    slicesDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixSlice + ".+"))
+    slicesDsResource.addProperty(PropertyDcatDistribution, distrResource)
+  }
+  
+  private def createDatasetsDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val datasetsDsResource = model.createResource(PrefixBase + "datasets-ds")
+    datasetsDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    datasetsDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Datasets dataset", XSDDatatype.XSDstring))
+    datasetsDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Datasets dataset", XSDDatatype.XSDstring))
+    datasetsDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("Datasets"))
+    datasetsDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    datasetsDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    datasetsDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    datasetsDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    datasetsDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixDataset + ".+"))
+    datasetsDsResource.addProperty(PropertyDcatDistribution, distrResource)
+  }
+  
+  private def createRegionsDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val regionDsResource = model.createResource(PrefixBase + "regions-ds")
+    regionDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    regionDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Regions dataset", XSDDatatype.XSDstring))
+    regionDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Regions dataset", XSDDatatype.XSDstring))
+    regionDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("Regions"))
+    regionDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    regionDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    regionDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    regionDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    regionDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixRegion + ".+"))
+    regionDsResource.addProperty(PropertyDcatDistribution, distrResource)
+  }
+  
+  private def createCountriesDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val countriesDsResource = model.createResource(PrefixBase + "countries-ds")
+    countriesDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    countriesDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Countries dataset", XSDDatatype.XSDstring))
+    countriesDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Countries dataset", XSDDatatype.XSDstring))
+    countriesDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("Countries"))
+    countriesDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    countriesDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    countriesDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    countriesDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    countriesDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixCountry + ".+"))
+    countriesDsResource.addProperty(PropertyDcatDistribution, distrResource)
+  }
+  
+  private def createOrganizationsDsMetadata(model : Model, timestamp : Long, format : SimpleDateFormat, distrResource : Resource) = {
+    val organizationsDsResource = model.createResource(PrefixBase + "organizations-ds")
+    organizationsDsResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixDcat + "Dataset"))
+    organizationsDsResource.addProperty(PropertyRdfsLabel, ResourceFactory.createTypedLiteral("Organizations dataset", XSDDatatype.XSDstring))
+    organizationsDsResource.addProperty(PropertyDcTermsTitle, ResourceFactory.createTypedLiteral("Organizations dataset", XSDDatatype.XSDstring))
+    organizationsDsResource.addProperty(PropertyDcatKeyword, ResourceFactory.createPlainLiteral("Organizations"))
+    organizationsDsResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(format.format(timestamp), XSDDatatype.XSDdate))
+    organizationsDsResource.addProperty(PropertyDcTermsPublisher, ResourceFactory.createResource(PrefixWfOrg + "WebFoundation"))
+    organizationsDsResource.addProperty(PropertyDcTermsContributor, ResourceFactory.createResource(PrefixWfOrg + "WESO"))
+    organizationsDsResource.addProperty(PropertyDcTermsLanguage, ResourceFactory.createResource("http://id.loc.gov/vocabulary/iso639-1/en"))
+    organizationsDsResource.addProperty(PropertyVoidUriRegex, ResourceFactory.createPlainLiteral(PrefixOrg + ".+"))
+    organizationsDsResource.addProperty(PropertyDcatDistribution, distrResource)
   }
   
   private def createComputationFlow(model : Model) = {
@@ -490,6 +640,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   private def createModel: com.hp.hpl.jena.rdf.model.Model = {
     val model = ModelFactory.createDefaultModel
     addPrefixes(model)
+    model.setNsPrefix("dcat", PrefixDcat)
     model
   }
   
@@ -526,6 +677,7 @@ object ModelGenerator {
   val PrefixVoid = "http://rdfs.org/ns/void#"
   val PrefixFoaf = "http://xmlns.com/foaf/0.1/"
   val PrefixOrg = "http://www.w3.org/ns/org#"
+  val PrefixDcat = "http://www.w3.org/ns/dcat#"
 
   val PropertyDcTermsPublisher = ResourceFactory.createProperty(PrefixDcTerms
     + "publisher")
@@ -537,6 +689,7 @@ object ModelGenerator {
   val PropertyDcTermsTitle = ResourceFactory.createProperty(PrefixDcTerms + "title")
   val PropertyDcTermsSubject = ResourceFactory.createProperty(PrefixDcTerms + "subject")
   val PropertyDcTermsLicense = ResourceFactory.createProperty(PrefixDcTerms + "license")
+  val PropertyDcTermsLanguage = ResourceFactory.createProperty(PrefixDcTerms + "language")
 
   val PropertyQbDataset = ResourceFactory.createProperty(PrefixQb
     + "dataSet")
@@ -587,5 +740,13 @@ object ModelGenerator {
   val PropertyFoafHomepage = ResourceFactory.createProperty(PrefixFoaf + "homepage")
   
   val PropertyOrgIdentifier = ResourceFactory.createProperty(PrefixOrg + "identifier")
+  
+  val PropertyDcatDataset = ResourceFactory.createProperty(PrefixDcat + "dataset")
+  val PropertyDcatKeyword = ResourceFactory.createProperty(PrefixDcat + "keyword")
+  val PropertyDcatAccesURL = ResourceFactory.createProperty(PrefixDcat + "accesURL")
+  val PropertyDcatMediaType = ResourceFactory.createProperty(PrefixDcat + "mediaType")
+  val PropertyDcatDistribution = ResourceFactory.createProperty(PrefixDcat + "distribution")
+  
+  val PropertyVoidUriRegex = ResourceFactory.createProperty(PrefixVoid + "uriRegexPattern")
 
 }
