@@ -8,6 +8,7 @@ object ApplicationBuild extends Build {
 
   val AppName = "wiFetcher"
   val AppOrg = "es.weso"
+    "git fetch --tags".!!
   val AppVersion = "git describe --abbrev=0 --tags".!!.trim
 
   val ScalaV = "2.10.2"
