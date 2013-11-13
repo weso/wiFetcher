@@ -127,7 +127,7 @@ class PrimaryObservationDAOImpl (
        if{
          val ret = indicator.isDefined
          if(ret == false) {
-           sFetcher.issueManager.addError(message = new StringBuilder("Indicator ")
+           sFetcher.issueManager.addWarn(message = new StringBuilder("Indicator ")
             .append(indicatorId).append(" is not defined").toString, path = XslxFile,
             sheetName = Some(sheet.getSheetName), col = Some(0), `row` = Some(rowIndicators),
             cell = Some(indicatorId))
