@@ -187,7 +187,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
       },
       names, //lab,
       descriptions, //comme,
-      null, null, 0, weight, hl match {
+      0, 0, 0, weight, hl match {
         case "High" => IndicatorHighLow.High
         case "Low" => IndicatorHighLow.Low
         case _ =>

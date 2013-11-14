@@ -438,13 +438,14 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixWfOnto + indicator.indicatorType + "Indicator"))
 //    indicatorResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(indicator.label, "en"))
 //    indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(indicator.comment, "en"))
-    indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2009", XSDDatatype.XSDinteger))
-    indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2012", XSDDatatype.XSDinteger))
+    indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral(indicator.intervalStarts.toString, XSDDatatype.XSDinteger))
+    indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral(indicator.interfalFinishes.toString, XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyWfOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
     indicator.providers.foreach(provider => {
       indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + provider.id))
     })
-    indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
+    if(!indicator.source.isEmpty)
+    	indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
     indicator.labels.keySet.foreach(lang => {
       val label = indicator.labels.get(lang).get
       if(!label.isEmpty)
@@ -452,9 +453,10 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     })
     indicator.comments.keySet.foreach(lang => {
       val comment = indicator.comments.get(lang).get
-      if(!comment.isEmpty)
+      if(!comment.isEmpty){
         indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))
         indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(comment, lang))
+      }
     })
     createIndicatorWeightTriples(indicator, model)
   }
@@ -477,7 +479,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicator.providers.foreach(provider => {
       indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + provider.id))
     })
-    indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
+    if(!indicator.source.isEmpty)
+    	indicatorResource.addProperty(PropertyWfOntoRefSource, ResourceFactory.createResource(indicator.source))
     indicator.labels.keySet.foreach(lang => {
       val label = indicator.labels.get(lang).get
       if(!label.isEmpty)
@@ -485,9 +488,10 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     })
     indicator.comments.keySet.foreach(lang => {
       val comment = indicator.comments.get(lang).get
-      if(!comment.isEmpty)
+      if(!comment.isEmpty) {
         indicatorResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))
         indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(comment, lang))
+      }
     })
     createIndicatorWeightTriples(indicator, model)
   }
