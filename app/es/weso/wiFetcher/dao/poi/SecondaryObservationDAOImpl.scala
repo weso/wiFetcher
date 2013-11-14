@@ -114,8 +114,9 @@ class SecondaryObservationDAOImpl(
     val dataset = sFetcher.getDatasetById(datasetId.trim)
     val indicator = sFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-'))) /*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
     val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
-
-    for {
+    var countries : Int = 0
+    val years : scala.collection.mutable.Set[Int] = scala.collection.mutable.Set.empty
+    val observations = for {
       row <- initialCell.getRow() to sheet.getLastRowNum()
       actualRow = sheet.getRow(row)
       if actualRow != null
@@ -132,15 +133,18 @@ class SecondaryObservationDAOImpl(
             .append(countryName).append(" is not defined").toString, path = XslxFile,
             sheetName = Some(sheet.getSheetName), col = Some(0), `row` = Some(row),
             cell = Some(countryName))
-        }
+        } else countries+=1
+       
         ret
       }
+      
       //We have to iterate throw the excel file
       col <- initialCell.getCol() to sheet.getRow(0).getLastCellNum() - 1
       year = POIUtils.extractNumericCellValue(sheet.getRow(initialCell.getRow() - 1)
         .getCell(col), evaluator)
       if (!year.isEmpty)
     } yield {
+      years += year.get.toInt
       val value = POIUtils.extractNumericCellValue(actualRow.getCell(col), evaluator)
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
@@ -149,6 +153,10 @@ class SecondaryObservationDAOImpl(
       createObservation(dataset, label, country.get, null,
         indicator.get, year.get, value, status, XslxFile)
     }
+    indicator.get.countriesCoverage = countries
+    indicator.get.intervalStarts = years.min
+    indicator.get.interfalFinishes = years.max
+    observations
   }
 
   def getObservations(): List[Observation] = observations.toList
