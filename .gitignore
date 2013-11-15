@@ -1,6 +1,7 @@
 logs
 tmp
 wiExtract/
+wiCompute/
 
 *~
 *.class
