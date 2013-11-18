@@ -112,7 +112,7 @@ class SecondaryObservationDAOImpl(
       sheet.getSheetName().substring(0, sheet.getSheetName.indexOf("("))
     }
     val dataset = sFetcher.getDatasetById(datasetId.trim)
-    val indicator = sFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-'))) /*obtainIndicator(sheet, Configuration.getIndicatorCell, evaluator)*/
+    val indicator = sFetcher.obtainIndicatorById(dataset.id.substring(0, dataset.id.lastIndexOf('-')))
     val status = dataset.id.substring(dataset.id.lastIndexOf('-') + 1)
     var countries : Int = 0
     val years : scala.collection.mutable.Set[Int] = scala.collection.mutable.Set.empty
