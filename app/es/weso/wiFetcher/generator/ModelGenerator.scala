@@ -441,6 +441,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral(indicator.intervalStarts.toString, XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral(indicator.interfalFinishes.toString, XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyWfOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
+    indicatorResource.addProperty(PropertySkosNotation, ResourceFactory.createTypedLiteral(indicator.id, XSDDatatype.XSDstring))
     indicator.providers.foreach(provider => {
       indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + provider.id))
     })
