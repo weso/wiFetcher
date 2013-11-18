@@ -75,6 +75,7 @@ object POIUtils {
             cell.getCellType() match {
               case Cell.CELL_TYPE_FORMULA => Some(cell.getNumericCellValue)
               case Cell.CELL_TYPE_NUMERIC => Some(cell.getNumericCellValue)
+              case Cell.CELL_TYPE_STRING => if (cell.getStringCellValue.forall(_.isDigit)) Some(cell.getStringCellValue.toDouble) else None
               case _ => None
             }
         }
