@@ -149,7 +149,7 @@ class SecondaryObservationDAOImpl(
       //Create the observation with the extracted data
       logger.info("Extracted observation of: " + dataset.id + " " +
         country.get.iso3Code + " " + year + " " + indicator.get.id + " " + value)
-      val label : String = "" + indicator.get.id + " in " + country.get.iso3Code + " during " + year.get.toInt
+      val label : String = "" + indicator.get.id + " " + status + " in " + country.get.iso3Code + " during " + year.get.toInt
       createObservation(dataset, label, country.get, null,
         indicator.get, year.get, value, status, XslxFile)
     }
