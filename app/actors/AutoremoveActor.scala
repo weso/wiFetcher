@@ -11,7 +11,7 @@ class AutoremoveActor extends Actor {
       
       Logger.info("\"Autoremove TTL-eports Demon\" is waking up")
       
-      val limit = DateTime.now - 48.hours
+      val limit = DateTime.now - 3.hours
       val dir = new File("public/reports/")
       for {
         file <- dir.listFiles.filterNot(_.getName == ".gitkeep")

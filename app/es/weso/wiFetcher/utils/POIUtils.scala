@@ -73,12 +73,9 @@ object POIUtils {
           case Cell.CELL_TYPE_BLANK => None
           case Cell.CELL_TYPE_ERROR => 
             try {
-              println("NUMERO: ")
               Some(cell.getNumericCellValue)              
             } catch {
-              case _ : Throwable => 
-                println("CELDA ERRONEA")
-                None
+              case _ : Throwable => None
             }
         }
       } else {
