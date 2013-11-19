@@ -72,11 +72,10 @@ object POIUtils {
           }
           case Cell.CELL_TYPE_BLANK => None
           case Cell.CELL_TYPE_ERROR => 
-            cell.getCellType() match {
-              case Cell.CELL_TYPE_FORMULA => Some(cell.getNumericCellValue)
-              case Cell.CELL_TYPE_NUMERIC => Some(cell.getNumericCellValue)
-              case Cell.CELL_TYPE_STRING => if (cell.getStringCellValue.forall(_.isDigit)) Some(cell.getStringCellValue.toDouble) else None
-              case _ => None
+            try {
+              Some(cell.getNumericCellValue)              
+            } catch {
+              case _ : Throwable => None
             }
         }
       } else {
