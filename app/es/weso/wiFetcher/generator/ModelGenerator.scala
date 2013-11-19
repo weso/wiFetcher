@@ -646,7 +646,15 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 
   private def createModel: com.hp.hpl.jena.rdf.model.Model = {
     val model = ModelFactory.createDefaultModel
-    //addPrefixes(model)
+    try {
+      addPrefixes(model)
+    } catch {
+      case _ : Throwable => addDefaultPrefixes(model)
+    }    
+    model
+  }
+  
+  private def addDefaultPrefixes(model : Model) = {
     model.setNsPrefix("dcat", PrefixDcat)
     model.setNsPrefix("skos", PrefixSkos)
     model.setNsPrefix("rdf", PrefixRdf)
@@ -694,7 +702,6 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     model.setNsPrefix("wi-slice", "http://data.webfoundation.org/webindex/v2013/slice/")
     model.setNsPrefix("wi-weightSchema", "http://data.webfoundation.org/webindex/v2013/weightSchema/")
     model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#")
-    model
   }
   
   
