@@ -60,7 +60,7 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   
   test("Obtain all components") {
     subIndexDao.getComponents should not be (null)
-    subIndexDao.getComponents.size should be (10)
+    subIndexDao.getComponents.size should be (9)
   }
   
   test("Obtain subindexes from empty excel file") {
@@ -77,7 +77,7 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
     subIndexDao.getSubIndexes.foreach(subindex => {
       subindex.id match {
         case "access" => subindex.getComponents.size should be (3)
-        case "freeopen" => subindex.getComponents.size should be (2)
+        case "freeopen" => subindex.getComponents.size should be (1)
         case "content" => subindex.getComponents.size should be (2)
         case "empowerment" => subindex.getComponents.size should be (3)
       }
@@ -87,10 +87,10 @@ class SubIndexDAOImplSuite extends FunSuite with BeforeAndAfter
   test("Validate indicators by components") {
     fetcher.components.foreach(component => {
       component.id match {
-        case "infrastructure" => component.getIndicators.size should be (9)
+        case "infrastructure" => component.getIndicators.size should be (10)
         case "affordability" => component.getIndicators.size should be (10)
         case "education" => component.getIndicators.size should be (9)
-        case "freedom" => component.getIndicators.size should be (8)
+        case "freedom" => component.getIndicators.size should be (11)
         case "openness" => component.getIndicators.size should be (4)
         case "creation" => component.getIndicators.size should be (16)
         case "use" => component.getIndicators.size should be (5)

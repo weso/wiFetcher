@@ -17,6 +17,7 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.utils.POIUtils
 import scala.collection.mutable.HashMap
+import es.weso.wiFetcher.entities.traits.Index
 
 /**
  * This class contains the implementation that allows to load all information
@@ -34,14 +35,17 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
   private val components: ListBuffer[Component] = ListBuffer.empty
   //A list with all sub-indexes loaded
   private val subIndexes: ListBuffer[SubIndex] = ListBuffer.empty
-
+  
+  private val indexes : ListBuffer[Index] = ListBuffer.empty
+  
+  
   load(is)
 
   /**
    * This method has to load the information about sub-indexes and components
    * @param path The path of the files that contains the information
    */
-  protected def load(is: InputStream) {
+  protected def load(is: InputStream) = {
     logger.info("Starting extraction of sub-indexes and components")
     val workbook = WorkbookFactory.create(is)
     //Obtain the corresponding sheet
@@ -50,11 +54,13 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
       sFetcher.issueManager.addError(
         message = new StringBuilder("The Subindex Sheet ").append(SheetName)
           .append(" does not exist").toString, sheetName = Some(SheetName), path = XslxFile)
+          None
     } else {
       val entities = parseData(workbook, sheet)
       enchainEntities(entities)
+      indexes.head.addSubindexes(subIndexes)
       logger.info("Finish extraction of sub-indexes and components")
-    }
+    }    
   }
 
   /**
@@ -77,6 +83,11 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
       //Extract the name
       name = POIUtils.extractCellValue(
         actualRow.getCell(Configuration.getSubindexNameColumn), evaluator)
+      order = POIUtils.extractNumericCellValue(
+          actualRow.getCell(Configuration.getSubindexOrderColumn), 
+          evaluator)
+      color = POIUtils.extractCellValue(
+          actualRow.getCell(Configuration.getSubindexColorColumn), evaluator)
       //Extract the description
       description = POIUtils.extractCellValue(
         actualRow.getCell(Configuration.getSubindexDescriptionColumn), evaluator)
@@ -106,7 +117,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
           "fr" -> frenchComment,
           "es" -> spanishComment,
           "ar" -> arabicComment)
-      createEntity(eType, id, weight.get, names, comments)
+      createEntity(eType, id, weight.get, names, comments, order.get.toInt, color)
     }
   }
 
@@ -131,7 +142,7 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
         }
       }
     }
-    entities.head match {
+    entities.drop(1).head match {
       case e: SubIndex =>
         inner(e, entities.tail)
       case _ =>
@@ -151,12 +162,14 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    */
   def createEntity(eType: String, id: String, weight: Double,
     names: HashMap[String, String], 
-    descriptions: HashMap[String, String]): Entity = {
+    descriptions: HashMap[String, String], order : Int, color : String): Entity = {
     eType match {
       case e if (e == SubindexType) =>
-        createSubIndex(id, names, descriptions, weight)
+        createSubIndex(id, names, descriptions, order, color, weight)
       case e if (e == ComponentType) =>
-        createComponent(id, names, descriptions, weight)
+        createComponent(id, names, descriptions, order, color, weight)
+      case e if (e == IndexType) => 
+        createIndex(id, names, descriptions, order, color, weight)
       case _ =>
         sFetcher.issueManager.addError(message = new StringBuilder("Unknown type '")
           .append(eType).append(" in Structure Sheet").toString, path = XslxFile,
@@ -174,11 +187,29 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    * Web Index
    */
   def createSubIndex(id: String, names: HashMap[String, String], 
-      descriptions: HashMap[String, String], weight: Double): SubIndex = {
-    logger.info("Create the component: {}" + { id })
-    val subIndex = new Entity(id, names, descriptions, weight) with SubIndex
+      descriptions: HashMap[String, String], order : Int, color : String, 
+      weight: Double): SubIndex = {
+    logger.info("Create the sub-index: {}" + { id })
+    val subIndex = new Entity(id, names, descriptions, order, color, weight) with SubIndex
     subIndexes += subIndex
     subIndex
+  }
+  
+  /**
+   * This method has to create the index
+   * @param id The identifier of the the index
+   * @param name The name of the index
+   * @param description The description of the index
+   * @param weight The weight that have the index in order to calculate the
+   * Web Index
+   */
+  def createIndex(id: String, names: HashMap[String, String], 
+      descriptions: HashMap[String, String], order : Int, color : String, 
+      weight: Double): Index = {
+    logger.info("Create the index: {}" + { id })
+    val index = new Entity(id, names, descriptions, order, color, weight) with Index
+    indexes += index
+    index
   }
 
   /**
@@ -190,9 +221,10 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
    * the Web Index
    */
   def createComponent(id: String, names: HashMap[String, String], 
-      descriptions: HashMap[String, String], weight: Double): Component = {
-    logger.info("Create the sub-index: {}", id)
-    val component = new Entity(id, names, descriptions, weight) with Component
+      descriptions: HashMap[String, String], order : Int, color : String, 
+      weight: Double): Component = {
+    logger.info("Create the component: {}", id)
+    val component = new Entity(id, names, descriptions, order, color, weight) with Component
     components += component
     component
   }
@@ -213,6 +245,10 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
   def getSubIndexes: List[SubIndex] = {
     subIndexes.toSet.toList
   }
+  
+  def getIndexes : ListBuffer[Index] = {
+    indexes
+  }
 
 }
 
@@ -226,6 +262,7 @@ object SubIndexDAOImpl {
 
   private val SubindexType = "subindex"
   private val ComponentType = "component"
+  private val IndexType = "index"
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
 }

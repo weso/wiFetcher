@@ -30,6 +30,7 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
 import es.weso.wiFetcher.utils.FilterIssue
 import es.weso.wiFetcher.dao.poi.PrimaryObservationDAOImpl
 import es.weso.wiFetcher.generator.CSVGenerator
+import es.weso.wiFetcher.entities.traits.Index
 
 case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
 
@@ -49,6 +50,7 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   val providers: ListBuffer[Provider] = ListBuffer.empty
   val datasets: ListBuffer[Dataset] = ListBuffer.empty
   val observations: ListBuffer[Observation] = ListBuffer.empty
+  val index : ListBuffer[Index] = ListBuffer.empty
 
   loadStructure(structure)
   if(!issueManager.asSeq.isEmpty)
@@ -142,10 +144,11 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     val subIndexDao = new SubIndexDAOImpl(is)
     components ++= subIndexDao.getComponents
     subIndexes ++= subIndexDao.getSubIndexes
+    index ++= subIndexDao.getIndexes
   }
 
   /**
-   * This method loads all information abou indicators
+   * This method loads all information about indicators
    */
   private def loadIndicatorInformation(is: InputStream) {
     val indicatorDao = new IndicatorDAOImpl(is)

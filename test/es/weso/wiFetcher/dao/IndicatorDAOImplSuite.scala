@@ -56,7 +56,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val indicatorDAO = new IndicatorDAOImpl(is)
     val indicators = indicatorDAO.getPrimaryIndicators
     indicators should not be (null)
-    indicators.size should be (53)
+    indicators.size should be (57)
   }
   
   test("Obtain secondary indicators") {
@@ -65,7 +65,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val indicatorDAO = new IndicatorDAOImpl(is)
     val indicators = indicatorDAO.getSecondaryIndicators
     indicators should not be (null)
-    indicators.size should be (38)
+    indicators.size should be (34)
   }
   
   test("Obtain primary indicator from empty excel") {
@@ -91,7 +91,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
     val component = new Entity("Q2", HashMap("en" -> "Q2"),
-        HashMap("en" -> "Q2 Description"), 0.0) with Component
+        HashMap("en" -> "Q2 Description"), 1, "red", 0.0) with Component
     val indicator = indicatorDAO.createIndicator("test", "Secondary", 
         HashMap("en" -> "Test indicator"), HashMap("en" -> "Test description"), 
         0.5, "High", "Source", 
@@ -106,7 +106,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
     val component = new Entity("Q2", HashMap("en" ->"Q2"), 
-        HashMap("en" -> "Q2 Description"), 0.0) with Component
+        HashMap("en" -> "Q2 Description"), 2, "green", 0.0) with Component
     val indicator = indicatorDAO.createIndicator("test", "Primary", 
         HashMap("en" -> "Test indicator"), HashMap("en" -> "Test description"), 
         0.5, "High", "Source", 
@@ -121,7 +121,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
     val component = new Entity("Q2", HashMap("en" -> "Q2"), 
-        HashMap("en" -> "Q2 Description"), 0.0) with Component
+        HashMap("en" -> "Q2 Description"), 3, "blue", 0.0) with Component
     val before = fetcher.issueManager.asSeq.size
     indicatorDAO.createIndicator("test", "AAAA", 
         HashMap("en" -> "Test indicator"), 
@@ -136,7 +136,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
         true))
     val indicatorDAO = new IndicatorDAOImpl(is)
     val component = new Entity("Q2", HashMap("en" -> "Q2"), 
-        HashMap("en" -> "Q2 Description"), 0.0) with Component
+        HashMap("en" -> "Q2 Description"), 1, "red", 0.0) with Component
     val before = fetcher.issueManager.asSeq.size
     indicatorDAO.createIndicator("test", "Primary", 
         HashMap("en" -> "Test indicator"), 
