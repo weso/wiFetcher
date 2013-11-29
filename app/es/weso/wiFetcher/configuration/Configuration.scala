@@ -231,6 +231,14 @@ object Configuration {
   def getSubindexArabicCommentColumn() : Int = {
     Config.getInt("sb_arabic_comment_column")
   }
+  
+  def getSubindexOrderColumn() : Int = {
+    Config.getInt("sb_order_column")
+  }
+  
+  def getSubindexColorColumn() : Int = {
+    Config.getInt("sb_color_column")
+  }
 
   def loadConfigure() = {
     val config = new CompositeConfiguration

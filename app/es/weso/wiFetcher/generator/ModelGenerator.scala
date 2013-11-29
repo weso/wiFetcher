@@ -38,6 +38,7 @@ import play.api.libs.json.Writes
 import play.api.libs.functional.syntax._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import es.weso.wiFetcher.entities.traits.Index
 
 case class ModelGenerator(baseUri: String, namespace : String, year : String)(implicit val sFetcher: SpreadsheetsFetcher) {
   import ModelGenerator._
@@ -85,6 +86,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   val PropertyWfOntoISO2 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha2-code")
   val PropertyWfOntoISO3 = ResourceFactory.createProperty(PrefixWfOnto + "has-iso-alpha3-code")
   val PropertyWfOntoRefSourceData = ResourceFactory.createProperty(PrefixWfOnto + "ref-source-data")
+  val PropertyWfOntoOrder = ResourceFactory.createProperty(PrefixWfOnto + "order")
+  val PropertyWfOntoColour = ResourceFactory.createProperty(PrefixWfOnto + "colour")
   
   private var id: Int = 1
 
@@ -96,9 +99,8 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     createDatasetMetadata(model, timestamp)
     createDataStructureDefinition(model)
     createComputationFlow(model)
-    val indexResource = model.createResource(PrefixIndex + "index")
-    indexResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Index"))
-    indexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral("The Index", "en"))
+    spreadsheetsFetcher.index.foreach(
+        index => createIndexTriples(index, model))
     spreadsheetsFetcher.primaryIndicators.toList.foreach(
       indicator => createPrimaryIndicatorTriples(indicator, model))
     spreadsheetsFetcher.secondaryIndicators.toList.foreach(
@@ -106,7 +108,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     spreadsheetsFetcher.components.foreach(
       comp => createComponentsTriples(comp, model))
     spreadsheetsFetcher.subIndexes.foreach(
-      subindex => createSubindexTriples(subindex, indexResource, model))
+      subindex => createSubindexTriples(subindex, model))
     spreadsheetsFetcher.datasets.foreach(
       dataset => {
         if(!dataset.id.contains("Missed")) 
@@ -125,6 +127,28 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     generateUploadScript(path, timestamp)
 
     path
+  }
+  
+  def createIndexTriples(index : Index, model : Model) = {
+    val indexResource = model.createResource(PrefixIndex + index.id.replace(" ", "_"))
+    indexResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "Index"))
+    index.names.keySet.foreach(lang => {
+      val label = index.names.get(lang).get
+      if(!label.isEmpty)
+    	  indexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(label, lang))
+    })
+    index.descriptions.keySet.foreach(lang => {
+      val comment = index.descriptions.get(lang).get
+      if(!comment.isEmpty)
+    	  indexResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))      
+    })
+    
+    index.getSubindexes.foreach(subindex => {
+      indexResource.addProperty(PropertyCexElement, ResourceFactory.createResource(PrefixSubindex + subindex.id.replace(" ", "_")))
+    })
+    if(!index.color.isEmpty)
+    	indexResource.addProperty(PropertyWfOntoColour, ResourceFactory.createTypedLiteral(index.color, XSDDatatype.XSDstring))
+    indexResource.addProperty(PropertyWfOntoOrder, ResourceFactory.createTypedLiteral(index.order.toString, XSDDatatype.XSDinteger))
   }
   
   private def createDatasetMetadata(model : Model, timestamp : Long) = {
@@ -531,6 +555,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     component.getIndicators.foreach(indicator => {
       componentResource.addProperty(PropertyCexElement, ResourceFactory.createResource(PrefixIndicator + indicator.id.replace(" ", "_")))
     })
+    if(!component.color.isEmpty)
+    	componentResource.addProperty(PropertyWfOntoColour, ResourceFactory.createTypedLiteral(component.color, XSDDatatype.XSDstring))
+    componentResource.addProperty(PropertyWfOntoOrder, ResourceFactory.createTypedLiteral(component.order.toString, XSDDatatype.XSDinteger))
 
     val weightComponent = model.createResource(PrefixWeightSchema + "componentWeights")
     weightComponent.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "WeightSchema"))
@@ -541,7 +568,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     weightComponent.addProperty(PropertyCexWeight, anonymousResource)
   }
 
-  def createSubindexTriples(subindex: SubIndex, indexResource : Resource, model: Model) {
+  def createSubindexTriples(subindex: SubIndex, model: Model) {
     val subindexResource = model.createResource(PrefixSubindex + subindex.id.replace(" ", "_"))
     subindexResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex + "SubIndex"))
 //    subindexResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(subindex.name, "en"))
@@ -560,7 +587,9 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     subindex.getComponents.foreach(component => {
       subindexResource.addProperty(PropertyCexElement, ResourceFactory.createResource(PrefixComponent + component.id.replace(" ", "_")))
     })
-    indexResource.addProperty(PropertyCexElement, subindexResource)
+    if(!subindex.color.isEmpty)
+    	subindexResource.addProperty(PropertyWfOntoColour, ResourceFactory.createTypedLiteral(subindex.color, XSDDatatype.XSDstring))
+    subindexResource.addProperty(PropertyWfOntoOrder, ResourceFactory.createTypedLiteral(subindex.order.toString, XSDDatatype.XSDinteger))
 
     val weightSubindex = model.createResource(PrefixWeightSchema + "subindexWeights")
     weightSubindex.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex))
