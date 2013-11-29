@@ -640,8 +640,10 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     providerResource.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixOrg + "Organization"))
     providerResource.addProperty(PropertyRdfsLabel, ResourceFactory.createLangLiteral(provider.name, "en"))
     providerResource.addProperty(PropertyOrgIdentifier, ResourceFactory.createTypedLiteral(provider.id, XSDDatatype.XSDstring))
-    providerResource.addProperty(PropertyFoafHomepage, ResourceFactory.createResource(provider.web))
-    providerResource.addProperty(PropertyWfOntoRefSourceData, ResourceFactory.createResource(provider.source))    
+    if(!provider.web.isEmpty)
+    	providerResource.addProperty(PropertyFoafHomepage, ResourceFactory.createResource(provider.web))
+	if(!provider.source.isEmpty)
+		providerResource.addProperty(PropertyWfOntoRefSourceData, ResourceFactory.createResource(provider.source))    
   }
 
   private def createModel: com.hp.hpl.jena.rdf.model.Model = {
