@@ -95,7 +95,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val indicator = indicatorDAO.createIndicator("test", "Secondary", 
         HashMap("en" -> "Test indicator"), HashMap("en" -> "Test description"), 
         0.5, "High", "Source", 
-        component, ListBuffer(Provider("", "", "", "")))
+        component, ListBuffer(Provider("", "", "", "")), "0")
     indicator.id should be ("test")
     indicator.component.id should be ("Q2")
     indicator.indicatorType should be (IndicatorType.Secondary)
@@ -110,7 +110,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     val indicator = indicatorDAO.createIndicator("test", "Primary", 
         HashMap("en" -> "Test indicator"), HashMap("en" -> "Test description"), 
         0.5, "High", "Source", 
-        component, ListBuffer(Provider("", "", "", "")))
+        component, ListBuffer(Provider("", "", "", "")), "0")
     indicator.id should be ("test")
     indicator.component.id should be ("Q2")
     indicator.indicatorType should be (IndicatorType.Primary)
@@ -126,7 +126,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     indicatorDAO.createIndicator("test", "AAAA", 
         HashMap("en" -> "Test indicator"), 
       HashMap("en" -> "Test description"), 0.5, "High", "Source", 
-      component, ListBuffer(Provider("", "", "", "")))
+      component, ListBuffer(Provider("", "", "", "")), "0")
     val after = fetcher.issueManager.asSeq.size
     after should be (before + 1)
   }
@@ -141,7 +141,7 @@ class IndicatorDAOImplSuite extends FunSuite with BeforeAndAfter
     indicatorDAO.createIndicator("test", "Primary", 
         HashMap("en" -> "Test indicator"), 
 	  HashMap("en" -> "Test description"), 0.5, "BBBB", "Source", 
-      component, ListBuffer(Provider("", "", "", "")))
+      component, ListBuffer(Provider("", "", "", "")), "0")
     val after = fetcher.issueManager.asSeq.size
     after should be (before + 1)
   }  
