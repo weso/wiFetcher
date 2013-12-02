@@ -118,6 +118,8 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
         Configuration.getIndicatorProviderColumn), evaluator)
       weight = POIUtils.extractNumericCellValue(actualRow.getCell(
         Configuration.getIndicatorWeightColumn), evaluator)
+      republish = POIUtils.extractCellValue(actualRow.getCell(
+    	Configuration.getRepublishColumn), evaluator)
       hl = POIUtils.extractCellValue(actualRow.getCell(
         Configuration.getIndicatorHLColumn), evaluator)
       componentId = POIUtils.extractCellValue(actualRow.getCell(
@@ -150,7 +152,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
           "es" -> spanishComment,
           "ar" -> arabicLabel)
       createIndicator(id, iType, names, descriptions, weight.get, hl, source,
-        component.get, providers)
+        component.get, providers, republish)
     }
     logger.info("Finish indicators extraction")
     indicators
@@ -175,7 +177,7 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
   def createIndicator(id: String, iType: String,
     names: HashMap[String, String], descriptions: HashMap[String, String], 
     weight: Double, hl: String, source: String, component: Component, 
-    provider: ListBuffer[Provider]): Indicator = {
+    provider: ListBuffer[Provider], republish : String): Indicator = {
     val indicator = Indicator(
       id, iType match {
         case "Primary" => IndicatorType.Primary
@@ -195,7 +197,14 @@ class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetch
             path = XslxFile, sheetName = Some(SheetName), cell = Some(hl))
           IndicatorHighLow.Wrong
       },
-      source, component, provider)
+      source, component, provider, republish match {
+        case "0" => false
+        case "1" => true
+        case _ =>
+          sFetcher.issueManager.addWarn(message = s"Value of property 'republish' for indicator '${id}' is unknown. By default is set as false.",
+            path = XslxFile, sheetName = Some(SheetName), cell = Some(hl))
+          false
+      })
     component.addIndicator(indicator)
     indicator
   }
