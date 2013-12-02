@@ -32,7 +32,7 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        ListBuffer(Provider("", "", "", "")))
+        ListBuffer(Provider("", "", "", "")), false)
     list += Indicator("B", 
         IndicatorType.Primary, 
         HashMap("en" -> "test indicator 2"),
@@ -44,7 +44,7 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        ListBuffer(Provider("", "", "", "")))
+        ListBuffer(Provider("", "", "", "")), false)
     list += Indicator("C", 
         IndicatorType.Primary, 
         HashMap("en" -> "test indicator 3"),
@@ -56,7 +56,7 @@ class DatasetDAOImplSuite extends FunSuite with BeforeAndAfter
         IndicatorHighLow.High,
         "",
         null,
-        ListBuffer(Provider("", "", "", "")))
+        ListBuffer(Provider("", "", "", "")), false)
     list
   }
   

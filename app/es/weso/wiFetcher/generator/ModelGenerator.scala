@@ -554,6 +554,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
       if(!comment.isEmpty)
     	  componentResource.addProperty(PropertyRdfsComment, ResourceFactory.createLangLiteral(comment, lang))      
     })
+    componentResource.addProperty(PropertySkosNotation, ResourceFactory.createTypedLiteral(component.id, XSDDatatype.XSDstring))
     componentResource.addProperty(PropertyDcTermsIssued, ResourceFactory.createTypedLiteral(DateUtils.getCurrentTimeAsString, XSDDatatype.XSDdate))
     component.getIndicators.foreach(indicator => {
       componentResource.addProperty(PropertyCexElement, ResourceFactory.createResource(PrefixIndicator + indicator.id.replace(" ", "_")))
@@ -593,7 +594,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     if(!subindex.color.isEmpty)
     	subindexResource.addProperty(PropertyWfOntoColour, ResourceFactory.createTypedLiteral(subindex.color, XSDDatatype.XSDstring))
     subindexResource.addProperty(PropertyWfOntoOrder, ResourceFactory.createTypedLiteral(subindex.order.toString, XSDDatatype.XSDinteger))
-
+    subindexResource.addProperty(PropertySkosNotation, ResourceFactory.createTypedLiteral(subindex.id, XSDDatatype.XSDstring))
     val weightSubindex = model.createResource(PrefixWeightSchema + "subindexWeights")
     weightSubindex.addProperty(PropertyRdfType, ResourceFactory.createResource(PrefixCex))
     val anonymousResource = model.createResource
