@@ -19,7 +19,8 @@ case class Indicator(
   val highLow: IndicatorHighLow = null,
   val source: String = "",
   val component: Component = null,
-  val providers:ListBuffer[Provider] = ListBuffer.empty) {
+  val providers:ListBuffer[Provider] = ListBuffer.empty,
+  val republish : Boolean) {
 
   override def equals(o: Any) = o match {
     case that: Indicator => that.id.equalsIgnoreCase(this.id)

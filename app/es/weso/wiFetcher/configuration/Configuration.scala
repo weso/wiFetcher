@@ -239,6 +239,10 @@ object Configuration {
   def getSubindexColorColumn() : Int = {
     Config.getInt("sb_color_column")
   }
+  
+  def getRepublishColumn() : Int = {
+    Config.getInt("republish_column")
+  }
 
   def loadConfigure() = {
     val config = new CompositeConfiguration

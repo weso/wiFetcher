@@ -88,6 +88,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   val PropertyWfOntoRefSourceData = ResourceFactory.createProperty(PrefixWfOnto + "ref-source-data")
   val PropertyWfOntoOrder = ResourceFactory.createProperty(PrefixWfOnto + "order")
   val PropertyWfOntoColour = ResourceFactory.createProperty(PrefixWfOnto + "colour")
+  val PropertyWfOntoRepublish = ResourceFactory.createProperty(PrefixWfOnto + "republish")
   
   private var id: Int = 1
 
@@ -468,6 +469,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral(indicator.interfalFinishes.toString, XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyWfOntoCountryCoverage, ResourceFactory.createTypedLiteral(indicator.countriesCoverage.toString, XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertySkosNotation, ResourceFactory.createTypedLiteral(indicator.id, XSDDatatype.XSDstring))
+    indicatorResource.addProperty(PropertyWfOntoRepublish, ResourceFactory.createTypedLiteral(indicator.republish.toString, XSDDatatype.XSDboolean))
     indicator.providers.foreach(provider => {
       indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + provider.id))
     })
@@ -503,6 +505,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
 //    indicatorResource.addProperty(PropertySkosDefinition, ResourceFactory.createLangLiteral(indicator.comment, "en"))
     indicatorResource.addProperty(PropertyTimeStarts, ResourceFactory.createTypedLiteral("2013", XSDDatatype.XSDinteger))
     indicatorResource.addProperty(PropertyTimeFinishes, ResourceFactory.createTypedLiteral("2013", XSDDatatype.XSDinteger))
+    indicatorResource.addProperty(PropertyWfOntoRepublish, ResourceFactory.createTypedLiteral(indicator.republish.toString, XSDDatatype.XSDboolean))
     indicator.providers.foreach(provider => {
       indicatorResource.addProperty(PropertyWfOntoProviderLink, ResourceFactory.createResource(PrefixWfOrg + provider.id))
     })
