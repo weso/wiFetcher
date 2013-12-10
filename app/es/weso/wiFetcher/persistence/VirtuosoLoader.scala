@@ -57,7 +57,6 @@ object VirtuosoLoader {
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
     scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
     scriptBuilder.append("install ./public/temp/computations.ttl ").append(dir).append("\n")
-    scriptBuilder.append("service memcached restart \n")
     scriptBuilder.append("isql-vt ").append(virtServer).append(" ").append(virtUser).append(" ").append(virtPass).append(" <<EOF\n")
     scriptBuilder.append("sparql clear graph '").append(graph).append("';\n")
     scriptBuilder.append("delete from DB.DBA.load_list;\n")
@@ -66,6 +65,7 @@ object VirtuosoLoader {
     scriptBuilder.append("rdf_loader_run();\n")
     scriptBuilder.append("EXIT;\n")
     scriptBuilder.append("EOF\n")
+    scriptBuilder.append("echo \"flush_all\" | /bin/netcat -q 2 127.0.0.1 11211\n")
     
     val f = new File("public/temp/script.sh")
     val printWriter = new PrintWriter(f, "UTF-8")
