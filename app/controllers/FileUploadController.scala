@@ -55,8 +55,6 @@ object FileUploadController extends Controller {
             fileInput.baseUri.substring(0, fileInput.baseUri.length - 1)
           else fileInput.baseUri
 
-          /*val uri = new StringBuilder(baseUri).append("/")
-            .append(fileInput.namespace).append("/v").append(fileInput.year).toString*/
           val year = "v" + fileInput.year.toString
           structure match {
             case Some(s) => load(observations, structure, baseUri, fileInput, year/*, store*/)
