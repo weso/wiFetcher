@@ -1,4 +1,4 @@
-@(path : String, issues : Seq[Issue], reportPath : String, graph : String)
+@(path : String, issues : Seq[Issue], reportPath : String, graph : String, computationPath : String)
 
 @printIssues(name:String, issues : Seq[Issue])={
 		@for(issue <- issues){
@@ -22,7 +22,7 @@
 <div id="results_container">
 
 	<p class="submit_button">
-		<a title="Upload data into the triple-store" href="@routes.Application.uploadData(path, reportPath, graph)"><button class="button">Upload</button></a>
+		<a title="Upload data into the triple-store" href="@routes.Application.uploadData(path, reportPath, graph, computationPath)"><button class="button">Upload</button></a>
 		<a title="Instructions to upload data" href="@routes.Application.instructions()"><button class="button">Instructions</button></a>
 	</p>
 

@@ -55,8 +55,6 @@ object FileUploadController extends Controller {
             fileInput.baseUri.substring(0, fileInput.baseUri.length - 1)
           else fileInput.baseUri
 
-          /*val uri = new StringBuilder(baseUri).append("/")
-            .append(fileInput.namespace).append("/v").append(fileInput.year).toString*/
           val year = "v" + fileInput.year.toString
           structure match {
             case Some(s) => load(observations, structure, baseUri, fileInput, year/*, store*/)
@@ -82,7 +80,9 @@ object FileUploadController extends Controller {
                     val graph = new StringBuilder(baseUri).append("/")
                     	.append(fileInput.namespace).append("/v")
                     	.append(fileInput.year).toString
-                    Ok(views.html.results.result(path, results._1, results._2, graph))
+                    val computationPath = new StringBuilder("temp/")
+                    	.append(fileInput.namespace).append("-computations.ttl").toString
+                    Ok(views.html.results.result(path, results._1, results._2, graph, computationPath))
                 }
               }
               case _ => concurrentFuture("Observations file cannot be parsed! Upload it again")

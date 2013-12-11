@@ -1,5 +1,5 @@
 @* loaderResult Template File *@
-@(errors: List[String], path : String, reportPath : String, graph : String)
+@(errors: List[String], path : String, reportPath : String, graph : String, computationPath : String)
 
 @printErrors() = {
 
@@ -14,6 +14,7 @@
 		<a class="download return-main" title="Return to main page" href="@routes.FileUploadController.byFileUploadGET">Return to main page</a>
 	    <a class="download download-link" title="Report" href="@routes.Application.files(reportPath)">Download report</a>
 	    <a class="download download-link" title="TTL Dataset" href="@routes.Application.files(path)">Download TTL Dataset</a>
+	    <a class="download download-link" title="TTL Computation Dataset" href="@routes.Application.files(computationPath)">Download TTL Computation Dataset</a>
 	</p>
 	
 	<div><p class="center">

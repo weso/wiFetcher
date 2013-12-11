@@ -15,11 +15,11 @@ object Application extends Controller {
   def index = 
     controllers.FileUploadController.byFileUploadGET
     
-  def uploadData(ttlPath : String, reportPath : String, graph : String) = Action  {
+  def uploadData(ttlPath : String, reportPath : String, graph : String, namespace : String) = Action  {
     implicit request => 
       logger.info("Upload data. IP Address: " + request.remoteAddress)
       val errors = VirtuosoLoader.store
-      Ok(views.html.results.loaderResult(errors, ttlPath, reportPath, graph + "/"))
+      Ok(views.html.results.loaderResult(errors, ttlPath, reportPath, graph + "/", namespace))
   }
   
   def instructions() = Action {
