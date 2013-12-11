@@ -18,8 +18,12 @@ import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
 import java.util.Date
 import es.weso.wiFetcher.entities.issues._
+import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 
 object FileUploadController extends Controller {
+  
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass())
 
   case class FileForm(val baseUri: String, val year: Int, val namespace: String/*, val store: Option[Int]*/)
 
@@ -37,6 +41,7 @@ object FileUploadController extends Controller {
 
   def byFileUploadPOST() = Action.async(parse.multipartFormData) {
     implicit request =>
+      logger.info("Parse excel file. IP Address: " + request.remoteAddress)
       fileInputForm.bindFromRequest.fold(
         formWithErrors => scala.concurrent.Future {
           Ok(views.html.file.upload(formWithErrors))
