@@ -5,14 +5,19 @@ import play.api.mvc._
 import es.weso.wiFetcher.persistence.VirtuosoLoader
 import scala.io.Source
 import java.io.File
+import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 
 object Application extends Controller {
+  
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass())
   
   def index = 
     controllers.FileUploadController.byFileUploadGET
     
   def uploadData(ttlPath : String, reportPath : String, graph : String) = Action  {
     implicit request => 
+      logger.info("Upload data. IP Address: " + request.remoteAddress)
       val errors = VirtuosoLoader.store
       Ok(views.html.results.loaderResult(errors, ttlPath, reportPath, graph + "/"))
   }
