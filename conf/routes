@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index
 
-GET     /result						controllers.Application.uploadData(path : String, reportPath : String, graph : String)
+GET     /result						controllers.Application.uploadData(path : String, reportPath : String, graph : String, computationPath : String)
 
 GET     /instructions				controllers.Application.instructions
 

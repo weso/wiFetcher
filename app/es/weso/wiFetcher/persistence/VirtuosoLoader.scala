@@ -49,7 +49,7 @@ object VirtuosoLoader {
     	.append(file).append(" ").append(out).append("\n")
     	
     val wiComputeInput = "-f public/" + path
-    val wiComputeOut = "-o public/temp/computations.ttl"
+    val wiComputeOut = "-o public/temp/" + namespace + "-computations.ttl"
     val wiComputeNamespace = "-n " + namespace
     val wiComputeYear = "-y 2013"
     scriptBuilder.append("java -jar ./public/temp/WiCompute-assembly-1.0-SNAPSHOT.jar ")
@@ -58,11 +58,11 @@ object VirtuosoLoader {
     
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
     scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
-    scriptBuilder.append("install ./public/temp/computations.ttl ").append(dir).append("\n")
+    scriptBuilder.append("install ./public/temp/").append(namespace).append("-computations.ttl ").append(dir).append("\n")
     scriptBuilder.append("isql-vt ").append(virtServer).append(" ").append(virtUser).append(" ").append(virtPass).append(" <<EOF\n")
     scriptBuilder.append("sparql clear graph '").append(graph).append("';\n")
     scriptBuilder.append("delete from DB.DBA.load_list;\n")
-    scriptBuilder.append("ld_dir ('").append(dir).append("', 'computations.ttl', '").append(graph).append("');\n")
+    scriptBuilder.append("ld_dir ('").append(dir).append("', '").append(namespace).append("-computations.ttl', '").append(graph).append("');\n")
     scriptBuilder.append("ld_dir ('").append(dir).append("', 'wf.ttl', '").append(graph).append("');\n")
     scriptBuilder.append("rdf_loader_run();\n")
     scriptBuilder.append("EXIT;\n")
