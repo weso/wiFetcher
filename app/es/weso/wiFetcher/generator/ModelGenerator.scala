@@ -365,7 +365,7 @@ case class ModelGenerator(baseUri: String, namespace : String, year : String)(im
   private def generateUploadScript(path: String, timestamp : Long) = {
     val builder = new StringBuilder(baseUri)
     builder.append("/").append(namespace).append("/").append(year)
-    VirtuosoLoader.generateCode(timestamp, path, builder.toString)
+    VirtuosoLoader.generateCode(timestamp, path, builder.toString, namespace)
   }
 
   def createDataStructureDefinition(model: Model) = {

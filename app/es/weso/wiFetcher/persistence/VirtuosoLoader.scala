@@ -33,7 +33,7 @@ object VirtuosoLoader {
     errors.toList
   }
   
-  def generateCode(timestamp : Long, path : String, baseUri : String) = {
+  def generateCode(timestamp : Long, path : String, baseUri : String, namespace : String) = {
     val variables : StringBuilder = new StringBuilder
     val graph : String = baseUri + "/"
     val dir = Configuration.getVirtuosoLoadDir
@@ -50,9 +50,11 @@ object VirtuosoLoader {
     	
     val wiComputeInput = "-f public/" + path
     val wiComputeOut = "-o public/temp/computations.ttl"
+    val wiComputeNamespace = "-n " + namespace
     val wiComputeYear = "-y 2013"
     scriptBuilder.append("java -jar ./public/temp/WiCompute-assembly-1.0-SNAPSHOT.jar ")
-    	.append(wiComputeInput).append(" ").append(wiComputeOut).append(" ").append(wiComputeYear).append("\n")
+    	.append(wiComputeInput).append(" ").append(wiComputeOut).append(" ")
+    	.append(wiComputeYear).append(" ").append(wiComputeNamespace).append("\n")
     
     scriptBuilder.append("wget -q https://raw.github.com/weso/computex/master/ontology/wf.ttl -O ./public/temp/wf.ttl\n")
     scriptBuilder.append("install ./public/temp/wf.ttl ").append(dir).append("\n")
