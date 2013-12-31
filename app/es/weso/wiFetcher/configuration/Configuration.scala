@@ -68,24 +68,24 @@ object Configuration {
     Config.getInt("h/l_column")
   }
 
-  def getIndicatorFilename(): String = {
+//  def getIndicatorFilename(): String = {
+//
+//    Config.getString("indicator_filename")
+//  }
 
-    Config.getString("indicator_filename")
-  }
+//  def getObservationFile(): String = {
+//
+//    Config.getString("observations_file")
+//  }
 
-  def getObservationFile(): String = {
-
-    Config.getString("observations_file")
-  }
-
-  def getDatasetFile(): String = {
+  /*def getDatasetFile(): String = {
 
     Config.getString("dataset_file")
-  }
+  }*/
 
-  def getSubindexFile(): String = {
-    Config.getString("subindexes_file")
-  }
+//  def getSubindexFile(): String = {
+//    Config.getString("subindexes_file")
+//  }
 
   def getSubindexInitialCell(): String = {
     Config.getString("initial_cell")
@@ -112,9 +112,9 @@ object Configuration {
     Config.getInt("sb_description_column")
   }
 
-  def getRegionsFilename(): String = {
-    Config.getString("regions_filename")
-  }
+//  def getRegionsFilename(): String = {
+//    Config.getString("regions_filename")
+//  }
 
   def getRegionInitialCell(): String = {
     Config.getString("intial_cell_regions_sheet")
@@ -132,9 +132,9 @@ object Configuration {
     Config.getString("country_reconciliator_file")
   }
 
-  def getIndicatorStopWordsFile(): String = {
-    Config.getString("indicator_stop_words_recon")
-  }
+//  def getIndicatorStopWordsFile(): String = {
+//    Config.getString("indicator_stop_words_recon")
+//  }
 
   def getProvierInitialCell(): String = {
     Config.getString("initial_cell_providers")
