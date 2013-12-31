@@ -7,7 +7,7 @@ Feature: Cucumber
     
   	Given I want to load all information about subindexes in the WebIndex
   	When I check all subindexes and components are loaded
-    Then There are "4" subindexes and "10" components
+    Then There are "4" subindexes and "9" components
     
     Given I want to load all information about subindexes in the WebIndex
     When I check the subindex with "name" "Impact and Empowerment"
@@ -15,7 +15,7 @@ Feature: Cucumber
     
     Given I want to load all information about subindexes in the WebIndex
     When I check the subindex with "id" "content"
-    Then the subindex "weight" should be "0.2"
+    Then the subindex "weight" should be "0.25"
     
     Given I want to load all information about subindexes in the WebIndex
     When I check the subindex with "id" "access"
@@ -23,7 +23,7 @@ Feature: Cucumber
     
     Given I want to load all information about subindexes in the WebIndex
     When I check the numbers of components of subindex "freeopen"
-    Then the number of components should be "2"
+    Then the number of components should be "1"
     
     Given I want to load all information about subindexes in the WebIndex
     When I check the component with "id" "economic"

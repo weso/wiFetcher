@@ -6,7 +6,7 @@ import java.io.InputStream
 import scala.collection.mutable.ListBuffer
 import org.apache.log4j.Logger
 import es.weso.reconciliator.CountryReconciliator
-import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
+//import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.entity.DatasetDAOImpl
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
@@ -32,13 +32,13 @@ import es.weso.wiFetcher.dao.poi.PrimaryObservationDAOImpl
 import es.weso.wiFetcher.generator.CSVGenerator
 import es.weso.wiFetcher.entities.traits.Index
 
-case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
+case class SpreadsheetsFetcher(structure: File, raw: File) {
 
   import SpreadsheetsFetcher._
 
   private implicit val currentFetcher = this
 
-  private val indicatorReconciliator = new IndicatorReconciliator
+//  private val indicatorReconciliator = new IndicatorReconciliator
   val issueManager = new IssueManagerUtils()
 
   val components: ListBuffer[Component] = ListBuffer.empty
@@ -155,8 +155,8 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
     primaryIndicators ++= indicatorDao.getPrimaryIndicators
     secondaryIndicators ++= indicatorDao.getSecondaryIndicators
     //Index all indicators in the reconciliator in order to search indicators
-    indicatorReconciliator.indexIndicators(primaryIndicators.toList)
-    indicatorReconciliator.indexIndicators(secondaryIndicators.toList)
+//    indicatorReconciliator.indexIndicators(primaryIndicators.toList)
+//    indicatorReconciliator.indexIndicators(secondaryIndicators.toList)
   }
 
   /**
@@ -195,12 +195,12 @@ case class SpreadsheetsFetcher(structure: File, raw: File) extends Fetcher {
   }
 
   //Obtain an indicator given it's name
-  def obtainIndicator(indicatorName: String): Option[Indicator] = {
-    val indicator = indicatorReconciliator.searchIndicator(indicatorName)
-    if (indicator == null)
-      logger.info(s"Not exist indicator with name ${indicatorName}")
-    indicator
-  }
+//  def obtainIndicator(indicatorName: String): Option[Indicator] = {
+//    val indicator = indicatorReconciliator.searchIndicator(indicatorName)
+//    if (indicator == null)
+//      logger.info(s"Not exist indicator with name ${indicatorName}")
+//    indicator
+//  }
 
   //Obtain an indicator given it's id
   def obtainIndicatorById(id: String): Option[Indicator] = {
