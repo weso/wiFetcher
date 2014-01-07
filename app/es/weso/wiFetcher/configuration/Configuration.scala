@@ -3,6 +3,9 @@ package es.weso.wiFetcher.configuration
 import org.apache.commons.configuration.CompositeConfiguration
 import org.apache.commons.configuration.PropertiesConfiguration
 
+/**
+ * This object allow application to load configuration files
+ */
 object Configuration {
 
   protected val Config: CompositeConfiguration = loadConfigure
@@ -68,25 +71,6 @@ object Configuration {
     Config.getInt("h/l_column")
   }
 
-//  def getIndicatorFilename(): String = {
-//
-//    Config.getString("indicator_filename")
-//  }
-
-//  def getObservationFile(): String = {
-//
-//    Config.getString("observations_file")
-//  }
-
-  /*def getDatasetFile(): String = {
-
-    Config.getString("dataset_file")
-  }*/
-
-//  def getSubindexFile(): String = {
-//    Config.getString("subindexes_file")
-//  }
-
   def getSubindexInitialCell(): String = {
     Config.getString("initial_cell")
   }
@@ -112,10 +96,6 @@ object Configuration {
     Config.getInt("sb_description_column")
   }
 
-//  def getRegionsFilename(): String = {
-//    Config.getString("regions_filename")
-//  }
-
   def getRegionInitialCell(): String = {
     Config.getString("intial_cell_regions_sheet")
   }
@@ -131,10 +111,6 @@ object Configuration {
   def getCountryReconciliatorFile(): String = {
     Config.getString("country_reconciliator_file")
   }
-
-//  def getIndicatorStopWordsFile(): String = {
-//    Config.getString("indicator_stop_words_recon")
-//  }
 
   def getProvierInitialCell(): String = {
     Config.getString("initial_cell_providers")
@@ -244,6 +220,10 @@ object Configuration {
     Config.getInt("republish_column")
   }
 
+  /**
+   * This method loads all configuration files of the application defined by
+   * developers
+   */
   def loadConfigure() = {
     val config = new CompositeConfiguration
     config.append(new PropertiesConfiguration("conf/countries.properties"))

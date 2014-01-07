@@ -17,13 +17,20 @@ object Global extends WithFilters(new GzipFilter) with GlobalSettings {
 
   override def onStart(app: Application) {
     super.onStart(app)
+    /*If application start in a production or development mode (not test), 
+    * the daemon will be executed. 
+    */
     play.api.Play.mode(app) match {
-      case play.api.Mode.Test => // do not schedule anything for Test
+      case play.api.Mode.Test => // do not schedule anything for Test  
       case _ => autoremoveEARLDaemon(app)
     }
 
   }
 
+  /**
+   * This method executes a daemon that delete all reports and ttl files after
+   * 24 hours of their creation
+   */
   def autoremoveEARLDaemon(app: Application) {
 
     Logger.info("Schedulling \"Autoremove TTL-Reports Demon\" every 48h")

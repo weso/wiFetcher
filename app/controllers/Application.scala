@@ -8,13 +8,22 @@ import java.io.File
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
 
+/**
+ * This class represent the default controller of the application.
+ */
 object Application extends Controller {
   
   private val logger: Logger = LoggerFactory.getLogger(this.getClass())
   
+  /**
+   * This action is triggered when a user goes to index path.
+   */
   def index = 
     controllers.FileUploadController.byFileUploadGET
     
+  /**
+   *   This action is triggered when a user upload new data to virtuoso server.
+   */  
   def uploadData(ttlPath : String, reportPath : String, graph : String, namespace : String) = Action  {
     implicit request => 
       logger.info("Upload data. IP Address: " + request.remoteAddress)
@@ -22,16 +31,25 @@ object Application extends Controller {
       Ok(views.html.results.loaderResult(errors, ttlPath, reportPath, graph + "/", namespace))
   }
   
+  /**
+   * This action is triggered when a user wants visit instruction page
+   */
   def instructions() = Action {
     implicit request =>
       Ok(views.html.instructions.instructions())
   }
   
+  /**
+   * This action is triggered when a user wants to view a report or ttl file
+   */
   def files(path : String) = Action {
     implicit request => 
       Ok(Source.fromFile(new File("./public/" + path)).mkString).as(extractMimeType(path))
   }
   
+  /**
+   * This method obtain the extension of a file and return it's mime type.
+   */
   protected def extractMimeType(path : String) : String = {
     val ext = path.substring(path.lastIndexOf('.'), path.length)
     		.replace(".", "")

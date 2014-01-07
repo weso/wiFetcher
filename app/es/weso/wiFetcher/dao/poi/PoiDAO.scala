@@ -7,6 +7,10 @@ import org.apache.poi.ss.usermodel.Workbook
 
 import es.weso.wiFetcher.dao.DAO
 
+/**
+ * This is a generic trait for all loaders that load information from an excel
+ * file
+ */
 trait PoiDAO[T] extends DAO[T]{
   
   protected def load(is: InputStream): Unit

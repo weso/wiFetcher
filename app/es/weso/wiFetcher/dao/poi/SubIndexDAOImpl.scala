@@ -22,9 +22,6 @@ import es.weso.wiFetcher.entities.traits.Index
 /**
  * This class contains the implementation that allows to load all information
  * about sub-indexes and components used by the Web Index
- *
- * At the moment, the information is extracted from an excel file that follows
- * the structure of the 2012 Web Index. Maybe the implementation has to change
  */
 class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
   extends SubIndexDAO with PoiDAO[Entity] {
@@ -122,13 +119,11 @@ class SubIndexDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetche
   }
 
   /**
-   * @param entities
+   * This method link a subindex with it's components. 
+   * @param entities A list that contains all loaded subindexes and components
    */
   def enchainEntities(entities: Seq[Entity]) {
-    /**
-     * @param subIndex
-     * @param entities
-     */
+    
     def inner(subIndex: SubIndex, entities: Seq[Entity]) {
       if(!entities.isEmpty) {
         val head = entities.head

@@ -19,9 +19,6 @@ import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 /**
  * This class contains the implementation that allows to load all information
  * about providers used by the Web Index
- *
- * At the moment, the information is extracted from an excel file that follows
- * the structure of the 2012 Web Index. Maybe the implementation has to change
  */
 class ProviderDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
   extends ProviderDAO with PoiDAO[Provider] {

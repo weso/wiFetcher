@@ -5,6 +5,10 @@ import akka.actor.Actor
 import java.io.File
 import play.api.Logger
 
+/**
+ * This class is an actor that has to delete all reports and ttl files after
+ * 24 hours of their creation
+ */
 class AutoremoveActor extends Actor {
   def receive = {
     case _ =>

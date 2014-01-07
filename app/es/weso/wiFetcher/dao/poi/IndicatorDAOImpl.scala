@@ -25,10 +25,6 @@ import scala.collection.mutable.HashMap
 /**
  * This class contains the implementation that allows to load all information
  * about Web Index indicators
- *
- * At the moment, this class extracts the information of the indicators from an
- * excel file that follows the structure of 2012 Web Index. Maybe we have
- * to change the implementation
  */
 class IndicatorDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher) extends IndicatorDAO
   with PoiDAO[Indicator] {
