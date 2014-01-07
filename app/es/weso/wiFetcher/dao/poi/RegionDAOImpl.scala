@@ -21,10 +21,6 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator
 /**
  * This class contains the implementation that allows to load all information
  * about the regions that are used by the Web Index.
- *
- * At the moment, this class extracts the information of the regions from an
- * excel file that follows the structure of 2012 Web Index. Maybe we have to
- * change the implementation
  */
 class RegionDAOImpl(is: InputStream)(implicit val sFetcher: SpreadsheetsFetcher)
   extends RegionDAO with PoiDAO[Region] {

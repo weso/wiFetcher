@@ -11,6 +11,10 @@ import es.weso.wiFetcher.entities.Observation
 import es.weso.wiFetcher.entities.ObservationStatus
 import es.weso.wiFetcher.fetchers.SpreadsheetsFetcher
 
+/**
+ * This trait contains all method that has to have a class that load information
+ * about observations
+ */
 trait ObservationDAO  extends DAO[Observation]{
 
   val reconciliator: CountryReconciliator = new CountryReconciliator(

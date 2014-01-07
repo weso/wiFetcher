@@ -6,7 +6,6 @@ import java.io.InputStream
 import scala.collection.mutable.ListBuffer
 import org.apache.log4j.Logger
 import es.weso.reconciliator.CountryReconciliator
-//import es.weso.wiFetcher.analyzer.indicator.IndicatorReconciliator
 import es.weso.wiFetcher.configuration.Configuration
 import es.weso.wiFetcher.dao.entity.DatasetDAOImpl
 import es.weso.wiFetcher.dao.file.CountryDAOImpl
@@ -32,13 +31,16 @@ import es.weso.wiFetcher.dao.poi.PrimaryObservationDAOImpl
 import es.weso.wiFetcher.generator.CSVGenerator
 import es.weso.wiFetcher.entities.traits.Index
 
+/**
+ * This class is the center of the application. Receive all requests of users
+ * and execute all operations until obtain the result
+ */
 case class SpreadsheetsFetcher(structure: File, raw: File) {
 
   import SpreadsheetsFetcher._
 
   private implicit val currentFetcher = this
 
-//  private val indicatorReconciliator = new IndicatorReconciliator
   val issueManager = new IssueManagerUtils()
 
   val components: ListBuffer[Component] = ListBuffer.empty
@@ -52,13 +54,16 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
   val observations: ListBuffer[Observation] = ListBuffer.empty
   val index : ListBuffer[Index] = ListBuffer.empty
 
+  //Load all structure information
   loadStructure(structure)
   if(!issueManager.asSeq.isEmpty)
     issueManager.addWarn("There were problems parsing structure file, so ttl " +
     		"generated maybe is not complete.", 
     		Some("Structure file"))
+  //Load all observations
   loadObservations(raw)
 
+  
   def issues: Seq[Issue] = {
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("MEAN")))
     issueManager.addFilter(FilterIssue(col=Some(0),cell=Some("Mean")))
@@ -74,6 +79,10 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
     issueManager.filteredAsSeq
   }
 
+  /**
+   * This method has to create a jena model with all information and stores it 
+   * in a local file
+   */
   def storeAsTTL(baseUri: String, namespace: String, year : String, timestamp : Long) =
     ModelGenerator(baseUri, namespace, year).generateJenaModel(this, timestamp)
 
@@ -89,6 +98,9 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
     safeLoadInformation(f, loadRegionInformation)
   }
   
+  /**
+   * This method saves generated errors during the process in a csv file 
+   */
   def saveReport(timestamp : Long) : (Seq[Issue], String) = {
     val csvSchema = Array("Type", "Message", "Path", "sheetName", "Column", "Row", "Cell")
     val csvGenerator = CSVGenerator(csvSchema)
@@ -106,28 +118,41 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
   }
 
   /**
-   * This method load all observation form an excel file
+   * This method loads all observation form an excel file
    */
   private def loadObservations(f: File) {
     safeLoadInformation(f, loadSecondaryObservationInformation)
     safeLoadInformation(f, loadPrimaryObservationInformation)
   }
 
+  /**
+   * This method loads all dataset information
+   */
   private def loadDatasetInformation(indicators: List[Indicator]) {
     val datasetDao = new DatasetDAOImpl(indicators)
     datasets ++= datasetDao.getDatasets
   }
 
+  /**
+   * This method loads all primary observation information
+   */
   private def loadPrimaryObservationInformation(is : InputStream) {
     val primaryObservationDao = new PrimaryObservationDAOImpl(is)
     observations ++= primaryObservationDao.getObservations
   }
  
+  /**
+   * This method loads all secondary observation information
+   */
   private def loadSecondaryObservationInformation(is: InputStream) {
     val secondaryObservationDao = new SecondaryObservationDAOImpl(is)
     observations ++= secondaryObservationDao.getObservations
   }
 
+  /**
+   * This method loads the information that is contained in a file using the 
+   * process that receive as a parameter
+   */
   private def safeLoadInformation(file: File, proccess: (InputStream) => Unit) {
     val is = new FileInputStream(file)
     try {
@@ -154,9 +179,6 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
     val indicatorDao = new IndicatorDAOImpl(is)
     primaryIndicators ++= indicatorDao.getPrimaryIndicators
     secondaryIndicators ++= indicatorDao.getSecondaryIndicators
-    //Index all indicators in the reconciliator in order to search indicators
-//    indicatorReconciliator.indexIndicators(primaryIndicators.toList)
-//    indicatorReconciliator.indexIndicators(secondaryIndicators.toList)
   }
 
   /**
@@ -175,12 +197,19 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
     regions ++= regionDao.getRegions
   }
 
+  /**
+   * This method loads all information about providers
+   */
   private def loadProviderInformation(is: InputStream) {
     val providerDao = new ProviderDAOImpl(is)
     providers ++= providerDao.getProviders
   }
 
-  //Obtain a country given it's name
+  /**
+   * This method obtains a country given a name. It uses countryReconciliator
+   * object to obtain the corresponding country. Return None if the country
+   * doesn't exist
+   */
   def obtainCountry(regionName: String): Option[Country] = {
     logger.info("Obtaining country with name: " + regionName)
     if (regionName == null || regionName.isEmpty) {
@@ -194,15 +223,10 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
     }
   }
 
-  //Obtain an indicator given it's name
-//  def obtainIndicator(indicatorName: String): Option[Indicator] = {
-//    val indicator = indicatorReconciliator.searchIndicator(indicatorName)
-//    if (indicator == null)
-//      logger.info(s"Not exist indicator with name ${indicatorName}")
-//    indicator
-//  }
-
-  //Obtain an indicator given it's id
+  /**
+   * Obtains an indicator given it's id. Return None if the indicator
+   * doesn't exist
+   */
   def obtainIndicatorById(id: String): Option[Indicator] = {
     val combined: ListBuffer[Indicator] = ListBuffer.empty
     combined.insertAll(0, primaryIndicators)
@@ -210,17 +234,10 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
     combined.find(indicator => indicator.id.equals(id))
   }
 
-  def obtainIndicatorByDescription(indicatorDescription: String): Indicator = {
-    val combined: ListBuffer[Indicator] = new ListBuffer
-    combined.insertAll(0, primaryIndicators)
-    combined.insertAll(0, secondaryIndicators)
-    combined.find(indicator => indicator.comments
-        .get("en").get.equalsIgnoreCase(indicatorDescription))
-      .getOrElse(throw new IllegalArgumentException("Not exist indicator with "
-        + s"description ${indicatorDescription}"))
-  }
-
-  //Obtain a component given it's id
+  /**
+   * This method obtains a component given it's id. Return None if the indicator
+   * doesn't exist
+   */
   def obtainComponent(componentId: String, row : Int, col : Int): Option[Component] = {
     if(componentId.isEmpty()) {
       issueManager.addError("Component of a indicator cannot be empty", 
@@ -235,6 +252,10 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
 	    }
   }
   
+  /**
+   * This method obtains a provider given it's id. Return None if the provider
+   * doesn't exist
+   */
   def obtainProvider(providerId : String, row : Int, col : Int) : ListBuffer[Provider] = {
     val providersLocal : ListBuffer[Provider] = ListBuffer.empty    
     if(providerId.isEmpty()) {
@@ -261,6 +282,9 @@ case class SpreadsheetsFetcher(structure: File, raw: File) {
     providersLocal
   }
   
+  /**
+   * This method obtains a provider given it's name
+   */
   def obtainProviderByName(providerName : String, row : Int, col : Int) : Option[Provider] = {
       val result = providers.find(provider => provider.name.equalsIgnoreCase(providerName.trim))
 	  result

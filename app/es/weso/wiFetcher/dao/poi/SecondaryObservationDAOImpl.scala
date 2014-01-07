@@ -27,11 +27,7 @@ import es.weso.wiFetcher.utils.IssueManagerUtils
 
 /**
  * This class contains the implementation that allows extract all information
- * about the observations of the Web Index
- *
- * This implementation is temporary because Web Foundation or TAS still has not
- * give us the final structure of the sheet that contains the observations.
- * Maybe the implementation has to change.
+ * about the observations of the secondary indicators of the Web Index
  *
  */
 class SecondaryObservationDAOImpl(
@@ -58,6 +54,8 @@ class SecondaryObservationDAOImpl(
       logger.info("Begin observations extraction")
       val workbook: Workbook = WorkbookFactory.create(is)
       checkSheets(workbook)
+      //This loop obtains a list of lists with all observations of the secondary
+      //indicators
       val obs = for {
         dataset <- datasets
         sheet = obtainSheet(workbook, dataset.id)
@@ -67,11 +65,15 @@ class SecondaryObservationDAOImpl(
           List.empty
         else parseData(workbook, sheet.get)
       }
+      //Combine all lists in only one list
       observations ++= obs.foldLeft(ListBuffer[Observation]())((a, b) => a ++= b)
       logger.info("Finish observations extraction")
     }
   }
   
+  /**
+   * This auxiliary method obtain a determine sheet
+   */
   protected def obtainSheet(workbook : Workbook, datasetId : String) : Option[Sheet] = {
     val auxSheet = workbook.getSheet(datasetId)
     if(auxSheet == null) {
@@ -82,6 +84,10 @@ class SecondaryObservationDAOImpl(
     }
   }
   
+  /**
+   * This method checks if there are observations for an indicator that are no 
+   * loaded 
+   */
   protected def checkSheets(workbook : Workbook) = {
     val sheets = workbook.getNumberOfSheets
     for{
@@ -100,6 +106,9 @@ class SecondaryObservationDAOImpl(
     }
   }
 
+  /**
+   * This method load all observations of a sheet
+   */
   protected def parseData(workbook: Workbook, sheet: Sheet): Seq[Observation] = {
     SecondaryObservationDAOImpl.logger.info("Begin observations extraction")
 
